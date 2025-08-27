@@ -97,7 +97,7 @@ const LandingPage = () => {
                 textShadow: '0 2px 4px rgba(0,0,0,0.3)'
               }}
             >
-              InPEP Healthcare Dashboard
+              InPEP™ Healthcare Dashboard
             </Typography>
             <Typography
               variant="h5"
@@ -112,9 +112,9 @@ const LandingPage = () => {
           </Box>
         </Fade>
 
-        <Grid container spacing={4}>
+                                                                <Grid container sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', m: -2 }}>
           {roles.map((role, index) => (
-            <Grid size={{ xs: 12, sm: 6 }} key={role.id}>
+            <Grid item key={role.id} sx={{ width: { xs: '100%', sm: '50%', md: '50%' }, p: 2 }}>
               <Grow in timeout={1000 + (index * 200)}>
                 <Card
                   elevation={hoveredCard === role.id ? 20 : 8}
@@ -220,7 +220,7 @@ const LandingPage = () => {
                         </Typography>
                         <Grid container spacing={1}>
                           {role.features.map((feature, idx) => (
-                            <Grid item xs={6} key={idx}>
+                                                                                    <Grid item xs={6} key={idx}>
                               <Paper
                                 elevation={0}
                                 sx={{
