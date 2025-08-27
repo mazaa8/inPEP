@@ -1,5 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import LandingPage from './pages/landing/LandingPage';
+import LoginPage from './pages/auth/LoginPage';
 import PatientDashboard from './pages/dashboards/PatientDashboard';
 import CaregiverDashboard from './pages/dashboards/CaregiverDashboard';
 import ProviderDashboard from './pages/dashboards/ProviderDashboard';
@@ -11,6 +12,7 @@ function App() {
     <Router>
       <Routes>
         <Route path="/" element={<LandingPage />} />
+        <Route path="/login" element={<LoginPage />} />
         <Route element={<ProtectedRoute allowedRoles={['Patient']} />}>
           <Route path="/dashboard/patient" element={<PatientDashboard />} />
         </Route>
