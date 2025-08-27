@@ -216,7 +216,7 @@ const LandingPage = () => {
                             mb: 2
                           }}
                         >
-                          Key Features:
+              
                         </Typography>
                         <Grid container spacing={1}>
                           {role.features.map((feature, idx) => (
