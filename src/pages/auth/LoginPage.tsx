@@ -35,8 +35,8 @@ const LoginPage = () => {
 
   return (
     <Box sx={{ minHeight: '100vh', display: 'flex', alignItems: 'center', background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' }}>
-      <Container maxWidth="xs">
-        <Paper elevation={12} sx={{ p: 4, borderRadius: 4 }}>
+      <Container maxWidth="sm">
+        <Paper elevation={12} sx={{ p: 4, borderRadius: 2 }}>
           {renderSignInComponent()}
         </Paper>
       </Container>
