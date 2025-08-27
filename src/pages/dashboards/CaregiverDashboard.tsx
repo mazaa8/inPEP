@@ -6,7 +6,7 @@ const CaregiverDashboard = () => {
   return (
     <Layout title="Caregiver Dashboard">
       <Grid container spacing={3}>
-        <Grid size={{ xs: 12, md: 6 }}>
+        <Grid item xs={12} md={12}>
           <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column', height: '100%' }}>
             <PatientSchedule />
           </Paper>
