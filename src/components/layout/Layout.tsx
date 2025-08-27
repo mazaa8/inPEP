@@ -1,4 +1,15 @@
-import { Box, AppBar, Toolbar, Typography, Drawer, List, ListItem, ListItemButton, ListItemText, Button } from '@mui/material';
+import { Box, AppBar, Toolbar, Typography, Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Button } from '@mui/material';
+import {
+  DashboardOutlined as Dashboard,
+  PersonOutlined as Person,
+  MailOutlined as Mail,
+  SettingsOutlined as SettingsIcon,
+  MonitorHeartOutlined as MonitorHeart,
+  EventNoteOutlined as EventNote,
+  ShoppingCartOutlined as ShoppingCart,
+  SupportAgentOutlined as SupportAgent,
+  WorkspacePremiumOutlined as WorkspacePremium,
+} from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 
@@ -19,7 +30,7 @@ const Layout = ({ children, title }: LayoutProps) => {
   };
 
   return (
-    <Box sx={{ display: 'flex' }}>
+    <Box sx={{ display: 'flex', height: '100vh' }}>
       <AppBar position="fixed" sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}>
         <Toolbar>
           <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
@@ -48,17 +59,47 @@ const Layout = ({ children, title }: LayoutProps) => {
         <Toolbar />
         <Box sx={{ overflow: 'auto' }}>
           <List>
-            {['Dashboard', 'Profile', 'Messages', 'Settings'].map((text) => (
-              <ListItem key={text} disablePadding>
-                <ListItemButton>
-                  <ListItemText primary={text} />
+            {[
+              { text: 'Dashboard', icon: <Dashboard />, path: `/dashboard/${user?.role?.toLowerCase()}` },
+            ].map((item) => (
+              <ListItem key={item.text} disablePadding>
+                <ListItemButton onClick={() => navigate(item.path)}>
+                  <ListItemIcon sx={{ color: 'primary.main' }}>{item.icon}</ListItemIcon>
+                  <ListItemText primary={item.text} />
+                </ListItemButton>
+              </ListItem>
+            ))}
+            {user?.role === 'Caregiver' &&
+              [
+                { text: 'Patient Monitor', icon: <MonitorHeart />, path: '/patient-monitor' },
+                { text: 'Care Planning', icon: <EventNote />, path: '/care-planning' },
+                { text: 'Caregiver Support', icon: <SupportAgent />, path: '/caregiver-support' },
+                { text: 'ReclaiMe™', icon: <WorkspacePremium />, path: '/reclaime' },
+                { text: 'Grocery List', icon: <ShoppingCart />, path: '/caregiver/grocery-list' },
+              ].map((item) => (
+                <ListItem key={item.text} disablePadding>
+                  <ListItemButton onClick={() => navigate(item.path)}>
+                    <ListItemIcon sx={{ color: 'primary.main' }}>{item.icon}</ListItemIcon>
+                    <ListItemText primary={item.text} />
+                  </ListItemButton>
+                </ListItem>
+              ))}
+            {[
+              { text: 'Profile', icon: <Person />, path: '/profile' },
+              { text: 'Messages', icon: <Mail />, path: '/messages' },
+              { text: 'Settings', icon: <SettingsIcon />, path: '/settings' },
+            ].map((item) => (
+              <ListItem key={item.text} disablePadding>
+                <ListItemButton onClick={() => navigate(item.path)}>
+                  <ListItemIcon sx={{ color: 'primary.main' }}>{item.icon}</ListItemIcon>
+                  <ListItemText primary={item.text} />
                 </ListItemButton>
               </ListItem>
             ))}
           </List>
         </Box>
       </Drawer>
-      <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
+      <Box component="main" sx={{ flexGrow: 1, p: 3, overflowY: 'auto' }}>
         <Toolbar />
         {children}
       </Box>

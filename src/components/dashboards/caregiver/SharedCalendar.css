@@ -1,0 +1,91 @@
+/* SharedCalendar.css */
+
+/* Toolbar styles */
+.rbc-toolbar {
+  background-color: transparent;
+  color: #2D4A43;
+  border-bottom: 1px solid #d0d9d6;
+  padding: 12px 20px;
+  margin-bottom: 10px;
+}
+
+.rbc-toolbar button {
+  color: #4A7C6E;
+  background-color: rgba(120, 166, 152, 0.1);
+  border: 1px solid rgba(120, 166, 152, 0.3);
+  border-radius: 8px;
+  transition: background-color 0.3s, color 0.3s;
+  padding: 6px 12px;
+}
+
+.rbc-toolbar button:hover,
+.rbc-toolbar button:focus {
+  background-color: #78A698;
+  color: #fff;
+  border-color: #78A698;
+}
+
+.rbc-toolbar .rbc-btn-group .rbc-active {
+  background-color: #4A7C6E;
+  color: #fff;
+  border-color: #4A7C6E;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.rbc-toolbar-label {
+  font-size: 1.3em;
+  font-weight: bold;
+  color: #2D4A43;
+}
+
+/* Calendar grid styles */
+.rbc-month-view, .rbc-time-view, .rbc-agenda-view {
+  border: none;
+}
+
+.rbc-header {
+  background-color: transparent;
+  color: #2D4A43;
+  border-bottom: 1px solid #d0d9d6;
+  padding: 10px 0;
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.8em;
+  letter-spacing: 0.5px;
+}
+
+.rbc-day-bg {
+  border-left: 1px solid #e9efee;
+}
+
+.rbc-day-bg:first-child {
+  border-left: none;
+}
+
+.rbc-today {
+  background-color: rgba(222, 233, 230, 0.5);
+}
+
+/* Event styles */
+.rbc-event {
+  background: linear-gradient(135deg, #78A698 0%, #5A9A9C 100%);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 5px 8px;
+  font-size: 0.9em;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.rbc-event.rbc-selected {
+  background: linear-gradient(135deg, #4A7C6E 0%, #3A6B6D 100%);
+}
+
+.rbc-show-more {
+  color: #4A7C6E;
+  font-weight: bold;
+  background-color: rgba(233, 239, 238, 0.7);
+  border-radius: 4px;
+  padding: 2px 4px;
+}
+
