@@ -19,7 +19,7 @@ const InsurerSignIn = () => {
 
   return (
     <Box>
-      <Typography variant="h5" gutterBottom>Health Insurer Sign-In</Typography>
+      <Typography variant="h5" gutterBottom>Insurer Sign-In</Typography>
       <Button variant="contained" onClick={handleSignIn}>
         Sign In
       </Button>

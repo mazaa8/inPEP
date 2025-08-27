@@ -34,7 +34,7 @@ const LandingPage = () => {
       icon: PatientIcon,
       color: '#2196F3', // Blue
       gradient: 'linear-gradient(135deg, #2196F3 0%, #21CBF3 100%)',
-      features: ['Health Records', 'Health Tracking', 'Appointments & Billing', 'Virtual Care']
+      features: ['Virtual Care Management', 'Patient Services', 'Heredibles™']
     },
     {
       id: 'caregiver',
@@ -44,13 +44,13 @@ const LandingPage = () => {
       icon: CaregiverIcon,
       color: '#4CAF50', // Green
       gradient: 'linear-gradient(135deg, #4CAF50 0%, #8BC34A 100%)',
-      features: ['Patient Monitor', 'Care Coordination', 'Caregiver Support', 'ReclaiMe™']
+      features: ['Patient Monitor', 'Care Planning', 'Caregiver Support', 'ReclaiMe™']
     },
     {
       id: 'hospital',
       title: 'Healthcare Provider',
       subtitle: 'Healthcare management',
-      description: 'Manage patients, staff, resources, and hospital operations efficiently',
+      description: 'Manage patients, staff, resources, and operations efficiently with real-time data',
       icon: HospitalIcon,
       color: '#FF9800', // Orange
       gradient: 'linear-gradient(135deg, #FF9800 0%, #FFC107 100%)',
@@ -216,7 +216,6 @@ const LandingPage = () => {
                             mb: 2
                           }}
                         >
-              
                         </Typography>
                         <Grid container spacing={1}>
                           {role.features.map((feature, idx) => (
