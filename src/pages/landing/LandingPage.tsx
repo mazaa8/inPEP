@@ -29,7 +29,7 @@ const LandingPage = () => {
     {
       id: 'patient',
       title: 'Patient',
-      subtitle: 'Access your medical records and health information',
+      subtitle: 'Medical records and health information',
       description: 'View medical history, appointments, prescriptions, and manage your healthcare journey',
       icon: PatientIcon,
       color: '#2196F3', // Blue
