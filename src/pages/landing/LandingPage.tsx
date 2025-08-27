@@ -44,7 +44,7 @@ const LandingPage = () => {
       icon: CaregiverIcon,
       color: '#4CAF50', // Green
       gradient: 'linear-gradient(135deg, #4CAF50 0%, #8BC34A 100%)',
-      features: ['Remote Patient Monitor', 'Care Coordination', 'Caregiver Support']
+      features: ['Patient Monitor', 'Care Coordination', 'Caregiver Support', 'ReclaiMe™']
     },
     {
       id: 'hospital',
