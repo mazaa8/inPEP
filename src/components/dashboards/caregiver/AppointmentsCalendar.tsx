@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Calendar, momentLocalizer, type Event as BigCalendarEvent } from 'react-big-calendar';
 import moment from 'moment';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
-import './SharedCalendar.css';
+import './AppointmentsCalendar.css';
 import { Card, CardContent, Typography, Box, Avatar } from '@mui/material';
 import { Event } from '@mui/icons-material';
 import EventDetailsModal from './EventDetailsModal';
@@ -34,7 +34,7 @@ const events = [
   },
 ];
 
-const SharedCalendar = () => {
+const AppointmentsCalendar = () => {
   const [selectedEvent, setSelectedEvent] = useState<BigCalendarEvent | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -57,7 +57,7 @@ const SharedCalendar = () => {
               <Event />
             </Avatar>
             <Typography variant="h6" component="div" sx={{ fontWeight: 'bold', letterSpacing: '0.5px' }}>
-              Shared Calendar
+              Appointments Calendar
             </Typography>
           </Box>
           <Box sx={{ flexGrow: 1 }}>
@@ -81,4 +81,4 @@ const SharedCalendar = () => {
   );
 };
 
-export default SharedCalendar;
+export default AppointmentsCalendar;

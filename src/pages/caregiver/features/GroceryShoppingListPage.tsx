@@ -28,11 +28,18 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import BlockIcon from '@mui/icons-material/Block';
 import { Rating } from '@mui/material';
-import { startOfWeek, endOfWeek, format, isSameWeek } from 'date-fns';
+import { format, startOfWeek, endOfWeek } from 'date-fns';
+import { useLocation } from 'react-router-dom';
 import Layout from '../../../components/layout/Layout';
+import { mealPlans } from '../../../data/mealPlans';
+import { transformMenuForGroceryList } from '../../../utils/dataTransformation';
+import { getCategory } from '../../../utils/categorizeIngredients';
+import type { WeeklyMenu, MealItem, Ingredient } from '../../../types';
+
+const GROCERY_STORAGE_KEY = 'heredibles-weekly-menu';
 
 // Mock Data
-const weeklyMenu = {
+const initialWeeklyMenu: WeeklyMenu = {
   monday: [
     {
       meal: 'Scrambled Eggs & Toast',
@@ -129,7 +136,6 @@ const initialFavoriteShops = [
 const CHECKLIST_STORAGE_KEY = 'grocery-checklist';
 const SHOPS_STORAGE_KEY = 'favorite-shops';
 const ALLERGIES_STORAGE_KEY = 'allergic-foods';
-const CONFECTIONERIES_STORAGE_KEY = 'confectioneries-checklist';
 
 const initialAllergicFoods = [
   { name: 'Peanuts' },
@@ -145,24 +151,64 @@ const initialConfectioneries = [
   { item: 'Cookies', checked: false },
   { item: 'Candy', checked: false },
   { item: 'Donuts', checked: false },
+  { item: 'Water', checked: false },
+  { item: 'Juice', checked: false },
+  { item: 'Soda', checked: false },
 ];
 
 const GroceryShoppingListPage = () => {
   const navigate = useNavigate();
+  const [weeklyMenu, setWeeklyMenu] = useState<WeeklyMenu>(initialWeeklyMenu);
 
   const aggregatedList = useMemo(() => {
     const allItems: { [key: string]: number } = {};
-    Object.values(weeklyMenu).forEach(day => {
-      day.forEach(meal => {
-        meal.ingredients.forEach(ingredient => {
+    Object.values(weeklyMenu).forEach((day: MealItem[]) => {
+      day.forEach((meal: MealItem) => {
+        meal.ingredients.forEach((ingredient: Ingredient) => {
           allItems[ingredient.item] = (allItems[ingredient.item] || 0) + ingredient.qty;
         });
       });
     });
-    return Object.entries(allItems).map(([item, qty]) => ({ item, qty, checked: false }));
-  }, []);
+    return Object.entries(allItems)
+      .map(([item, qty]) => ({ item, qty, checked: false }))
+      .sort((a, b) => a.item.localeCompare(b.item));
+  }, [weeklyMenu]);
 
-  const [checklist, setChecklist] = useState(aggregatedList);
+  const [checklist, setChecklist] = useState([...aggregatedList].sort((a, b) => a.item.localeCompare(b.item)));
+
+  const allCategories = [
+    'Nuts & Confectioneries',
+    'Pantry',
+    'Vegetables',
+    'Fruits',
+    'Meat & Seafood',
+    'Dairy & Eggs',
+    'Grains',
+    'Frozen Foods',
+    'Beverages',
+  ];
+
+  const categorizedList = useMemo(() => {
+    const categories: { [key: string]: typeof checklist } = {};
+    allCategories.forEach(category => {
+      categories[category] = [];
+    });
+
+    checklist.forEach(item => {
+      const category = getCategory(item.item);
+      if (categories[category]) {
+        categories[category].push(item);
+      } else {
+        // Handle items with categories not in allCategories, though the logic tries to prevent this
+        if (!categories['Nuts & Confectioneries']) {
+          categories['Nuts & Confectioneries'] = [];
+        }
+        categories['Nuts & Confectioneries'].push(item);
+      }
+    });
+
+    return Object.entries(categories).sort(([a], [b]) => a.localeCompare(b));
+  }, [checklist]);
   const [currentWeek, setCurrentWeek] = useState(new Date());
   const [favoriteShops, setFavoriteShops] = useState(initialFavoriteShops);
   const [open, setOpen] = useState(false);
@@ -173,15 +219,15 @@ const GroceryShoppingListPage = () => {
   const [allergyDialogOpen, setAllergyDialogOpen] = useState(false);
   const [currentAllergy, setCurrentAllergy] = useState<{ name: string } | null>(null);
   const [isEditingAllergy, setIsEditingAllergy] = useState(false);
+  const location = useLocation();
 
-  const [confectioneries, setConfectioneries] = useState(initialConfectioneries);
 
   const [recipeModalOpen, setRecipeModalOpen] = useState(false);
-  const [selectedMeal, setSelectedMeal] = useState<any>(null);
+  const [selectedMeal, setSelectedMeal] = useState<MealItem | null>(null);
   const [currentRating, setCurrentRating] = useState(0);
   const [currentComment, setCurrentComment] = useState('');
 
-  const handleRecipeOpen = (meal: any) => {
+  const handleRecipeOpen = (meal: MealItem) => {
     setSelectedMeal(meal);
     setCurrentRating(meal.rating || 0);
     setCurrentComment(meal.comments || '');
@@ -196,32 +242,22 @@ const GroceryShoppingListPage = () => {
   };
 
   useEffect(() => {
-    const storedChecklist = localStorage.getItem(CHECKLIST_STORAGE_KEY);
-    if (storedChecklist) {
-      const { week, list } = JSON.parse(storedChecklist);
-      if (isSameWeek(new Date(week), new Date(), { weekStartsOn: 1 })) {
-        setChecklist(list);
-      } else {
-        localStorage.removeItem(CHECKLIST_STORAGE_KEY);
-      }
+    const storedMenu = localStorage.getItem(GROCERY_STORAGE_KEY);
+    if (storedMenu) {
+      const herediblesMenu = JSON.parse(storedMenu);
+      const transformedMenu = transformMenuForGroceryList(herediblesMenu, mealPlans);
+      setWeeklyMenu(transformedMenu);
     }
-    setCurrentWeek(new Date());
 
     const storedShops = localStorage.getItem(SHOPS_STORAGE_KEY);
-    if (storedShops) {
-      setFavoriteShops(JSON.parse(storedShops));
-    }
+    if (storedShops) setFavoriteShops(JSON.parse(storedShops));
 
     const storedAllergies = localStorage.getItem(ALLERGIES_STORAGE_KEY);
-    if (storedAllergies) {
-      setAllergicFoods(JSON.parse(storedAllergies));
-    }
+    if (storedAllergies) setAllergicFoods(JSON.parse(storedAllergies));
 
-    const storedConfectioneries = localStorage.getItem(CONFECTIONERIES_STORAGE_KEY);
-    if (storedConfectioneries) {
-      setConfectioneries(JSON.parse(storedConfectioneries));
-    }
-  }, [aggregatedList]);
+
+    setCurrentWeek(new Date());
+  }, [location]);
 
   useEffect(() => {
     localStorage.setItem(CHECKLIST_STORAGE_KEY, JSON.stringify({ week: currentWeek, list: checklist }));
@@ -235,9 +271,6 @@ const GroceryShoppingListPage = () => {
     localStorage.setItem(ALLERGIES_STORAGE_KEY, JSON.stringify(allergicFoods));
   }, [allergicFoods]);
 
-  useEffect(() => {
-    localStorage.setItem(CONFECTIONERIES_STORAGE_KEY, JSON.stringify(confectioneries));
-  }, [confectioneries]);
 
   const handleOpen = (shop: any = null) => {
     setCurrentShop(shop ? { ...shop } : { name: '', location: '', phone: '' });
@@ -313,9 +346,22 @@ const GroceryShoppingListPage = () => {
   };
 
   const handleConfectioneryToggle = (item: string) => {
-    setConfectioneries(prev =>
-      prev.map(i => (i.item === item ? { ...i, checked: !i.checked } : i))
-    );
+    setChecklist(prev => {
+      const existingItem = prev.find(i => i.item === item);
+      // If the item is not in the checklist, add it.
+      if (!existingItem) {
+        return [...prev, { item, qty: 1, checked: false }].sort((a, b) => a.item.localeCompare(b.item));
+      }
+
+      // If the item came from the meal plan, it should not be removable by unchecking.
+      // Instead, we just toggle its checked status in the main list.
+      if (aggregatedList.some(aggItem => aggItem.item === item)) {
+        return prev.map(i => i.item === item ? { ...i, checked: !i.checked } : i);
+      }
+
+      // If it's a confectionery item added manually, remove it from the list upon toggle.
+      return prev.filter(i => i.item !== item);
+    });
   };
 
   return (
@@ -332,17 +378,17 @@ const GroceryShoppingListPage = () => {
           <Paper sx={{ mb: 3, flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
             <Typography variant="h6" sx={{ bgcolor: 'primary.main', color: 'white', p: 1, borderTopLeftRadius: 4, borderTopRightRadius: 4 }}>Weekly Meal Plan & Ingredients</Typography>
             <Box sx={{ overflow: 'auto', flexGrow: 1 }}>
-              {Object.entries(weeklyMenu).map(([day, meals]) => (
+              {Object.entries(weeklyMenu).map(([day, meals]: [string, MealItem[]]) => (
                 <Accordion key={day}>
                   <AccordionSummary expandIcon={<ExpandMoreIcon />}>
                     <Typography sx={{ textTransform: 'capitalize', fontWeight: 'bold' }}>{day}</Typography>
                   </AccordionSummary>
                   <AccordionDetails>
-                    {meals.map((meal, i) => (
+                    {meals.map((meal: MealItem, i: number) => (
                       <Box key={i} sx={{ mb: 1 }}>
                         <Typography variant="subtitle1" onClick={() => handleRecipeOpen(meal)} sx={{ cursor: 'pointer', '&:hover': { color: 'primary.main' } }}>{meal.meal}</Typography>
                         <List dense>
-                          {meal.ingredients.map((ing, j) => (
+                          {meal.ingredients.map((ing: Ingredient, j: number) => (
                             <ListItem key={j}><ListItemText primary={`${ing.item} (Qty: ${ing.qty})`} /></ListItem>
                           ))}
                         </List>
@@ -356,7 +402,7 @@ const GroceryShoppingListPage = () => {
 
           <Paper sx={{ width: '100%' }}>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', bgcolor: 'primary.main', color: 'white', p: 1, borderTopLeftRadius: 4, borderTopRightRadius: 4 }}>
-              <Typography variant="h6" sx={{ color: 'white' }}>Allergic or Denied Foods</Typography>
+              <Typography variant="h6" sx={{ color: 'white' }}>Allergic or Prohibited Foods</Typography>
               <Button variant="contained" size="small" onClick={() => handleAllergyOpen()} sx={{ bgcolor: 'white', color: 'primary.dark', '&:hover': { bgcolor: 'grey.200' }, fontWeight: 900 }}>Add</Button>
             </Box>
             <List sx={{ maxHeight: 200, overflow: 'auto' }}>
@@ -411,45 +457,47 @@ const GroceryShoppingListPage = () => {
           <Paper sx={{ mt: 3 }}>
             <Typography variant="h6" sx={{ bgcolor: 'primary.main', color: 'white', p: 1, borderTopLeftRadius: 4, borderTopRightRadius: 4 }}>Confectioneries</Typography>
             <List sx={{ maxHeight: 380, overflow: 'auto' }}>
-              {confectioneries.map(({ item, checked }) => (
-                <ListItem key={item} dense button onClick={() => handleConfectioneryToggle(item)}>
-                  <ListItemIcon>
-                    <Checkbox edge="start" checked={checked} tabIndex={-1} disableRipple />
-                  </ListItemIcon>
-                  <ListItemText primary={item} style={{ textDecoration: checked ? 'line-through' : 'none' }} />
-                </ListItem>
-              ))}
+              {initialConfectioneries.map(({ item }) => {
+                const isChecked = checklist.some(checklistItem => checklistItem.item === item);
+                return (
+                  <ListItem key={item} dense button onClick={() => handleConfectioneryToggle(item)}>
+                    <ListItemIcon>
+                      <Checkbox edge="start" checked={isChecked} tabIndex={-1} disableRipple />
+                    </ListItemIcon>
+                    <ListItemText primary={item} />
+                  </ListItem>
+                );
+              })}
             </List>
           </Paper>
         </Grid>
 
-        {/* Bottom: Aggregated List and Checklist */}
-        <Grid item xs={12} container spacing={3}>
-          <Grid item xs={12} md={6} sx={{ display: 'flex' }}>
-            <Paper sx={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column' }}>
-              <Typography variant="h6" sx={{ bgcolor: 'primary.main', color: 'white', p: 1, borderTopLeftRadius: 4, borderTopRightRadius: 4 }}>Aggregated Shopping List</Typography>
-              <List sx={{ maxHeight: 400, overflow: 'auto', flexGrow: 1 }}>
-                {checklist.map(({ item, qty }) => (
-                  <ListItem key={item}><ListItemText primary={`${item}`} secondary={`Total Quantity: ${qty}`} /></ListItem>
-                ))}
-              </List>
-            </Paper>
-          </Grid>
-          <Grid item xs={12} md={6} sx={{ display: 'flex' }}>
-            <Paper sx={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column' }}>
-              <Typography variant="h6" sx={{ bgcolor: 'primary.main', color: 'white', p: 1, borderTopLeftRadius: 4, borderTopRightRadius: 4 }}>Shopping Checklist</Typography>
-              <List sx={{ maxHeight: 400, overflow: 'auto', flexGrow: 1 }}>
-                {checklist.map(({ item, qty, checked }) => (
-                  <ListItem key={item} dense button onClick={() => handleToggle(item)}>
-                    <ListItemIcon>
-                      <Checkbox edge="start" checked={checked} tabIndex={-1} disableRipple />
-                    </ListItemIcon>
-                    <ListItemText primary={`${item} (Qty: ${qty})`} style={{ textDecoration: checked ? 'line-through' : 'none' }} />
-                  </ListItem>
-                ))}
-              </List>
-            </Paper>
-          </Grid>
+        {/* Bottom: Smart Shopping List */}
+        <Grid item xs={12}>
+          <Paper sx={{ width: '100%', display: 'flex', flexDirection: 'column' }}>
+            <Typography variant="h6" sx={{ bgcolor: 'primary.main', color: 'white', p: 1, borderTopLeftRadius: 4, borderTopRightRadius: 4 }}>Smart Shopping List</Typography>
+            <Box sx={{ maxHeight: 400, overflow: 'auto', flexGrow: 1 }}>
+              {categorizedList.map(([category, items]) => (
+                <Accordion key={category} defaultExpanded>
+                  <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                    <Typography sx={{ fontWeight: 'bold' }}>{category}</Typography>
+                  </AccordionSummary>
+                  <AccordionDetails sx={{ p: 0 }}>
+                    <List dense sx={{ width: '100%' }}>
+                      {items.map(({ item, qty, checked }) => (
+                        <ListItem key={item} dense button onClick={() => handleToggle(item)}>
+                          <ListItemIcon>
+                            <Checkbox edge="start" checked={checked} tabIndex={-1} disableRipple />
+                          </ListItemIcon>
+                          <ListItemText primary={`${item} (Qty: ${qty})`} style={{ textDecoration: checked ? 'line-through' : 'none' }} />
+                        </ListItem>
+                      ))}
+                    </List>
+                  </AccordionDetails>
+                </Accordion>
+              ))}
+            </Box>
+          </Paper>
         </Grid>
       </Grid>
 
@@ -511,11 +559,11 @@ const GroceryShoppingListPage = () => {
       <Dialog open={recipeModalOpen} onClose={handleRecipeClose} maxWidth="md" fullWidth>
         <DialogTitle>{selectedMeal?.meal}</DialogTitle>
         <DialogContent dividers>
-          {selectedMeal && (
+          {selectedMeal && selectedMeal.recipe && (
             <Box>
               <Typography variant="h6">Ingredients</Typography>
               <List dense>
-                {selectedMeal.ingredients.map((ing: any, i: number) => (
+                {selectedMeal.ingredients.map((ing: Ingredient, i: number) => (
                   <ListItem key={i}>
                     <ListItemText primary={`${ing.item} (Qty: ${ing.qty})`} />
                   </ListItem>
@@ -523,7 +571,7 @@ const GroceryShoppingListPage = () => {
               </List>
               <Divider sx={{ my: 2 }} />
               <Typography variant="h6">Preparation</Typography>
-              <Typography sx={{ whiteSpace: 'pre-wrap', mb: 2 }}>{selectedMeal.recipe.preparation}</Typography>
+              <Typography sx={{ whiteSpace: 'pre-wrap', mb: 2 }}>{selectedMeal.recipe.preparation || selectedMeal.recipe.instructions?.join('\n')}</Typography>
               <Divider sx={{ my: 2 }} />
               <Typography variant="h6">Details</Typography>
               <Typography><strong>Timing:</strong> {selectedMeal.recipe.timing}</Typography>

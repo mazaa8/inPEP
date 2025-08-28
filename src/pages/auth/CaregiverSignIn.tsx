@@ -31,8 +31,8 @@ const CaregiverSignIn = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await login(nationalId, 'Caregiver');
-      navigate('/dashboard/caregiver');
+      await login(nationalId, 'Caregiver', hospital);
+      navigate('/dashboard');
     } catch (err) {
       setError('Invalid credentials. Please try again.');
     }
@@ -65,8 +65,8 @@ const CaregiverSignIn = () => {
       >
         <ArrowBackIcon />
       </IconButton>
-      <Box sx={{ width: '100%', p: 8, height: '100%', p: 4 }}>
-        <Paper elevation={3} sx={{ p: { xs: 2, md: 6 }, mt: 1, width: '100%', p:1, maxWidth: '1200px', p: 3,mx: 'auto' }}>
+      <Box sx={{ width: '100%', height: '100%', p: 4 }}>
+        <Paper elevation={3} sx={{ p: { xs: 2, md: 6 }, mt: 1, width: '100%', maxWidth: '1200px', mx: 'auto' }}>
           <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', mb: 3 }}>
             <Avatar sx={{ width: 80, height: 80, mb: 2, background: 'linear-gradient(135deg, #2E7D32 0%, #4CAF50 100%)', boxShadow: '0 40px 120px rgba(0,0,0,0.2)' }}>
               <CaregiverIcon sx={{ fontSize: 50 }} />

@@ -191,7 +191,7 @@ const CarePlanningPage = () => {
             <Paper sx={{ p: 3, background: 'linear-gradient(to right, #e3f2fd, #f3e5f5)', borderRadius: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <div>
           <Typography variant="h4" gutterBottom sx={{ fontWeight: 'bold', color: 'primary.dark' }}>
-            Care Plan for {carePlanData.individualNeeds.name}
+            Wellness Care Plan for {carePlanData.individualNeeds.name}
           </Typography>
           <Typography variant="subtitle1" gutterBottom>
             A person-centered roadmap for health, social, and personal care.
@@ -404,7 +404,7 @@ const CarePlanningPage = () => {
           )}
             <Stack direction="row" spacing={1} sx={{ mt: 1, flexWrap: 'wrap', p: 2, backgroundColor: '#f9f9f9', borderRadius: 1 }}>
               <Button variant="outlined" size="small" onClick={() => handleMenuNavigation('/caregiver/grocery-list')}>Grocery Shopping List</Button>
-              <Button variant="outlined" size="small" onClick={() => handleMenuNavigation('/caregiver/weekly-menu')}>Weekly Menu</Button>
+              <Button variant="outlined" size="small" onClick={() => handleMenuNavigation('/caregiver/heredibles')}>Heredibles™</Button>
               <Button variant="outlined" size="small" onClick={() => handleMenuNavigation('/caregiver/pharmacy')}>Pharmacy & Medications</Button>
               <Button variant="outlined" size="small" onClick={() => handleMenuNavigation('/caregiver/care-tips')}>Caregiving Tips</Button>
             </Stack>
