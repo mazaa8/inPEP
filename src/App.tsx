@@ -34,60 +34,64 @@ import ProtectedRoute from './routes/ProtectedRoute';
 import HelpCenter from './pages/support/HelpCenter';
 import TermsOfService from './pages/support/TermsOfService';
 import PrivacyPolicy from './pages/support/PrivacyPolicy';
+import { AuthProvider } from './context/AuthContext';
+import { EmergencyAlertProvider } from './context/EmergencyAlertContext';
 
 function App() {
   return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<LandingPage />} />
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/help-center" element={<HelpCenter />} />
-        <Route path="/terms-of-service" element={<TermsOfService />} />
-        <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-        <Route element={<ProtectedRoute allowedRoles={['Patient']} />}>
-          <Route path="/welcome-home/patient" element={<WelcomeHomePatient />} />
-          <Route path="/dashboard/patient" element={<PatientDashboard />} />
-        </Route>
-        <Route element={<ProtectedRoute allowedRoles={['Caregiver']} />}>
-          <Route path="/patient-support" element={<PatientSupportPage />} />
-          <Route path="/dashboard/caregiver" element={<CaregiverDashboard />} />
-          <Route path="/patient-monitor" element={<PatientMonitorPage />} />
-          <Route path="/care-planning" element={<CarePlanningPage />} />
-          <Route path="/caregiver-support" element={<CaregiverSupportPage />} />
-          <Route path="/reclaime" element={<ReclaimePage />} />
-          <Route path="/caregiver/grocery-list" element={<GroceryShoppingListPage />} />
-          <Route path="/caregiver/heredibles" element={<HerediblesPage />} />
-          <Route path="/caregiver/pharmacy" element={<PharmacyPage />} />
-          <Route path="/caregiver/care-tips" element={<CaregivingTipsPage />} />
-          <Route path="/caregiver/appointments-billing" element={<AppointmentsBillingPage />} />
-          <Route path="/caregiver/payment-methods" element={<PaymentMethodsPage />} />
-          <Route path="/champion-corner" element={<ChampionCornerPage />} />
-          <Route path="/share-your-story" element={<StorySubmissionPage />} />
-          <Route path="/caregiver/messages" element={<CaregiverMessagesPage />} />
-        </Route>
-        <Route element={<ProtectedRoute allowedRoles={['Provider']} />}>
-          <Route path="/welcome-home/provider" element={<WelcomeHomeProvider />} />
-          <Route path="/dashboard/provider" element={<ProviderDashboard />} />
-                    <Route path="/dashboard/analytics" element={<AnalyticsPage />} />
-          <Route path="/provider/messages" element={<ProviderMessagesPage />} />
-          <Route path="/provider/appointments" element={<ProviderAppointmentsPage />} />
-        </Route>
-        <Route element={<ProtectedRoute allowedRoles={['Insurer']} />}>
-          <Route path="/welcome-home/insurer" element={<WelcomeHomeInsurer />} />
-          <Route path="/dashboard/insurer" element={<InsurerDashboard />} />
-        </Route>
-        <Route element={<ProtectedRoute allowedRoles={['Caregiver']} />}>
-          <Route path="/welcome-home" element={<WelcomeHomePage />} />
-          <Route path="/dashboard" element={<CaregiverWelcomeLand />} />
-          <Route path="/profile" element={<ProfilePage />} />
-          <Route path="/messages" element={<MessagesPage />} />
-          <Route path="/settings" element={<SettingsPage />} />
-        </Route>
-      </Routes>
-    </Router>
+    <AuthProvider>
+      <EmergencyAlertProvider>
+        <Router>
+          <Routes>
+            <Route path="/" element={<LandingPage />} />
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/help-center" element={<HelpCenter />} />
+            <Route path="/terms-of-service" element={<TermsOfService />} />
+            <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+            <Route element={<ProtectedRoute allowedRoles={['Patient']} />}>
+              <Route path="/welcome-home/patient" element={<WelcomeHomePatient />} />
+              <Route path="/dashboard/patient" element={<PatientDashboard />} />
+            </Route>
+            <Route element={<ProtectedRoute allowedRoles={['Caregiver']} />}>
+              <Route path="/patient-support" element={<PatientSupportPage />} />
+              <Route path="/dashboard/caregiver" element={<CaregiverDashboard />} />
+              <Route path="/patient-monitor" element={<PatientMonitorPage />} />
+              <Route path="/care-planning" element={<CarePlanningPage />} />
+              <Route path="/caregiver-support" element={<CaregiverSupportPage />} />
+              <Route path="/reclaime" element={<ReclaimePage />} />
+              <Route path="/caregiver/grocery-list" element={<GroceryShoppingListPage />} />
+              <Route path="/caregiver/heredibles" element={<HerediblesPage />} />
+              <Route path="/caregiver/pharmacy" element={<PharmacyPage />} />
+              <Route path="/caregiver/care-tips" element={<CaregivingTipsPage />} />
+              <Route path="/caregiver/appointments-billing" element={<AppointmentsBillingPage />} />
+              <Route path="/caregiver/payment-methods" element={<PaymentMethodsPage />} />
+              <Route path="/champion-corner" element={<ChampionCornerPage />} />
+              <Route path="/share-your-story" element={<StorySubmissionPage />} />
+              <Route path="/caregiver/messages" element={<CaregiverMessagesPage />} />
+            </Route>
+            <Route element={<ProtectedRoute allowedRoles={['Provider']} />}>
+              <Route path="/welcome-home/provider" element={<WelcomeHomeProvider />} />
+              <Route path="/dashboard/provider" element={<ProviderDashboard />} />
+              <Route path="/dashboard/analytics" element={<AnalyticsPage />} />
+              <Route path="/provider/messages" element={<ProviderMessagesPage />} />
+              <Route path="/provider/appointments" element={<ProviderAppointmentsPage />} />
+            </Route>
+            <Route element={<ProtectedRoute allowedRoles={['Insurer']} />}>
+              <Route path="/welcome-home/insurer" element={<WelcomeHomeInsurer />} />
+              <Route path="/dashboard/insurer" element={<InsurerDashboard />} />
+            </Route>
+            <Route element={<ProtectedRoute allowedRoles={['Caregiver']} />}>
+              <Route path="/welcome-home" element={<WelcomeHomePage />} />
+              <Route path="/dashboard" element={<CaregiverWelcomeLand />} />
+              <Route path="/profile" element={<ProfilePage />} />
+              <Route path="/messages" element={<MessagesPage />} />
+              <Route path="/settings" element={<SettingsPage />} />
+            </Route>
+          </Routes>
+        </Router>
+      </EmergencyAlertProvider>
+    </AuthProvider>
   );
 }
 
 export default App;
-
-

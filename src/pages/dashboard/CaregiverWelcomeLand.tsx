@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
-import { Box, Typography, Grid, Card, CardContent, CardActionArea, Button } from '@mui/material';
+import { Box, Typography, Grid, Card, CardContent, CardActionArea, Button, Alert } from '@mui/material';
 import { Settings as SettingsIcon } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import Layout from '../../components/layout/Layout';
 import { useAuth } from '../../context/AuthContext';
+import { useEmergencyAlert } from '../../context/EmergencyAlertContext';
 import DashboardCustomizeModal from '../../components/dashboard/DashboardCustomizeModal';
 
 const allFeatures = [
@@ -16,6 +17,7 @@ const allFeatures = [
 ];
 
 const CaregiverWelcomeLand = () => {
+  const { isAlertActive, patientName, resetAlert } = useEmergencyAlert();
   const navigate = useNavigate();
   const { user } = useAuth();
   const [customizableFeatures, setCustomizableFeatures] = useState<typeof allFeatures>([]);
@@ -45,9 +47,23 @@ const CaregiverWelcomeLand = () => {
 
   return (
     <Layout title="Caregiver Dashboard">
+      {isAlertActive && (
+        <Alert
+          severity="error"
+          action={
+            <Button color="inherit" size="small" onClick={resetAlert}>
+              DISMISS
+            </Button>
+          }
+          sx={{ mb: 2, '.MuiAlert-message': { width: '100%' } }}
+        >
+          <Typography variant="h6">Emergency Alert!</Typography>
+          <Typography>Patient <strong>{patientName}</strong> requires immediate assistance.</Typography>
+        </Alert>
+      )}
       <Box sx={{ p: 3 }}>
-        <Typography variant="h4" component="h1" gutterBottom>
-          Welcome Back, [User Name]!
+        <Typography variant="h4" component="h1" sx={{ fontWeight: 'bold', color: 'primary.main' }}>
+          Welcome Back!
         </Typography>
         <Typography color="text.secondary" sx={{ mb: 4 }}>
           Here's a quick look at your day.

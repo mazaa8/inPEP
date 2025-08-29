@@ -1,4 +1,6 @@
-import { Grid, Paper } from '@mui/material';
+import { Grid, Paper, Button, Box, Typography } from '@mui/material';
+import { Warning as WarningIcon } from '@mui/icons-material';
+import { useEmergencyAlert } from '../../context/EmergencyAlertContext';
 import Layout from '../../components/layout/Layout';
 import UpcomingAppointments, { type Appointment } from '../../components/dashboards/patient/UpcomingAppointments';
 import RecentMessages, { type Message } from '../../components/dashboards/patient/RecentMessages';
@@ -31,9 +33,30 @@ const healthChartData: HealthData[] = [
 ];
 
 const PatientDashboard = () => {
+  const { triggerAlert } = useEmergencyAlert();
+
+  const handleEmergencyClick = () => {
+    // In a real app, you'd get the patient's name from auth context or props
+    triggerAlert('John Doe');
+    alert('An emergency alert has been sent to your caregiver.');
+  };
+
   return (
     <Layout title="Patient Dashboard">
       <Grid container spacing={3}>
+        <Grid item xs={12}>
+          <Paper sx={{ p: 2, backgroundColor: 'error.main', color: 'white' }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <Typography variant="h6" component="div" sx={{ display: 'flex', alignItems: 'center' }}>
+                <WarningIcon sx={{ mr: 1 }} />
+                Emergency Assistance
+              </Typography>
+              <Button variant="contained" color="error" sx={{ backgroundColor: 'white', color: 'error.main', '&:hover': { backgroundColor: '#fce4e4' } }} onClick={handleEmergencyClick}>
+                Request Help Now
+              </Button>
+            </Box>
+          </Paper>
+        </Grid>
         <Grid item xs={12} md={4}>
           <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column', height: '100%' }}>
             <UpcomingAppointments appointments={appointmentsData} />
