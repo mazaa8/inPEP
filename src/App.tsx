@@ -9,6 +9,8 @@ import PatientDashboard from './pages/dashboards/PatientDashboard';
 import PatientSupportPage from './pages/patient/PatientSupportPage';
 import CaregiverDashboard from './pages/dashboards/CaregiverDashboard';
 import ProviderDashboard from './pages/dashboards/ProviderDashboard';
+import ProviderMessagesPage from './pages/provider/ProviderMessagesPage';
+import ProviderAppointmentsPage from './pages/provider/ProviderAppointmentsPage';
 import AnalyticsPage from './pages/dashboards/AnalyticsPage';
 import InsurerDashboard from './pages/dashboards/InsurerDashboard';
 import ProfilePage from './pages/profile/ProfilePage';
@@ -66,7 +68,9 @@ function App() {
         <Route element={<ProtectedRoute allowedRoles={['Provider']} />}>
           <Route path="/welcome-home/provider" element={<WelcomeHomeProvider />} />
           <Route path="/dashboard/provider" element={<ProviderDashboard />} />
-          <Route path="/dashboard/analytics" element={<AnalyticsPage />} />
+                    <Route path="/dashboard/analytics" element={<AnalyticsPage />} />
+          <Route path="/provider/messages" element={<ProviderMessagesPage />} />
+          <Route path="/provider/appointments" element={<ProviderAppointmentsPage />} />
         </Route>
         <Route element={<ProtectedRoute allowedRoles={['Insurer']} />}>
           <Route path="/welcome-home/insurer" element={<WelcomeHomeInsurer />} />

@@ -102,8 +102,18 @@ const Layout = ({ children, title }: LayoutProps) => {
       const handleLogoClick = () => {
     if (user?.role === 'Caregiver') {
       navigate('/dashboard');
+    } else if (user?.role === 'Provider') {
+      navigate('/dashboard/provider');
     } else {
       navigate('/');
+    }
+  };
+
+    const handleNotificationClick = () => {
+    if (user?.role === 'Provider') {
+      navigate('/provider/messages');
+    } else if (user?.role === 'Caregiver') {
+      navigate('/caregiver/messages');
     }
   };
 
@@ -151,7 +161,7 @@ const Layout = ({ children, title }: LayoutProps) => {
           <Box sx={{ flexGrow: 1 }} />
           {user && (
             <Box sx={{ display: 'flex', alignItems: 'center' }}>
-              <IconButton size="large" aria-label="show 17 new notifications" color="inherit" onClick={() => navigate('/caregiver/messages')}>
+              <IconButton size="large" aria-label="show 17 new notifications" color="inherit" onClick={handleNotificationClick}>
                 <Badge badgeContent={17} color="error">
                   <NotificationsIcon />
                 </Badge>
