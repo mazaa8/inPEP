@@ -15,7 +15,7 @@ const allFeatures = [
   { id: 'caregiver-support', title: 'Caregiver Support', description: 'Find resources and support.', path: '/caregiver-support', roles: ['Caregiver'] },
 ];
 
-const DashboardPage = () => {
+const CaregiverWelcomeLand = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [customizableFeatures, setCustomizableFeatures] = useState<typeof allFeatures>([]);
@@ -122,4 +122,4 @@ const DashboardPage = () => {
   );
 };
 
-export default DashboardPage;
+export default CaregiverWelcomeLand;

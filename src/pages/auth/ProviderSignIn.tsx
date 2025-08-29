@@ -31,7 +31,7 @@ const ProviderSignIn = () => {
     e.preventDefault();
     try {
       await login(providerId, 'Provider');
-      navigate('/dashboard/provider');
+      navigate('/welcome-home/provider');
     } catch (err) {
       setError('Invalid credentials. Please try again.');
     }

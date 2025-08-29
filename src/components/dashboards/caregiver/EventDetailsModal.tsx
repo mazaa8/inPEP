@@ -1,4 +1,5 @@
 import { Modal, Box, Typography, IconButton, Button } from '@mui/material';
+import type { AppointmentEvent } from './AppointmentsCalendar';
 import { Close, Notifications } from '@mui/icons-material';
 import { useNotifications } from '../../../hooks/useNotifications';
 import moment from 'moment';
@@ -6,14 +7,7 @@ import moment from 'moment';
 interface EventDetailsModalProps {
   open: boolean;
   onClose: () => void;
-  event: {
-    title: string;
-    start: Date;
-    end: Date;
-    description?: string;
-    specialty?: string;
-    location?: string;
-  } | null;
+  event: AppointmentEvent | null;
 }
 
 const style = {
@@ -39,7 +33,7 @@ const EventDetailsModal = ({ open, onClose, event }: EventDetailsModalProps) => 
       currentPermission = await requestPermission();
     }
 
-    if (currentPermission === 'granted') {
+    if (currentPermission === 'granted' && event.start) {
       scheduleNotification(
         `Reminder: ${event.title}`,
         {

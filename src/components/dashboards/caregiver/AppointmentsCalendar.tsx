@@ -1,6 +1,14 @@
 import { useState } from 'react';
-import { Calendar, momentLocalizer, type Event as BigCalendarEvent } from 'react-big-calendar';
 import moment from 'moment';
+import { Calendar, momentLocalizer, type Event as BigCalendarEvent } from 'react-big-calendar';
+
+// Define a more specific event type for appointments
+export interface AppointmentEvent extends Omit<BigCalendarEvent, 'title'> {
+  title: string; // Override title to be a required string
+  description?: string;
+  specialty?: string;
+  location?: string;
+}
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import './AppointmentsCalendar.css';
 import { Card, CardContent, Typography, Box, Avatar } from '@mui/material';
@@ -9,37 +17,18 @@ import EventDetailsModal from './EventDetailsModal';
 
 const localizer = momentLocalizer(moment);
 
-const events = [
-  {
-    title: 'Dr. Smith Appointment',
-    start: new Date(2025, 8, 2, 10, 0),
-    end: new Date(2025, 8, 2, 11, 0),
-    description: 'Routine check-up with Dr. Smith. Remember to bring the latest test results.',
-    specialty: 'Cardiology',
-    location: 'Springfield General Hospital, 123 Health St.',
-  },
-  {
-    title: 'Physical Therapy',
-    start: new Date(2025, 8, 4, 14, 0),
-    end: new Date(2025, 8, 4, 15, 0),
-    description: 'Session focusing on lower back exercises.',
-    specialty: 'Orthopedic Physical Therapy',
-    location: 'Community Rehab Center, 456 Wellness Ave.',
-  },
-  {
-    title: 'Family Visit',
-    start: new Date(2025, 8, 7, 13, 0),
-    end: new Date(2025, 8, 7, 17, 0),
-    description: 'The Johnsons are visiting in the afternoon.',
-  },
-];
+interface AppointmentsCalendarProps {
+  events: AppointmentEvent[];
+}
 
-const AppointmentsCalendar = () => {
-  const [selectedEvent, setSelectedEvent] = useState<BigCalendarEvent | null>(null);
+
+const AppointmentsCalendar = ({ events }: AppointmentsCalendarProps) => {
+  const [selectedEvent, setSelectedEvent] = useState<AppointmentEvent | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handleSelectEvent = (event: BigCalendarEvent) => {
-    setSelectedEvent(event);
+    // We cast here after confirming the event shape, ensuring type safety with the modal
+    setSelectedEvent(event as AppointmentEvent);
     setIsModalOpen(true);
   };
 
@@ -75,7 +64,7 @@ const AppointmentsCalendar = () => {
       <EventDetailsModal
         open={isModalOpen}
         onClose={handleCloseModal}
-        event={selectedEvent as any} 
+        event={selectedEvent} 
       />
     </>
   );

@@ -1,11 +1,15 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import LandingPage from './pages/landing/LandingPage';
 import WelcomeHomePage from './pages/landing/WelcomeHomePage';
+import WelcomeHomePatient from './pages/landing/WelcomeHomePatient';
+import WelcomeHomeInsurer from './pages/landing/WelcomeHomeInsurer';
+import WelcomeHomeProvider from './pages/landing/WelcomeHomeProvider';
 import LoginPage from './pages/auth/LoginPage';
 import PatientDashboard from './pages/dashboards/PatientDashboard';
 import PatientSupportPage from './pages/patient/PatientSupportPage';
 import CaregiverDashboard from './pages/dashboards/CaregiverDashboard';
 import ProviderDashboard from './pages/dashboards/ProviderDashboard';
+import AnalyticsPage from './pages/dashboards/AnalyticsPage';
 import InsurerDashboard from './pages/dashboards/InsurerDashboard';
 import ProfilePage from './pages/profile/ProfilePage';
 import MessagesPage from './pages/messages/MessagesPage';
@@ -21,10 +25,13 @@ import CaregivingTipsPage from './pages/caregiver/features/CaregivingTipsPage';
 import ChampionCornerPage from './pages/caregiver/features/ChampionCornerPage';
 import StorySubmissionPage from './pages/caregiver/features/StorySubmissionPage';
 import CaregiverMessagesPage from './pages/caregiver/MessagesPage';
-import DashboardPage from './pages/dashboard/DashboardPage';
+import CaregiverWelcomeLand from './pages/dashboard/CaregiverWelcomeLand';
 import AppointmentsBillingPage from './pages/caregiver/features/AppointmentsBillingPage';
 import PaymentMethodsPage from './pages/caregiver/features/PaymentMethodsPage';
 import ProtectedRoute from './routes/ProtectedRoute';
+import HelpCenter from './pages/support/HelpCenter';
+import TermsOfService from './pages/support/TermsOfService';
+import PrivacyPolicy from './pages/support/PrivacyPolicy';
 
 function App() {
   return (
@@ -32,7 +39,11 @@ function App() {
       <Routes>
         <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={<LoginPage />} />
+        <Route path="/help-center" element={<HelpCenter />} />
+        <Route path="/terms-of-service" element={<TermsOfService />} />
+        <Route path="/privacy-policy" element={<PrivacyPolicy />} />
         <Route element={<ProtectedRoute allowedRoles={['Patient']} />}>
+          <Route path="/welcome-home/patient" element={<WelcomeHomePatient />} />
           <Route path="/dashboard/patient" element={<PatientDashboard />} />
         </Route>
         <Route element={<ProtectedRoute allowedRoles={['Caregiver']} />}>
@@ -53,14 +64,17 @@ function App() {
           <Route path="/caregiver/messages" element={<CaregiverMessagesPage />} />
         </Route>
         <Route element={<ProtectedRoute allowedRoles={['Provider']} />}>
+          <Route path="/welcome-home/provider" element={<WelcomeHomeProvider />} />
           <Route path="/dashboard/provider" element={<ProviderDashboard />} />
+          <Route path="/dashboard/analytics" element={<AnalyticsPage />} />
         </Route>
         <Route element={<ProtectedRoute allowedRoles={['Insurer']} />}>
+          <Route path="/welcome-home/insurer" element={<WelcomeHomeInsurer />} />
           <Route path="/dashboard/insurer" element={<InsurerDashboard />} />
         </Route>
-        <Route element={<ProtectedRoute allowedRoles={['Patient', 'Caregiver', 'Provider', 'Insurer']} />}>
+        <Route element={<ProtectedRoute allowedRoles={['Caregiver']} />}>
           <Route path="/welcome-home" element={<WelcomeHomePage />} />
-          <Route path="/dashboard" element={<DashboardPage />} />
+          <Route path="/dashboard" element={<CaregiverWelcomeLand />} />
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/messages" element={<MessagesPage />} />
           <Route path="/settings" element={<SettingsPage />} />

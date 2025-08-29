@@ -31,7 +31,7 @@ const InsurerSignIn = () => {
     e.preventDefault();
     try {
       await login(insurerId, 'Insurer');
-      navigate('/dashboard/insurer');
+      navigate('/welcome-home/insurer');
     } catch (err) {
       setError('Invalid credentials. Please try again.');
     }

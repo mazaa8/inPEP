@@ -31,7 +31,7 @@ const PatientSignIn = () => {
     e.preventDefault();
     try {
       await login(nationalId, 'Patient', hospital);
-      navigate('/dashboard/patient');
+      navigate('/welcome-home/patient');
     } catch (err) {
       setError('Invalid credentials. Please try again.');
     }

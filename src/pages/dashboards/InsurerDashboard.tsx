@@ -4,9 +4,9 @@ import ClaimRequests from '../../components/dashboards/insurer/ClaimRequests';
 
 const InsurerDashboard = () => {
   return (
-    <Layout title="Insurer Dashboard">
+    <Layout>
       <Grid container spacing={3}>
-        <Grid size={{ xs: 12, md: 8 }}>
+        <Grid item xs={12} md={8}>
           <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column' }}>
             <ClaimRequests />
           </Paper>

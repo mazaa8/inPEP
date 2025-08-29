@@ -2,17 +2,17 @@ import { Card, CardContent, Typography, Box, Avatar } from '@mui/material';
 import { ShowChart } from '@mui/icons-material';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 
-const data = [
-  { name: 'Mon', heartRate: 72, bp: 120 },
-  { name: 'Tue', heartRate: 75, bp: 122 },
-  { name: 'Wed', heartRate: 78, bp: 118 },
-  { name: 'Thu', heartRate: 74, bp: 121 },
-  { name: 'Fri', heartRate: 76, bp: 125 },
-  { name: 'Sat', heartRate: 73, bp: 123 },
-  { name: 'Sun', heartRate: 71, bp: 119 },
-];
+export interface VitalsData {
+  name: string;
+  heartRate: number;
+  bp: number;
+}
 
-const VitalsLog = () => {
+interface VitalsLogProps {
+  data: VitalsData[];
+}
+
+const VitalsLog = ({ data }: VitalsLogProps) => {
   return (
     <Card sx={{ background: 'linear-gradient(135deg, #F4F7F6 0%, #E9EFEE 100%)', color: '#2D4A43', borderRadius: '16px', boxShadow: '0 12px 32px rgba(0,0,0,0.1)' }}>
       <CardContent>

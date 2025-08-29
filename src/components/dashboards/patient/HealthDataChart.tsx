@@ -1,15 +1,15 @@
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
-const data = [
-  { name: 'Jan', weight: 65 },
-  { name: 'Feb', weight: 66 },
-  { name: 'Mar', weight: 67 },
-  { name: 'Apr', weight: 66 },
-  { name: 'May', weight: 68 },
-  { name: 'Jun', weight: 70 },
-];
+export interface HealthData {
+  name: string;
+  weight: number;
+}
 
-const HealthDataChart = () => {
+interface HealthDataChartProps {
+  data: HealthData[];
+}
+
+const HealthDataChart = ({ data }: HealthDataChartProps) => {
   return (
     <ResponsiveContainer width="100%" height={300}>
       <LineChart data={data}>

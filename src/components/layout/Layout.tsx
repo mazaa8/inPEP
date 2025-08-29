@@ -1,9 +1,9 @@
-import { Box, AppBar, Toolbar, Typography, Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Button, Collapse, IconButton } from '@mui/material';
+import { Box, AppBar, Toolbar, Typography, Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Button, Collapse, IconButton, InputBase, Badge, Menu, MenuItem } from '@mui/material';
+import { styled, alpha } from '@mui/material/styles';
 import {
   DashboardOutlined as Dashboard,
+  AnalyticsOutlined as AnalyticsIcon,
   PersonOutlined as Person,
-  MailOutlined as Mail,
-  SettingsOutlined as SettingsIcon,
   MonitorHeartOutlined as MonitorHeart,
   MeetingRoomOutlined as MeetingRoom,
   EventNoteOutlined as EventNote,
@@ -16,25 +16,76 @@ import {
   ApartmentOutlined as Apartment,
   ExpandLess,
   ExpandMore,
+  Search as SearchIcon,
+  NotificationsOutlined as NotificationsIcon,
+  AccountCircle,
 } from '@mui/icons-material';
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import Footer from './Footer';
 
 const drawerWidth = 240;
 
+const Search = styled('div')(({ theme }) => ({
+  position: 'relative',
+  borderRadius: theme.shape.borderRadius,
+  backgroundColor: alpha(theme.palette.common.white, 0.15),
+  '&:hover': {
+    backgroundColor: alpha(theme.palette.common.white, 0.25),
+  },
+  marginRight: theme.spacing(2),
+  marginLeft: 0,
+  width: '100%',
+  [theme.breakpoints.up('sm')]: {
+    marginLeft: theme.spacing(3),
+    width: 'auto',
+  },
+}));
+
+const SearchIconWrapper = styled('div')(({ theme }) => ({
+  padding: theme.spacing(0, 2),
+  height: '100%',
+  position: 'absolute',
+  pointerEvents: 'none',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+}));
+
+const StyledInputBase = styled(InputBase)(({ theme }) => ({
+  color: 'inherit',
+  '& .MuiInputBase-input': {
+    padding: theme.spacing(1, 1, 1, 0),
+    paddingLeft: `calc(1em + ${theme.spacing(4)})`,
+    transition: theme.transitions.create('width'),
+    width: '100%',
+    [theme.breakpoints.up('md')]: {
+      width: '20ch',
+    },
+  },
+}));
+
 interface LayoutProps {
   children: React.ReactNode;
-  title: string;
+  title?: string;
 }
 
 const Layout = ({ children, title }: LayoutProps) => {
   const { user, logout } = useAuth();
-
   const navigate = useNavigate();
   const [dashboardOpen, setDashboardOpen] = useState(true);
   const [carePlanningOpen, setCarePlanningOpen] = useState(false);
   const [reclaiMeOpen, setReclaiMeOpen] = useState(false);
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+
+  const handleProfileMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+  };
 
   const handleDashboardClick = () => {
     setDashboardOpen(!dashboardOpen);
@@ -48,41 +99,78 @@ const Layout = ({ children, title }: LayoutProps) => {
     setReclaiMeOpen(!reclaiMeOpen);
   };
 
+      const handleLogoClick = () => {
+    if (user?.role === 'Caregiver') {
+      navigate('/dashboard');
+    } else {
+      navigate('/');
+    }
+  };
+
   const handleLogout = () => {
+    handleMenuClose();
     logout();
     navigate('/');
   };
 
+  const renderProfileMenu = (
+    <Menu
+      anchorEl={anchorEl}
+      anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+      keepMounted
+      transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+      open={Boolean(anchorEl)}
+      onClose={handleMenuClose}
+    >
+      <MenuItem onClick={() => { handleMenuClose(); navigate('/profile'); }}>Profile</MenuItem>
+      <MenuItem onClick={() => { handleMenuClose(); navigate('/settings'); }}>Settings</MenuItem>
+      <MenuItem onClick={handleLogout}>Logout</MenuItem>
+    </Menu>
+  );
+
   return (
-    <Box sx={{ display: 'flex', height: '100vh' }}>
+    <Box sx={{ display: 'flex' }}>
       <AppBar position="fixed" sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}>
         <Toolbar>
-          <Button color="inherit" onClick={() => navigate('/dashboard')} sx={{ textTransform: 'none', p: 1 }}>
+          <Button color="inherit" onClick={handleLogoClick} sx={{ textTransform: 'none', p: 1 }}>
             <Apartment sx={{ mr: 1 }} />
             <Typography variant="h6" noWrap component="div">
               InPEP™
             </Typography>
           </Button>
-          <Typography variant="h6" noWrap component="div" sx={{ ml: 2 }}>
-            | {user?.hospitalName || '[Hospital Name]'} | {title}
-          </Typography>
-          {user && (
-            <Typography sx={{ ml: 2 }}>
-            </Typography>
-          )}
+          <Box sx={{ flexGrow: 1 }} />
+          <Search>
+            <SearchIconWrapper>
+              <SearchIcon />
+            </SearchIconWrapper>
+            <StyledInputBase
+              placeholder="Search Patients…"
+              inputProps={{ 'aria-label': 'search' }}
+            />
+          </Search>
           <Box sx={{ flexGrow: 1 }} />
           {user && (
-            <>
-              <IconButton color="inherit" onClick={() => navigate('/caregiver/messages')}>
-                <Mail />
+            <Box sx={{ display: 'flex', alignItems: 'center' }}>
+              <IconButton size="large" aria-label="show 17 new notifications" color="inherit" onClick={() => navigate('/caregiver/messages')}>
+                <Badge badgeContent={17} color="error">
+                  <NotificationsIcon />
+                </Badge>
               </IconButton>
-              <Button color="inherit" onClick={handleLogout}>
-                Logout
-              </Button>
-            </>
+              <IconButton
+                size="large"
+                edge="end"
+                aria-label="account of current user"
+                aria-haspopup="true"
+                onClick={handleProfileMenuOpen}
+                color="inherit"
+              >
+                <AccountCircle />
+              </IconButton>
+            </Box>
           )}
         </Toolbar>
       </AppBar>
+      {renderProfileMenu}
       <Drawer
         variant="permanent"
         sx={{
@@ -94,6 +182,26 @@ const Layout = ({ children, title }: LayoutProps) => {
         <Toolbar />
         <Box sx={{ overflow: 'auto' }}>
           <List>
+            {user?.role === 'Provider' && (
+              <>
+                <ListItem disablePadding>
+                  <ListItemButton onClick={() => navigate('/dashboard/provider')}>
+                    <ListItemIcon>
+                      <Dashboard />
+                    </ListItemIcon>
+                    <ListItemText primary="Dashboard" />
+                  </ListItemButton>
+                </ListItem>
+                <ListItem disablePadding>
+                  <ListItemButton onClick={() => navigate('/dashboard/analytics')}>
+                    <ListItemIcon>
+                      <AnalyticsIcon />
+                    </ListItemIcon>
+                    <ListItemText primary="Analytics" />
+                  </ListItemButton>
+                </ListItem>
+              </>
+            )}
             {(user?.role === 'Caregiver' || user?.role === 'Patient') && (
               <>
                 <ListItem disablePadding>
@@ -187,7 +295,7 @@ const Layout = ({ children, title }: LayoutProps) => {
                       </ListItemIcon>
                       <ListItemText primary="Wellness Plan" />
                     </ListItemButton>
-                    <ListItemButton sx={{ pl: 4 }} onClick={() => navigate('/caregiver/heredibles')}>
+                    <ListItemButton sx={{ pl: 4 }} onClick={() => navigate('/caregiver/heredibles')}> 
                       <ListItemIcon sx={{ color: 'primary.main' }}>
                         <RestaurantMenu />
                       </ListItemIcon>
@@ -203,23 +311,15 @@ const Layout = ({ children, title }: LayoutProps) => {
                 </Collapse>
               </>
             )}
-
-            {[
-              { text: 'Settings', icon: <SettingsIcon />, path: '/settings' },
-            ].map((item) => (
-              <ListItem key={item.text} disablePadding>
-                <ListItemButton onClick={() => navigate(item.path)}>
-                  <ListItemIcon sx={{ color: 'primary.main' }}>{item.icon}</ListItemIcon>
-                  <ListItemText primary={item.text} />
-                </ListItemButton>
-              </ListItem>
-            ))}
           </List>
         </Box>
       </Drawer>
-      <Box component="main" sx={{ flexGrow: 1, p: 3, overflowY: 'auto' }}>
-        <Toolbar />
-        {children}
+      <Box sx={{ display: 'flex', flexDirection: 'column', flexGrow: 1, minHeight: '100vh' }}>
+        <Box component="main" sx={{ flexGrow: 1, p: 3, mt: '64px' }}>
+          {title && <Typography variant="h4" gutterBottom>{title}</Typography>}
+          {children}
+        </Box>
+        <Footer />
       </Box>
     </Box>
   );

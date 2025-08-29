@@ -14,6 +14,7 @@
     "@emotion/styled": "^11.11.5",
     "@hello-pangea/dnd": "^18.0.1",
     "@mui/icons-material": "^5.15.20",
+    "@mui/lab": "^5.0.0-alpha.170",
     "@mui/material": "^5.15.20",
     "@types/moment": "^2.11.29",
     "@types/react-big-calendar": "^1.16.2",
