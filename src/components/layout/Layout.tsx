@@ -258,33 +258,48 @@ const Layout = ({ children, title }: LayoutProps) => {
               </>
             )}
 
-            <ListItem disablePadding>
-              <ListItemButton onClick={handleDashboardClick}>
-                <ListItemIcon sx={{ color: 'primary.main' }}>
-                  <Dashboard />
-                </ListItemIcon>
-                <ListItemText primary="Patient Hub" />
-                {dashboardOpen ? <ExpandLess /> : <ExpandMore />}
-              </ListItemButton>
-            </ListItem>
-            <Collapse in={dashboardOpen} timeout="auto" unmountOnExit>
-              <List component="div" disablePadding>
-                <ListItemButton sx={{ pl: 4 }} onClick={() => navigate(`/dashboard/${user?.role?.toLowerCase()}`)}>
-                  <ListItemIcon sx={{ color: 'primary.main' }}>
-                    <MonitorHeart />
-                  </ListItemIcon>
-                  <ListItemText primary="Patient Monitor" />
-                </ListItemButton>
-                {user?.role === 'Caregiver' && (
-                  <ListItemButton sx={{ pl: 4 }} onClick={() => navigate('/patient-support')}>
-                    <ListItemIcon sx={{ color: 'primary.main' }}>
-                      <SupportAgent />
+            {user?.role === 'Insurer' ? (
+              <>
+                <ListItem disablePadding>
+                  <ListItemButton onClick={() => navigate('/dashboard/insurer')}>
+                    <ListItemIcon>
+                      <Dashboard />
                     </ListItemIcon>
-                    <ListItemText primary="Patient Support" />
+                    <ListItemText primary="Analytics Dashboard" />
                   </ListItemButton>
-                )}
-              </List>
-            </Collapse>
+                </ListItem>
+              </>
+            ) : (
+              <>
+                <ListItem disablePadding>
+                  <ListItemButton onClick={handleDashboardClick}>
+                    <ListItemIcon sx={{ color: 'primary.main' }}>
+                      <Dashboard />
+                    </ListItemIcon>
+                    <ListItemText primary="Patient Hub" />
+                    {dashboardOpen ? <ExpandLess /> : <ExpandMore />}
+                  </ListItemButton>
+                </ListItem>
+                <Collapse in={dashboardOpen} timeout="auto" unmountOnExit>
+                  <List component="div" disablePadding>
+                    <ListItemButton sx={{ pl: 4 }} onClick={() => navigate(`/dashboard/${user?.role?.toLowerCase()}`)}>
+                      <ListItemIcon sx={{ color: 'primary.main' }}>
+                        <MonitorHeart />
+                      </ListItemIcon>
+                      <ListItemText primary="Patient Monitor" />
+                    </ListItemButton>
+                    {user?.role === 'Caregiver' && (
+                      <ListItemButton sx={{ pl: 4 }} onClick={() => navigate('/patient-support')}>
+                        <ListItemIcon sx={{ color: 'primary.main' }}>
+                          <SupportAgent />
+                        </ListItemIcon>
+                        <ListItemText primary="Patient Support" />
+                      </ListItemButton>
+                    )}
+                  </List>
+                </Collapse>
+              </>
+            )}
 
             {user?.role === 'Caregiver' && (
               <>

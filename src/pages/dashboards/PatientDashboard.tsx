@@ -36,9 +36,9 @@ const PatientDashboard = () => {
   const { triggerAlert } = useEmergencyAlert();
 
   const handleEmergencyClick = () => {
-    // In a real app, you'd get the patient's name from auth context or props
-    triggerAlert('John Doe');
-    alert('An emergency alert has been sent to your caregiver.');
+    // In a real app, you'd get the patient's name and ID from auth context or props
+    triggerAlert('John Doe', 'P001', 4); // Triggering a Level 4 alert (Code Red)
+    alert('A high-priority emergency alert has been sent to your caregiver.');
   };
 
   return (

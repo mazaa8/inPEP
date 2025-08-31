@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Box, Typography, Grid, Card, CardContent, CardActionArea, Button, Alert } from '@mui/material';
+import { Box, Typography, Grid, Card, CardContent, CardActionArea, Button, Alert, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material';
 import { Settings as SettingsIcon } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import Layout from '../../components/layout/Layout';
@@ -17,11 +17,18 @@ const allFeatures = [
 ];
 
 const CaregiverWelcomeLand = () => {
-  const { isAlertActive, patientName, resetAlert } = useEmergencyAlert();
+  const { isAlertActive, patientName, alertLevel, isEscalated, resetAlert, escalateToProvider } = useEmergencyAlert();
+  const [isEscalationPromptOpen, setIsEscalationPromptOpen] = useState(false);
   const navigate = useNavigate();
   const { user } = useAuth();
   const [customizableFeatures, setCustomizableFeatures] = useState<typeof allFeatures>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  useEffect(() => {
+    if (isAlertActive && alertLevel >= 3 && !isEscalated) {
+      setIsEscalationPromptOpen(true);
+    }
+  }, [isAlertActive, alertLevel, isEscalated]);
 
   useEffect(() => {
     const savedFeatures = localStorage.getItem('dashboardFeatures');
@@ -38,6 +45,15 @@ const CaregiverWelcomeLand = () => {
       }
     }
   }, [user]);
+
+  const handleEscalate = () => {
+    escalateToProvider();
+    setIsEscalationPromptOpen(false);
+  };
+
+  const handleClosePrompt = () => {
+    setIsEscalationPromptOpen(false);
+  };
 
   const handleSaveCustomization = (selectedIds: string[]) => {
     localStorage.setItem('dashboardFeatures', JSON.stringify(selectedIds));
@@ -61,6 +77,27 @@ const CaregiverWelcomeLand = () => {
           <Typography>Patient <strong>{patientName}</strong> requires immediate assistance.</Typography>
         </Alert>
       )}
+      <Dialog open={isEscalationPromptOpen} onClose={handleClosePrompt}>
+        <DialogTitle sx={{ fontWeight: 'bold' }}>{'Escalate to Provider?'}</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            If this alert is critical, select 'Yes' to notify the provider.
+            <br />
+            <Typography variant="caption" color="text.secondary">
+              Please note: Unnecessary escalations may result in penalties to prevent dashboard congestion.
+            </Typography>
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleClosePrompt} color="primary">
+            No, Stay Alert
+          </Button>
+          <Button onClick={handleEscalate} color="error" variant="contained">
+            Yes, Notify Provider
+          </Button>
+        </DialogActions>
+      </Dialog>
+
       <Box sx={{ p: 3 }}>
         <Typography variant="h4" component="h1" sx={{ fontWeight: 'bold', color: 'primary.main' }}>
           Welcome Back!
