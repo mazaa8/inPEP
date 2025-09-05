@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import {
-  Paper,
   Typography,
   Box,
   Tabs,
@@ -88,8 +87,7 @@ const CommunicationHub = () => {
   };
 
   return (
-    <Paper sx={{ p: 2 }}>
-      <Typography variant="h6" gutterBottom>Communication Hub</Typography>
+    <Box sx={{ p: 2 }}>
       <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
         <Tabs value={value} onChange={handleChange} aria-label="communication tabs">
           <Tab label="All" />
@@ -132,7 +130,7 @@ const CommunicationHub = () => {
       <TabPanel value={value} index={3}>
         <Typography>Messages from insurers will appear here.</Typography>
       </TabPanel>
-    </Paper>
+    </Box>
   );
 };
 

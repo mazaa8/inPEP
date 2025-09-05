@@ -5,6 +5,7 @@ import TodaysSummary from '../../components/dashboards/caregiver/TodaysSummary';
 import MedicationChecklist, { type Medication } from '../../components/dashboards/caregiver/MedicationChecklist';
 import AppointmentsCalendar, { type AppointmentEvent } from '../../components/dashboards/caregiver/AppointmentsCalendar';
 import VitalsLog, { type VitalsData } from '../../components/dashboards/caregiver/VitalsLog';
+import WeeklyMealPlanner from '../../components/dashboards/caregiver/WeeklyMealPlanner';
 
 const appointmentsData: AppointmentEvent[] = [
   {
@@ -74,10 +75,11 @@ const CaregiverDashboard = () => {
             <Grid item xs={12}>
               <VitalsLog data={vitalsData} />
             </Grid>
-          </Grid>
+                      </Grid>
         </Grid>
         {/* Larger column for the calendar */}
         <Grid item xs={12} lg={8}>
+          <WeeklyMealPlanner />
           <AppointmentsCalendar events={appointmentsData} />
         </Grid>
       </Grid>

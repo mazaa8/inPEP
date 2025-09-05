@@ -5,6 +5,7 @@ import Layout from '../../components/layout/Layout';
 import UpcomingAppointments, { type Appointment } from '../../components/dashboards/patient/UpcomingAppointments';
 import RecentMessages, { type Message } from '../../components/dashboards/patient/RecentMessages';
 import HealthSummary, { type HealthMetric } from '../../components/dashboards/patient/HealthSummary';
+import { Link } from 'react-router-dom';
 import HealthDataChart, { type HealthData } from '../../components/dashboards/patient/HealthDataChart';
 
 const appointmentsData: Appointment[] = [
@@ -31,6 +32,7 @@ const healthChartData: HealthData[] = [
   { name: 'May', weight: 68 },
   { name: 'Jun', weight: 70 },
 ];
+
 
 const PatientDashboard = () => {
   const { triggerAlert } = useEmergencyAlert();
@@ -72,9 +74,19 @@ const PatientDashboard = () => {
             <HealthSummary metrics={healthSummaryData} />
           </Paper>
         </Grid>
-        <Grid item xs={12}>
-          <Paper sx={{ p: 2, mt: 3 }}>
+        <Grid item xs={12} md={8}>
+          <Paper sx={{ p: 2, mt: 3, height: '100%' }}>
             <HealthDataChart data={healthChartData} />
+          </Paper>
+        </Grid>
+        <Grid item xs={12}>
+          <Paper sx={{ p: 2, mt: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <Typography variant="h6" component="div">
+              Weekly Meal Plan
+            </Typography>
+            <Button component={Link} to="/patient/meal-plan" variant="contained">
+              View Plan
+            </Button>
           </Paper>
         </Grid>
       </Grid>

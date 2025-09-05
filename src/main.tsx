@@ -5,13 +5,16 @@ import CssBaseline from '@mui/material/CssBaseline';
 import App from './App';
 import theme from './styles/theme';
 import { AuthProvider } from './context/AuthContext';
+import { MealPlanProvider } from './context/MealPlanContext';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <AuthProvider>
-        <App />
+        <MealPlanProvider>
+          <App />
+        </MealPlanProvider>
       </AuthProvider>
     </ThemeProvider>
   </StrictMode>

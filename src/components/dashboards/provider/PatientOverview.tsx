@@ -1,4 +1,5 @@
-import { Paper, Typography, Grid, Box } from '@mui/material';
+import { Typography, Grid, Box } from '@mui/material';
+import DashboardCard from './DashboardCard';
 import { PieChart, Pie, Cell, ResponsiveContainer, RadialBarChart, RadialBar, Legend } from 'recharts';
 
 // Placeholder data
@@ -22,28 +23,22 @@ const caregiverEngagementData = [
 
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28'];
 
-const WidgetPaper = ({ title, children }: { title: string, children: React.ReactNode }) => (
-  <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column', height: '100%' }}>
-    <Typography variant="h6" gutterBottom>{title}</Typography>
-    {children}
-  </Paper>
-);
 
 const PatientOverview = () => {
   return (
     <Grid container spacing={3}>
       {/* Active Patients Widget */}
       <Grid item xs={12} sm={6} md={3}>
-        <WidgetPaper title="Active Patients">
+        <DashboardCard title="Active Patients">
           <Typography variant="h4" component="div" sx={{ flexGrow: 1, textAlign: 'center', alignSelf: 'center' }}>
             {activePatients}
           </Typography>
-        </WidgetPaper>
+        </DashboardCard>
       </Grid>
 
       {/* Risk Alerts Widget */}
       <Grid item xs={12} sm={6} md={3}>
-        <WidgetPaper title="Risk Alerts">
+        <DashboardCard title="Risk Alerts">
           <Box sx={{ display: 'flex', justifyContent: 'space-around', alignItems: 'center', height: '100%' }}>
             <Box sx={{ textAlign: 'center' }}>
               <Box sx={{ width: 40, height: 40, borderRadius: '50%', backgroundColor: '#ff4d4d', mb: 1 }} />
@@ -58,12 +53,12 @@ const PatientOverview = () => {
               <Typography variant="h6">{riskAlertsData.low}</Typography>
             </Box>
           </Box>
-        </WidgetPaper>
+        </DashboardCard>
       </Grid>
 
       {/* Readmission Risk Widget */}
       <Grid item xs={12} sm={6} md={3}>
-        <WidgetPaper title="Readmission Risk">
+        <DashboardCard title="Readmission Risk">
           <ResponsiveContainer width="100%" height={150}>
             <RadialBarChart 
               innerRadius="70%" 
@@ -77,12 +72,12 @@ const PatientOverview = () => {
               <Legend iconSize={10} layout='vertical' verticalAlign='middle' align="center" />
             </RadialBarChart>
           </ResponsiveContainer>
-        </WidgetPaper>
+        </DashboardCard>
       </Grid>
 
       {/* Caregiver Engagement Widget */}
       <Grid item xs={12} sm={6} md={3}>
-        <WidgetPaper title="Caregiver Engagement">
+        <DashboardCard title="Caregiver Engagement">
           <ResponsiveContainer width="100%" height={150}>
             <PieChart>
               <Pie
@@ -101,7 +96,7 @@ const PatientOverview = () => {
               <Legend />
             </PieChart>
           </ResponsiveContainer>
-        </WidgetPaper>
+        </DashboardCard>
       </Grid>
     </Grid>
   );

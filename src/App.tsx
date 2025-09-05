@@ -7,12 +7,15 @@ import WelcomeHomeProvider from './pages/landing/WelcomeHomeProvider';
 import LoginPage from './pages/auth/LoginPage';
 import PatientDashboard from './pages/dashboards/PatientDashboard';
 import PatientSupportPage from './pages/patient/PatientSupportPage';
+import MealPlanPage from './pages/patient/MealPlanPage';
+import PatientHerediblesPage from './pages/patient/HerediblesPage';
 import CaregiverDashboard from './pages/dashboards/CaregiverDashboard';
 import ProviderDashboard from './pages/dashboards/ProviderDashboard';
 import ProviderMessagesPage from './pages/provider/ProviderMessagesPage';
 import ProviderAppointmentsPage from './pages/provider/ProviderAppointmentsPage';
 import AnalyticsPage from './pages/dashboards/AnalyticsPage';
 import InsurerDashboard from './pages/dashboards/InsurerDashboard';
+import InsurerMessagesPage from './pages/insurer/InsurerMessagesPage';
 import ProfilePage from './pages/profile/ProfilePage';
 import MessagesPage from './pages/messages/MessagesPage';
 import SettingsPage from './pages/settings/SettingsPage';
@@ -51,6 +54,8 @@ function App() {
             <Route element={<ProtectedRoute allowedRoles={['Patient']} />}>
               <Route path="/welcome-home/patient" element={<WelcomeHomePatient />} />
               <Route path="/dashboard/patient" element={<PatientDashboard />} />
+              <Route path="/patient/meal-plan" element={<MealPlanPage />} />
+              <Route path="/patient/heredibles" element={<PatientHerediblesPage />} />
             </Route>
             <Route element={<ProtectedRoute allowedRoles={['Caregiver']} />}>
               <Route path="/patient-support" element={<PatientSupportPage />} />
@@ -79,6 +84,7 @@ function App() {
             <Route element={<ProtectedRoute allowedRoles={['Insurer']} />}>
               <Route path="/welcome-home/insurer" element={<WelcomeHomeInsurer />} />
               <Route path="/dashboard/insurer" element={<InsurerDashboard />} />
+              <Route path="/insurer/messages" element={<InsurerMessagesPage />} />
             </Route>
             <Route element={<ProtectedRoute allowedRoles={['Caregiver']} />}>
               <Route path="/welcome-home" element={<WelcomeHomePage />} />

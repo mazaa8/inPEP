@@ -1,4 +1,5 @@
-import { Grid, Paper, Alert, Typography, Button } from '@mui/material';
+import { Grid, Alert, Typography, Button } from '@mui/material';
+import DashboardCard from '../../components/dashboards/provider/DashboardCard';
 import { useEmergencyAlert } from '../../context/EmergencyAlertContext';
 import Layout from '../../components/layout/Layout';
 import PatientList from '../../components/dashboards/provider/PatientList';
@@ -52,26 +53,40 @@ const ProviderDashboard = () => {
           <PatientOverview />
         </Grid>
 
-        {/* Left Column */}
+        {/* Main Content Grid */}
         <Grid item xs={12} md={8}>
           <Grid container spacing={3}>
+            {/* Communication Hub */}
             <Grid item xs={12}>
-              <CommunicationHub />
+              <DashboardCard title="Communication Hub">
+                <CommunicationHub />
+              </DashboardCard>
             </Grid>
+            {/* Patient Journeys */}
             <Grid item xs={12}>
-              <PatientJourneys />
-            </Grid>
-            <Grid item xs={12}>
-              <EMRIntegration />
+              <DashboardCard title="Patient & Caregiver Journeys">
+                <PatientJourneys />
+              </DashboardCard>
             </Grid>
           </Grid>
         </Grid>
 
-        {/* Right Column */}
+        {/* Right Sidebar */}
         <Grid item xs={12} md={4}>
-          <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column', height: '100%' }}>
-            <PatientList />
-          </Paper>
+          <Grid container spacing={3}>
+            {/* Patient List */}
+            <Grid item xs={12}>
+              <DashboardCard title="Patient List">
+                <PatientList />
+              </DashboardCard>
+            </Grid>
+            {/* EMR Integration */}
+            <Grid item xs={12}>
+              <DashboardCard title="Seamless EMR Integration">
+                <EMRIntegration />
+              </DashboardCard>
+            </Grid>
+          </Grid>
         </Grid>
       </Grid>
     </Layout>

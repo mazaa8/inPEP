@@ -114,6 +114,8 @@ const Layout = ({ children, title }: LayoutProps) => {
       navigate('/provider/messages');
     } else if (user?.role === 'Caregiver') {
       navigate('/caregiver/messages');
+    } else if (user?.role === 'Insurer') {
+      navigate('/insurer/messages');
     }
   };
 
@@ -282,19 +284,49 @@ const Layout = ({ children, title }: LayoutProps) => {
                 </ListItem>
                 <Collapse in={dashboardOpen} timeout="auto" unmountOnExit>
                   <List component="div" disablePadding>
-                    <ListItemButton sx={{ pl: 4 }} onClick={() => navigate(`/dashboard/${user?.role?.toLowerCase()}`)}>
-                      <ListItemIcon sx={{ color: 'primary.main' }}>
-                        <MonitorHeart />
-                      </ListItemIcon>
-                      <ListItemText primary="Patient Monitor" />
-                    </ListItemButton>
+                    {user?.role === 'Patient' && (
+                      <>
+                        <ListItemButton sx={{ pl: 4 }} onClick={() => navigate('/dashboard/patient')}>
+                          <ListItemIcon sx={{ color: 'primary.main' }}>
+                            <EventNote />
+                          </ListItemIcon>
+                          <ListItemText primary="Appointments" />
+                        </ListItemButton>
+                        <ListItemButton sx={{ pl: 4 }} onClick={() => navigate('/dashboard/patient')}>
+                          <ListItemIcon sx={{ color: 'primary.main' }}>
+                            <MonitorHeart />
+                          </ListItemIcon>
+                          <ListItemText primary="Health Summary" />
+                        </ListItemButton>
+                        <ListItemButton sx={{ pl: 4 }} onClick={() => navigate('/patient/heredibles')}>
+                          <ListItemIcon sx={{ color: 'primary.main' }}>
+                            <AllInclusive />
+                          </ListItemIcon>
+                          <ListItemText primary="Heredibles" />
+                        </ListItemButton>
+                        <ListItemButton sx={{ pl: 4 }} onClick={() => navigate('/patient/meal-plan')}>
+                          <ListItemIcon sx={{ color: 'primary.main' }}>
+                            <RestaurantMenu />
+                          </ListItemIcon>
+                          <ListItemText primary="Meal Plan" />
+                        </ListItemButton>
+                      </>
+                    )}
                     {user?.role === 'Caregiver' && (
-                      <ListItemButton sx={{ pl: 4 }} onClick={() => navigate('/patient-support')}>
-                        <ListItemIcon sx={{ color: 'primary.main' }}>
-                          <SupportAgent />
-                        </ListItemIcon>
-                        <ListItemText primary="Patient Support" />
-                      </ListItemButton>
+                      <>
+                        <ListItemButton sx={{ pl: 4 }} onClick={() => navigate('/dashboard/caregiver')}>
+                          <ListItemIcon sx={{ color: 'primary.main' }}>
+                            <MonitorHeart />
+                          </ListItemIcon>
+                          <ListItemText primary="Patient Monitor" />
+                        </ListItemButton>
+                        <ListItemButton sx={{ pl: 4 }} onClick={() => navigate('/patient-support')}>
+                          <ListItemIcon sx={{ color: 'primary.main' }}>
+                            <SupportAgent />
+                          </ListItemIcon>
+                          <ListItemText primary="Patient Support" />
+                        </ListItemButton>
+                      </>
                     )}
                   </List>
                 </Collapse>

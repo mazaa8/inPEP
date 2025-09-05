@@ -1,4 +1,4 @@
-import { Paper, Typography, List, ListItem, ListItemButton, ListItemText, Divider, Box } from '@mui/material';
+import { Typography, List, ListItem, ListItemButton, ListItemText, Divider, Box } from '@mui/material';
 import { CheckCircle, Error } from '@mui/icons-material';
 import { Link as RouterLink } from 'react-router-dom';
 
@@ -17,8 +17,7 @@ const patients = [
 
 const EMRIntegration = () => {
   return (
-    <Paper sx={{ p: 2, mt: 4 }}>
-      <Typography variant="h6" gutterBottom>Seamless EMR Integration</Typography>
+    <Box sx={{ p: 2, mt: 4 }}>
       
       {/* Live Data Sync Status */}
       <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
@@ -51,7 +50,7 @@ const EMRIntegration = () => {
           </div>
         ))}
       </List>
-    </Paper>
+    </Box>
   );
 };
 

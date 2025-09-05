@@ -1,4 +1,4 @@
-import { Typography, List, ListItem, ListItemText, Avatar, ListItemAvatar, ListItemButton } from '@mui/material';
+import { List, ListItem, ListItemText, Avatar, ListItemAvatar, ListItemButton } from '@mui/material';
 
 const patients = [
   { id: 1, name: 'John Doe', condition: 'Hypertension', avatar: 'JD' },
@@ -8,9 +8,7 @@ const patients = [
 
 const PatientList = () => {
   return (
-    <>
-      <Typography variant="h6" gutterBottom>Your Patients</Typography>
-      <List>
+      <List sx={{ p: 0 }}>
         {patients.map((patient) => (
           <ListItem key={patient.id} disablePadding>
             <ListItemButton>
@@ -22,7 +20,6 @@ const PatientList = () => {
           </ListItem>
         ))}
       </List>
-    </>
   );
 };
 

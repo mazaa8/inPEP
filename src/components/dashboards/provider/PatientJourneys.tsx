@@ -1,4 +1,4 @@
-import { Paper, Typography } from '@mui/material';
+import { Box, Typography } from '@mui/material';
 import Timeline from '@mui/lab/Timeline';
 import TimelineItem from '@mui/lab/TimelineItem';
 import TimelineSeparator from '@mui/lab/TimelineSeparator';
@@ -9,8 +9,7 @@ import { EventNote, Healing, CheckCircle } from '@mui/icons-material';
 
 const PatientJourneys = () => {
   return (
-    <Paper sx={{ p: 2 }}>
-      <Typography variant="h6" gutterBottom>Patient & Caregiver Journeys</Typography>
+    <Box sx={{ p: 2 }}>
       <Timeline position="alternate">
         <TimelineItem>
           <TimelineSeparator>
@@ -68,7 +67,7 @@ const PatientJourneys = () => {
           </TimelineContent>
         </TimelineItem>
       </Timeline>
-    </Paper>
+    </Box>
   );
 };
 
