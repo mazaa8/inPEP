@@ -27,7 +27,7 @@ const initialFamilyData: FamilyMember[] = [
 ];
 
 const HerediblesPage = () => {
-  const [familyMembers, setFamilyMembers] = useState(initialFamilyData);
+  const [familyMembers] = useState(initialFamilyData);
   const [isAdding, setIsAdding] = useState(false);
 
   return (

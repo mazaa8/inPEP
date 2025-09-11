@@ -16,7 +16,9 @@ export interface WeeklyMealPlan {
 interface MealPlanContextType {
   availableMeals: Meal[];
   weeklyPlan: WeeklyMealPlan;
-  updateMeal: (day: string, mealType: keyof DailyMealPlan, mealId: string) => void;
+  updateMeal: (day: string, mealType: keyof DailyMealPlan, mealId: string | null) => void;
+  selectedMeal: string | null;
+  selectMeal: (mealId: string | null) => void;
 }
 
 // Create a default weekly plan
@@ -34,8 +36,9 @@ const MealPlanContext = createContext<MealPlanContextType | undefined>(undefined
 
 export const MealPlanProvider = ({ children }: { children: ReactNode }) => {
   const [weeklyPlan, setWeeklyPlan] = useState<WeeklyMealPlan>(initialWeeklyPlan);
+  const [selectedMeal, selectMeal] = useState<string | null>(null);
 
-  const updateMeal = (day: string, mealType: keyof DailyMealPlan, mealId: string) => {
+  const updateMeal = (day: string, mealType: keyof DailyMealPlan, mealId: string | null) => {
     setWeeklyPlan(prevPlan => ({
       ...prevPlan,
       [day]: {
@@ -46,7 +49,15 @@ export const MealPlanProvider = ({ children }: { children: ReactNode }) => {
   };
 
   return (
-    <MealPlanContext.Provider value={{ availableMeals: mealPlans, weeklyPlan, updateMeal }}>
+    <MealPlanContext.Provider
+      value={{
+        availableMeals: mealPlans,
+        weeklyPlan,
+        updateMeal,
+        selectedMeal,
+        selectMeal,
+      }}
+    >
       {children}
     </MealPlanContext.Provider>
   );

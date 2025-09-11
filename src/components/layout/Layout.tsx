@@ -7,8 +7,10 @@ import {
   MonitorHeartOutlined as MonitorHeart,
   MeetingRoomOutlined as MeetingRoom,
   EventNoteOutlined as EventNote,
+  ScheduleOutlined as ScheduleIcon,
   ShoppingCartOutlined as ShoppingCart,
   RestaurantMenuOutlined as RestaurantMenu,
+  LocalPharmacyOutlined as LocalPharmacy,
   SupportAgentOutlined as SupportAgent,
   WorkspacePremiumOutlined as WorkspacePremium,
   VolunteerActivismOutlined as VolunteerActivism,
@@ -320,6 +322,12 @@ const Layout = ({ children, title }: LayoutProps) => {
                           </ListItemIcon>
                           <ListItemText primary="Patient Support" />
                         </ListItemButton>
+                        <ListItemButton sx={{ pl: 4 }} onClick={() => navigate('/caregiver/pharmacy')}>
+                          <ListItemIcon sx={{ color: 'primary.main' }}>
+                            <LocalPharmacy />
+                          </ListItemIcon>
+                          <ListItemText primary="Pharmacy" />
+                        </ListItemButton>
                       </>
                     )}
                   </List>
@@ -357,6 +365,12 @@ const Layout = ({ children, title }: LayoutProps) => {
                         <ShoppingCart />
                       </ListItemIcon>
                       <ListItemText primary="Grocery List" />
+                    </ListItemButton>
+                    <ListItemButton sx={{ pl: 4 }} onClick={() => navigate('/caregiver/medication-schedule')}>
+                      <ListItemIcon sx={{ color: 'primary.main' }}>
+                        <ScheduleIcon />
+                      </ListItemIcon>
+                      <ListItemText primary="Medication Scheduler" />
                     </ListItemButton>
                   </List>
                 </Collapse>

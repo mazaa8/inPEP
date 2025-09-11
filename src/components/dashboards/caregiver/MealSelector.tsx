@@ -18,7 +18,7 @@ const MealSelector = () => {
         <InputLabel id="dinner-select-label">Dinner Choice</InputLabel>
         <Select
           labelId="dinner-select-label"
-          value={selectedMeal?.id || ''}
+          value={selectedMeal || ''}
           label="Dinner Choice"
           onChange={handleMealChange}
         >

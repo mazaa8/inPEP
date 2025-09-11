@@ -1,11 +1,9 @@
 import { Box, Typography, Container, Grid, Paper, Button, Avatar } from '@mui/material';
 import { styled } from '@mui/material/styles';
-import ForumIcon from '@mui/icons-material/Forum';
-import GroupWorkIcon from '@mui/icons-material/GroupWork';
 import IntegrationInstructionsIcon from '@mui/icons-material/IntegrationInstructions';
 import TimelineIcon from '@mui/icons-material/Timeline';
 import { useNavigate } from 'react-router-dom';
-import { Diversity2, Healing, MonitorHeart } from '@mui/icons-material';
+import { Diversity2, Healing } from '@mui/icons-material';
 
 const HeroBox = styled(Box)(({ theme }) => ({
   background: `linear-gradient(45deg, ${theme.palette.primary.main} 30%, ${theme.palette.primary.dark} 90%)`,

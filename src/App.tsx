@@ -8,7 +8,7 @@ import LoginPage from './pages/auth/LoginPage';
 import PatientDashboard from './pages/dashboards/PatientDashboard';
 import PatientSupportPage from './pages/patient/PatientSupportPage';
 import MealPlanPage from './pages/patient/MealPlanPage';
-import HerediblesPage from './pages/patient/HerediblesPage';
+import PatientHerediblesPage from './pages/patient/HerediblesPage';
 import CaregiverDashboard from './pages/dashboards/CaregiverDashboard';
 import ProviderDashboard from './pages/dashboards/ProviderDashboard';
 import ProviderMessagesPage from './pages/provider/ProviderMessagesPage';
@@ -24,11 +24,12 @@ import CarePlanningPage from './pages/caregiver/CarePlanningPage';
 import CaregiverSupportPage from './pages/caregiver/CaregiverSupportPage';
 import ReclaimePage from './pages/caregiver/ReclaimePage';
 import GroceryShoppingListPage from './pages/caregiver/features/GroceryShoppingListPage';
-import HerediblesPage from './pages/caregiver/features/HerediblesPage';
+import CaregiverHerediblesPage from './pages/caregiver/features/HerediblesPage';
 import PharmacyPage from './pages/caregiver/features/PharmacyPage';
 import CaregivingTipsPage from './pages/caregiver/features/CaregivingTipsPage';
 import ChampionCornerPage from './pages/caregiver/features/ChampionCornerPage';
 import StorySubmissionPage from './pages/caregiver/features/StorySubmissionPage';
+import MedicationSchedulePage from './pages/caregiver/features/MedicationSchedulePage';
 import CaregiverMessagesPage from './pages/caregiver/MessagesPage';
 import CaregiverWelcomeLand from './pages/dashboard/CaregiverWelcomeLand';
 import AppointmentsBillingPage from './pages/caregiver/features/AppointmentsBillingPage';
@@ -57,7 +58,7 @@ function App() {
               <Route path="/welcome-home/patient" element={<WelcomeHomePatient />} />
               <Route path="/dashboard/patient" element={<PatientDashboard />} />
                             <Route path="/patient/meal-plan" element={<MealPlanPage />} />
-              <Route path="/patient/heredibles" element={<HerediblesPage />} />
+              <Route path="/patient/heredibles" element={<PatientHerediblesPage />} />
             </Route>
             <Route element={<ProtectedRoute allowedRoles={['Caregiver']} />}>
               <Route path="/patient-support" element={<PatientSupportPage />} />
@@ -67,7 +68,7 @@ function App() {
               <Route path="/caregiver-support" element={<CaregiverSupportPage />} />
               <Route path="/reclaime" element={<ReclaimePage />} />
               <Route path="/caregiver/grocery-list" element={<GroceryShoppingListPage />} />
-              <Route path="/caregiver/heredibles" element={<HerediblesPage />} />
+              <Route path="/caregiver/heredibles" element={<CaregiverHerediblesPage />} />
               <Route path="/caregiver/pharmacy" element={<PharmacyPage />} />
               <Route path="/caregiver/care-tips" element={<CaregivingTipsPage />} />
               <Route path="/caregiver/appointments-billing" element={<AppointmentsBillingPage />} />
@@ -75,6 +76,7 @@ function App() {
               <Route path="/champion-corner" element={<ChampionCornerPage />} />
               <Route path="/share-your-story" element={<StorySubmissionPage />} />
               <Route path="/caregiver/messages" element={<CaregiverMessagesPage />} />
+              <Route path="/caregiver/medication-schedule" element={<MedicationSchedulePage />} />
             </Route>
             <Route element={<ProtectedRoute allowedRoles={['Provider']} />}>
               <Route path="/welcome-home/provider" element={<WelcomeHomeProvider />} />
