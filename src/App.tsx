@@ -8,7 +8,7 @@ import LoginPage from './pages/auth/LoginPage';
 import PatientDashboard from './pages/dashboards/PatientDashboard';
 import PatientSupportPage from './pages/patient/PatientSupportPage';
 import MealPlanPage from './pages/patient/MealPlanPage';
-import PatientHerediblesPage from './pages/patient/HerediblesPage';
+import HerediblesPage from './pages/patient/HerediblesPage';
 import CaregiverDashboard from './pages/dashboards/CaregiverDashboard';
 import ProviderDashboard from './pages/dashboards/ProviderDashboard';
 import ProviderMessagesPage from './pages/provider/ProviderMessagesPage';
@@ -39,12 +39,14 @@ import TermsOfService from './pages/support/TermsOfService';
 import PrivacyPolicy from './pages/support/PrivacyPolicy';
 import { AuthProvider } from './context/AuthContext';
 import { EmergencyAlertProvider } from './context/EmergencyAlertContext';
+import { PatientSummaryProvider } from './context/PatientSummaryContext';
 
 function App() {
   return (
     <AuthProvider>
       <EmergencyAlertProvider>
-        <Router>
+        <PatientSummaryProvider>
+          <Router>
           <Routes>
             <Route path="/" element={<LandingPage />} />
             <Route path="/login" element={<LoginPage />} />
@@ -54,8 +56,8 @@ function App() {
             <Route element={<ProtectedRoute allowedRoles={['Patient']} />}>
               <Route path="/welcome-home/patient" element={<WelcomeHomePatient />} />
               <Route path="/dashboard/patient" element={<PatientDashboard />} />
-              <Route path="/patient/meal-plan" element={<MealPlanPage />} />
-              <Route path="/patient/heredibles" element={<PatientHerediblesPage />} />
+                            <Route path="/patient/meal-plan" element={<MealPlanPage />} />
+              <Route path="/patient/heredibles" element={<HerediblesPage />} />
             </Route>
             <Route element={<ProtectedRoute allowedRoles={['Caregiver']} />}>
               <Route path="/patient-support" element={<PatientSupportPage />} />
@@ -94,7 +96,8 @@ function App() {
               <Route path="/settings" element={<SettingsPage />} />
             </Route>
           </Routes>
-        </Router>
+          </Router>
+        </PatientSummaryProvider>
       </EmergencyAlertProvider>
     </AuthProvider>
   );

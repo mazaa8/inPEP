@@ -2,10 +2,10 @@ import { useState } from 'react';
 import { Grid } from '@mui/material';
 import Layout from '../../components/layout/Layout';
 import TodaysSummary from '../../components/dashboards/caregiver/TodaysSummary';
+import Reminders from '../../components/dashboards/caregiver/Reminders';
 import MedicationChecklist, { type Medication } from '../../components/dashboards/caregiver/MedicationChecklist';
 import AppointmentsCalendar, { type AppointmentEvent } from '../../components/dashboards/caregiver/AppointmentsCalendar';
 import VitalsLog, { type VitalsData } from '../../components/dashboards/caregiver/VitalsLog';
-import WeeklyMealPlanner from '../../components/dashboards/caregiver/WeeklyMealPlanner';
 
 const appointmentsData: AppointmentEvent[] = [
   {
@@ -43,11 +43,7 @@ const initialMedications: Medication[] = [
   { id: 4, name: 'Aspirin', dose: '81mg', time: '8:00 PM', taken: false },
 ];
 
-const summaryData = {
-  mood: 'Cheerful and energetic',
-  notes: 'Watched a movie in the afternoon.',
-  tasks: ['Morning medication due', 'Check blood pressure at 3 PM'],
-};
+const remindersData = ['Morning medication due', 'Check blood pressure at 3 PM'];
 
 const CaregiverDashboard = () => {
   const [medications, setMedications] = useState<Medication[]>(initialMedications);
@@ -61,13 +57,16 @@ const CaregiverDashboard = () => {
   };
 
   return (
-    <Layout title="Caregiver Dashboard">
+    <Layout title="Caregiving Patient Monitor">
       <Grid container spacing={3}>
         {/* Main column for smaller components */}
         <Grid item xs={12} lg={4}>
           <Grid container spacing={3}>
             <Grid item xs={12}>
-              <TodaysSummary mood={summaryData.mood} notes={summaryData.notes} tasks={summaryData.tasks} />
+              <TodaysSummary />
+            </Grid>
+            <Grid item xs={12}>
+              <Reminders tasks={remindersData} />
             </Grid>
             <Grid item xs={12}>
               <MedicationChecklist medications={medications} onToggle={handleToggleMedication} />
@@ -75,11 +74,10 @@ const CaregiverDashboard = () => {
             <Grid item xs={12}>
               <VitalsLog data={vitalsData} />
             </Grid>
-                      </Grid>
+                                  </Grid>
         </Grid>
         {/* Larger column for the calendar */}
         <Grid item xs={12} lg={8}>
-          <WeeklyMealPlanner />
           <AppointmentsCalendar events={appointmentsData} />
         </Grid>
       </Grid>

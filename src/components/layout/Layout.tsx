@@ -214,7 +214,7 @@ const Layout = ({ children, title }: LayoutProps) => {
                 </ListItem>
               </>
             )}
-            {(user?.role === 'Caregiver' || user?.role === 'Patient') && (
+            {user?.role === 'Caregiver' && (
               <>
                 <ListItem disablePadding>
                   <ListItemButton onClick={handleReclaiMeClick}>
@@ -298,17 +298,11 @@ const Layout = ({ children, title }: LayoutProps) => {
                           </ListItemIcon>
                           <ListItemText primary="Health Summary" />
                         </ListItemButton>
-                        <ListItemButton sx={{ pl: 4 }} onClick={() => navigate('/patient/heredibles')}>
-                          <ListItemIcon sx={{ color: 'primary.main' }}>
-                            <AllInclusive />
-                          </ListItemIcon>
-                          <ListItemText primary="Heredibles" />
-                        </ListItemButton>
                         <ListItemButton sx={{ pl: 4 }} onClick={() => navigate('/patient/meal-plan')}>
                           <ListItemIcon sx={{ color: 'primary.main' }}>
                             <RestaurantMenu />
                           </ListItemIcon>
-                          <ListItemText primary="Meal Plan" />
+                          <ListItemText primary="Heredibles™" />
                         </ListItemButton>
                       </>
                     )}
