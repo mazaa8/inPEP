@@ -1,0 +1,103 @@
+// This is your Prisma schema file
+// Learn more: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String   @id @default(uuid())
+  email         String   @unique
+  passwordHash  String
+  name          String
+  role          String   // PATIENT, CAREGIVER, PROVIDER, INSURER
+  phoneNumber   String?
+  dateOfBirth   DateTime?
+  address       String?
+  
+  // Metadata
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  lastLogin     DateTime?
+  isActive      Boolean  @default(true)
+  
+  // Relations
+  patientProfile    PatientProfile?
+  caregiverProfile  CaregiverProfile?
+  providerProfile   ProviderProfile?
+  insurerProfile    InsurerProfile?
+  
+  @@map("users")
+}
+
+model PatientProfile {
+  id                String   @id @default(uuid())
+  userId            String   @unique
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  medicalRecordNumber String? @unique
+  bloodType         String?
+  allergies         String?  // JSON string or comma-separated
+  chronicConditions String?  // JSON string or comma-separated
+  emergencyContact  String?
+  
+  caregiverId       String?
+  primaryProviderId String?
+  insurerId         String?
+  
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  @@map("patient_profiles")
+}
+
+model CaregiverProfile {
+  id                String   @id @default(uuid())
+  userId            String   @unique
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  relationshipType  String?  // e.g., "Spouse", "Child", "Professional Caregiver"
+  licenseNumber     String?
+  
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  @@map("caregiver_profiles")
+}
+
+model ProviderProfile {
+  id                String   @id @default(uuid())
+  userId            String   @unique
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  specialty         String?
+  licenseNumber     String   @unique
+  npiNumber         String?  @unique // National Provider Identifier
+  clinicName        String?
+  clinicAddress     String?
+  
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  @@map("provider_profiles")
+}
+
+model InsurerProfile {
+  id                String   @id @default(uuid())
+  userId            String   @unique
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  companyName       String
+  policyNumber      String?  @unique
+  department        String?
+  
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  @@map("insurer_profiles")
+}

@@ -5,6 +5,8 @@ import WelcomeHomePatient from './pages/landing/WelcomeHomePatient';
 import WelcomeHomeInsurer from './pages/landing/WelcomeHomeInsurer';
 import WelcomeHomeProvider from './pages/landing/WelcomeHomeProvider';
 import LoginPage from './pages/auth/LoginPage';
+import RealLoginPage from './pages/auth/RealLoginPage';
+import TestLogin from './pages/auth/TestLogin';
 import PatientDashboard from './pages/dashboards/PatientDashboard';
 import PatientSupportPage from './pages/patient/PatientSupportPage';
 import MealPlanPage from './pages/patient/MealPlanPage';
@@ -51,16 +53,18 @@ function App() {
           <Routes>
             <Route path="/" element={<LandingPage />} />
             <Route path="/login" element={<LoginPage />} />
+            <Route path="/auth" element={<RealLoginPage />} />
+            <Route path="/test-login" element={<TestLogin />} />
             <Route path="/help-center" element={<HelpCenter />} />
             <Route path="/terms-of-service" element={<TermsOfService />} />
             <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-            <Route element={<ProtectedRoute allowedRoles={['Patient']} />}>
+            <Route element={<ProtectedRoute allowedRoles={['PATIENT']} />}>
               <Route path="/welcome-home/patient" element={<WelcomeHomePatient />} />
               <Route path="/dashboard/patient" element={<PatientDashboard />} />
                             <Route path="/patient/meal-plan" element={<MealPlanPage />} />
               <Route path="/patient/heredibles" element={<PatientHerediblesPage />} />
             </Route>
-            <Route element={<ProtectedRoute allowedRoles={['Caregiver']} />}>
+            <Route element={<ProtectedRoute allowedRoles={['CAREGIVER']} />}>
               <Route path="/patient-support" element={<PatientSupportPage />} />
               <Route path="/dashboard/caregiver" element={<CaregiverDashboard />} />
               <Route path="/patient-monitor" element={<PatientMonitorPage />} />
@@ -78,19 +82,19 @@ function App() {
               <Route path="/caregiver/messages" element={<CaregiverMessagesPage />} />
               <Route path="/caregiver/medication-schedule" element={<MedicationSchedulePage />} />
             </Route>
-            <Route element={<ProtectedRoute allowedRoles={['Provider']} />}>
+            <Route element={<ProtectedRoute allowedRoles={['PROVIDER']} />}>
               <Route path="/welcome-home/provider" element={<WelcomeHomeProvider />} />
               <Route path="/dashboard/provider" element={<ProviderDashboard />} />
               <Route path="/dashboard/analytics" element={<AnalyticsPage />} />
               <Route path="/provider/messages" element={<ProviderMessagesPage />} />
               <Route path="/provider/appointments" element={<ProviderAppointmentsPage />} />
             </Route>
-            <Route element={<ProtectedRoute allowedRoles={['Insurer']} />}>
+            <Route element={<ProtectedRoute allowedRoles={['INSURER']} />}>
               <Route path="/welcome-home/insurer" element={<WelcomeHomeInsurer />} />
               <Route path="/dashboard/insurer" element={<InsurerDashboard />} />
               <Route path="/insurer/messages" element={<InsurerMessagesPage />} />
             </Route>
-            <Route element={<ProtectedRoute allowedRoles={['Caregiver']} />}>
+            <Route element={<ProtectedRoute allowedRoles={['CAREGIVER']} />}>
               <Route path="/welcome-home" element={<WelcomeHomePage />} />
               <Route path="/dashboard" element={<CaregiverWelcomeLand />} />
               <Route path="/profile" element={<ProfilePage />} />

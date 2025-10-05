@@ -96,27 +96,28 @@ const Layout = ({ children, title }: LayoutProps) => {
   const handleCarePlanningClick = () => {
     setCarePlanningOpen(!carePlanningOpen);
   };
-
   const handleReclaiMeClick = () => {
     setReclaiMeOpen(!reclaiMeOpen);
   };
 
       const handleLogoClick = () => {
-    if (user?.role === 'Caregiver') {
+    if (user?.role === 'CAREGIVER') {
       navigate('/dashboard');
-    } else if (user?.role === 'Provider') {
+    } else if (user?.role === 'PROVIDER') {
       navigate('/dashboard/provider');
-    } else {
-      navigate('/');
+    } else if (user?.role === 'PATIENT') {
+      navigate('/dashboard/patient');
+    } else if (user?.role === 'INSURER') {
+      navigate('/dashboard/insurer');
     }
   };
 
-    const handleNotificationClick = () => {
-    if (user?.role === 'Provider') {
+  const handleNotificationClick = () => {
+    if (user?.role === 'PROVIDER') {
       navigate('/provider/messages');
-    } else if (user?.role === 'Caregiver') {
+    } else if (user?.role === 'CAREGIVER') {
       navigate('/caregiver/messages');
-    } else if (user?.role === 'Insurer') {
+    } else if (user?.role === 'INSURER') {
       navigate('/insurer/messages');
     }
   };
@@ -196,7 +197,7 @@ const Layout = ({ children, title }: LayoutProps) => {
         <Toolbar />
         <Box sx={{ overflow: 'auto' }}>
           <List>
-            {user?.role === 'Provider' && (
+            {user?.role === 'PROVIDER' && (
               <>
                 <ListItem disablePadding>
                   <ListItemButton onClick={() => navigate('/dashboard/provider')}>
@@ -216,7 +217,7 @@ const Layout = ({ children, title }: LayoutProps) => {
                 </ListItem>
               </>
             )}
-            {user?.role === 'Caregiver' && (
+            {user?.role === 'CAREGIVER' && (
               <>
                 <ListItem disablePadding>
                   <ListItemButton onClick={handleReclaiMeClick}>
@@ -235,7 +236,7 @@ const Layout = ({ children, title }: LayoutProps) => {
                       </ListItemIcon>
                       <ListItemText primary="Profile" />
                     </ListItemButton>
-                    {user?.role === 'Caregiver' && (
+                    {user?.role === 'CAREGIVER' && (
                       <>
                         <ListItemButton sx={{ pl: 4 }} onClick={() => navigate('/champion-corner')}>
                           <ListItemIcon sx={{ color: 'primary.main' }}>
@@ -262,7 +263,7 @@ const Layout = ({ children, title }: LayoutProps) => {
               </>
             )}
 
-            {user?.role === 'Insurer' ? (
+            {user?.role === 'INSURER' ? (
               <>
                 <ListItem disablePadding>
                   <ListItemButton onClick={() => navigate('/dashboard/insurer')}>
@@ -286,7 +287,7 @@ const Layout = ({ children, title }: LayoutProps) => {
                 </ListItem>
                 <Collapse in={dashboardOpen} timeout="auto" unmountOnExit>
                   <List component="div" disablePadding>
-                    {user?.role === 'Patient' && (
+                    {user?.role === 'PATIENT' && (
                       <>
                         <ListItemButton sx={{ pl: 4 }} onClick={() => navigate('/dashboard/patient')}>
                           <ListItemIcon sx={{ color: 'primary.main' }}>
@@ -308,7 +309,7 @@ const Layout = ({ children, title }: LayoutProps) => {
                         </ListItemButton>
                       </>
                     )}
-                    {user?.role === 'Caregiver' && (
+                    {user?.role === 'CAREGIVER' && (
                       <>
                         <ListItemButton sx={{ pl: 4 }} onClick={() => navigate('/dashboard/caregiver')}>
                           <ListItemIcon sx={{ color: 'primary.main' }}>
@@ -335,7 +336,7 @@ const Layout = ({ children, title }: LayoutProps) => {
               </>
             )}
 
-            {user?.role === 'Caregiver' && (
+            {user?.role === 'CAREGIVER' && (
               <>
                 <ListItem disablePadding>
                   <ListItemButton onClick={handleCarePlanningClick}>

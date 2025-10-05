@@ -71,7 +71,7 @@ const LandingPage = () => {
   const handleRoleSelect = (roleId: string) => {
     // Store selected role in sessionStorage to pass to login
     sessionStorage.setItem('selectedRole', roleId);
-    navigate('/login');
+    navigate('/auth');
   };
 
   return (
