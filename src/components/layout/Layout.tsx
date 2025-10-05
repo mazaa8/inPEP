@@ -168,6 +168,14 @@ const Layout = ({ children, title, darkMode = false, themeColor }: LayoutProps) 
           borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
           boxShadow: '0 4px 20px rgba(0, 0, 0, 0.3)',
         }),
+        ...(themeColor === 'INSURER' && !darkMode && {
+          background: 'linear-gradient(135deg, rgba(74, 20, 140, 0.95) 0%, rgba(123, 31, 162, 0.95) 100%)',
+          backdropFilter: 'blur(20px)',
+          WebkitBackdropFilter: 'blur(20px)',
+          borderBottom: '1px solid rgba(186, 104, 200, 0.3)',
+          boxShadow: '0 4px 20px rgba(123, 31, 162, 0.3)',
+          color: 'white',
+        }),
       }}>
         <Toolbar>
           <Button color="inherit" onClick={handleLogoClick} sx={{ textTransform: 'none', p: 1 }}>
@@ -222,6 +230,13 @@ const Layout = ({ children, title, darkMode = false, themeColor }: LayoutProps) 
               backdropFilter: 'blur(20px)',
               WebkitBackdropFilter: 'blur(20px)',
               borderRight: '1px solid rgba(255, 255, 255, 0.1)',
+              color: 'white',
+            }),
+            ...(themeColor === 'INSURER' && !darkMode && {
+              background: 'linear-gradient(180deg, rgba(94, 40, 160, 0.92) 0%, rgba(123, 31, 162, 0.92) 100%)',
+              backdropFilter: 'blur(20px)',
+              WebkitBackdropFilter: 'blur(20px)',
+              borderRight: '1px solid rgba(186, 104, 200, 0.3)',
               color: 'white',
             }),
           },
@@ -307,11 +322,22 @@ const Layout = ({ children, title, darkMode = false, themeColor }: LayoutProps) 
             {user?.role === 'INSURER' ? (
               <>
                 <ListItem disablePadding>
-                  <ListItemButton onClick={() => navigate('/dashboard/insurer')}>
-                    <ListItemIcon>
+                  <ListItemButton 
+                    onClick={() => navigate('/dashboard/insurer')}
+                    sx={{
+                      color: 'white',
+                      '&:hover': {
+                        bgcolor: 'rgba(156, 39, 176, 0.2)',
+                      },
+                    }}
+                  >
+                    <ListItemIcon sx={{ color: currentTheme.secondary }}>
                       <Dashboard />
                     </ListItemIcon>
-                    <ListItemText primary="Analytics Dashboard" />
+                    <ListItemText 
+                      primary="Analytics Dashboard"
+                      primaryTypographyProps={{ fontWeight: 600 }}
+                    />
                   </ListItemButton>
                 </ListItem>
               </>
@@ -441,6 +467,9 @@ const Layout = ({ children, title, darkMode = false, themeColor }: LayoutProps) 
         ...(darkMode && {
           background: 'transparent',
         }),
+        ...(themeColor === 'INSURER' && !darkMode && {
+          background: 'transparent',
+        }),
       }}>
         <Box component="main" sx={{ 
           flexGrow: 1, 
@@ -449,11 +478,44 @@ const Layout = ({ children, title, darkMode = false, themeColor }: LayoutProps) 
           ...(darkMode && {
             background: 'transparent',
           }),
+          ...(themeColor === 'INSURER' && !darkMode && {
+            background: 'transparent',
+          }),
         }}>
-          {title && <Typography variant="h4" gutterBottom sx={{ ...(darkMode && { color: 'white' }) }}>{title}</Typography>}
+          {title && <Typography variant="h4" gutterBottom sx={{ 
+            ...(darkMode && { color: 'white' }),
+            ...(themeColor === 'INSURER' && !darkMode && { color: '#4a148c' }),
+          }}>{title}</Typography>}
           {children}
         </Box>
-        {!darkMode && <Footer />}
+        {!darkMode && themeColor !== 'INSURER' && <Footer />}
+        {themeColor === 'INSURER' && !darkMode && (
+          <Box sx={{
+            background: 'linear-gradient(135deg, rgba(74, 20, 140, 0.95) 0%, rgba(123, 31, 162, 0.95) 100%)',
+            backdropFilter: 'blur(20px)',
+            WebkitBackdropFilter: 'blur(20px)',
+            borderTop: '1px solid rgba(186, 104, 200, 0.3)',
+            py: 3,
+            px: 4,
+          }}>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.7)' }}>
+                © 2024 inPEP™. All rights reserved.
+              </Typography>
+              <Box sx={{ display: 'flex', gap: 3 }}>
+                <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.7)', cursor: 'pointer', '&:hover': { color: currentTheme.secondary } }}>
+                  Privacy Policy
+                </Typography>
+                <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.7)', cursor: 'pointer', '&:hover': { color: currentTheme.secondary } }}>
+                  Terms of Service
+                </Typography>
+                <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.7)', cursor: 'pointer', '&:hover': { color: currentTheme.secondary } }}>
+                  Contact Support
+                </Typography>
+              </Box>
+            </Box>
+          </Box>
+        )}
       </Box>
     </Box>
   );

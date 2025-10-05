@@ -4,17 +4,24 @@ import {
   TextField,
   Button,
   Box,
-  Paper,
   Alert,
   Avatar,
   Typography,
   Tab,
   Tabs,
   CircularProgress,
+  ToggleButton,
+  ToggleButtonGroup,
 } from '@mui/material';
-import { LockOutlined as LockIcon } from '@mui/icons-material';
+import { 
+  Person as PatientIcon,
+  Business as InsurerIcon,
+  LocalHospital as ProviderIcon,
+  FavoriteBorder as CaregiverIcon,
+} from '@mui/icons-material';
 import { useAuth } from '../../context/AuthContext';
 import { authService } from '../../services/authService';
+import { roleColors } from '../../styles/glassmorphism';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -122,6 +129,49 @@ const RealLoginPage = () => {
     }
   };
 
+  const getRoleTheme = () => {
+    switch (role) {
+      case 'PATIENT':
+        return {
+          background: 'linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%)',
+          cardBg: 'rgba(255, 255, 255, 0.05)',
+          textColor: 'white',
+          icon: <PatientIcon />,
+          gradient: roleColors.PATIENT.gradient,
+          primary: roleColors.PATIENT.primary,
+        };
+      case 'INSURER':
+        return {
+          background: 'linear-gradient(135deg, #faf8ff 0%, #f0ebff 50%, #e8deff 100%)',
+          cardBg: 'rgba(255, 255, 255, 0.7)',
+          textColor: '#4a148c',
+          icon: <InsurerIcon />,
+          gradient: roleColors.INSURER.gradient,
+          primary: roleColors.INSURER.primary,
+        };
+      case 'PROVIDER':
+        return {
+          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+          cardBg: 'rgba(255, 255, 255, 0.9)',
+          textColor: '#333',
+          icon: <ProviderIcon />,
+          gradient: roleColors.PROVIDER.gradient,
+          primary: roleColors.PROVIDER.primary,
+        };
+      case 'CAREGIVER':
+        return {
+          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+          cardBg: 'rgba(255, 255, 255, 0.9)',
+          textColor: '#333',
+          icon: <CaregiverIcon />,
+          gradient: roleColors.CAREGIVER.gradient,
+          primary: roleColors.CAREGIVER.primary,
+        };
+    }
+  };
+
+  const theme = getRoleTheme();
+
   return (
     <Box
       sx={{
@@ -129,24 +179,91 @@ const RealLoginPage = () => {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        background: theme.background,
         p: 2,
+        transition: 'background 0.5s ease',
       }}
     >
-      <Paper elevation={6} sx={{ maxWidth: 500, width: '100%', p: 4 }}>
-        <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', mb: 3 }}>
-          <Avatar sx={{ m: 1, bgcolor: 'primary.main', width: 56, height: 56 }}>
-            <LockIcon />
+      <Box sx={{ 
+        maxWidth: 500, 
+        width: '100%', 
+        p: 4,
+        background: theme.cardBg,
+        backdropFilter: 'blur(30px)',
+        WebkitBackdropFilter: 'blur(30px)',
+        border: role === 'PATIENT' ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid rgba(255, 255, 255, 0.8)',
+        borderRadius: '24px',
+        boxShadow: role === 'PATIENT' ? '0 8px 32px rgba(0, 0, 0, 0.4)' : '0 8px 32px rgba(156, 39, 176, 0.2)',
+      }}>
+        <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', mb: 4 }}>
+          <Avatar sx={{ 
+            m: 1, 
+            background: theme.gradient,
+            width: 72, 
+            height: 72,
+            boxShadow: `0 8px 24px ${theme.primary}40`,
+          }}>
+            {theme.icon}
           </Avatar>
-          <Typography component="h1" variant="h5" fontWeight="bold">
-            My Health Hub
+          <Typography component="h1" variant="h4" sx={{ fontWeight: 700, color: theme.textColor, mt: 2 }}>
+            inPEP™
           </Typography>
-          <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-            Healthcare Management Platform
+          <Typography variant="body1" sx={{ color: role === 'PATIENT' ? 'rgba(255,255,255,0.7)' : 'rgba(74, 20, 140, 0.7)', mt: 0.5 }}>
+            {role === 'PATIENT' ? 'Patient Portal' : role === 'INSURER' ? 'Insurer Analytics' : 'Healthcare Platform'}
           </Typography>
         </Box>
 
-        <Tabs value={tabValue} onChange={handleTabChange} centered sx={{ mb: 2 }}>
+        {/* Role Selector */}
+        <Box sx={{ mb: 3 }}>
+          <Typography variant="body2" sx={{ color: theme.textColor, mb: 1.5, fontWeight: 600, textAlign: 'center' }}>
+            Select Your Role
+          </Typography>
+          <ToggleButtonGroup
+            value={role}
+            exclusive
+            onChange={(_, newRole) => newRole && setRole(newRole)}
+            fullWidth
+            sx={{
+              '& .MuiToggleButton-root': {
+                color: role === 'PATIENT' ? 'rgba(255,255,255,0.7)' : 'rgba(74, 20, 140, 0.7)',
+                borderColor: role === 'PATIENT' ? 'rgba(255,255,255,0.2)' : 'rgba(156, 39, 176, 0.3)',
+                '&.Mui-selected': {
+                  background: theme.gradient,
+                  color: 'white',
+                  fontWeight: 700,
+                  '&:hover': {
+                    background: theme.gradient,
+                  },
+                },
+              },
+            }}
+          >
+            <ToggleButton value="PATIENT">Patient</ToggleButton>
+            <ToggleButton value="CAREGIVER">Caregiver</ToggleButton>
+            <ToggleButton value="PROVIDER">Provider</ToggleButton>
+            <ToggleButton value="INSURER">Insurer</ToggleButton>
+          </ToggleButtonGroup>
+        </Box>
+
+        <Tabs 
+          value={tabValue} 
+          onChange={handleTabChange} 
+          centered 
+          sx={{ 
+            mb: 3,
+            '& .MuiTab-root': {
+              color: role === 'PATIENT' ? 'rgba(255,255,255,0.7)' : 'rgba(74, 20, 140, 0.7)',
+              fontWeight: 600,
+              '&.Mui-selected': {
+                color: role === 'PATIENT' ? 'white' : theme.primary,
+              },
+            },
+            '& .MuiTabs-indicator': {
+              background: theme.gradient,
+              height: 3,
+            },
+          }}
+        >
           <Tab label="Sign In" />
           <Tab label="Sign Up" />
         </Tabs>
@@ -171,6 +288,17 @@ const RealLoginPage = () => {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               disabled={loading}
+              sx={{
+                '& .MuiOutlinedInput-root': {
+                  color: theme.textColor,
+                  bgcolor: role === 'PATIENT' ? 'rgba(255,255,255,0.05)' : 'rgba(255,255,255,0.5)',
+                  '& fieldset': { borderColor: role === 'PATIENT' ? 'rgba(255,255,255,0.2)' : 'rgba(156, 39, 176, 0.3)' },
+                  '&:hover fieldset': { borderColor: theme.primary },
+                  '&.Mui-focused fieldset': { borderColor: theme.primary },
+                },
+                '& .MuiInputLabel-root': { color: role === 'PATIENT' ? 'rgba(255,255,255,0.7)' : 'rgba(74, 20, 140, 0.7)' },
+                '& .MuiInputLabel-root.Mui-focused': { color: theme.primary },
+              }}
             />
             <TextField
               margin="normal"
@@ -182,15 +310,41 @@ const RealLoginPage = () => {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               disabled={loading}
+              sx={{
+                '& .MuiOutlinedInput-root': {
+                  color: theme.textColor,
+                  bgcolor: role === 'PATIENT' ? 'rgba(255,255,255,0.05)' : 'rgba(255,255,255,0.5)',
+                  '& fieldset': { borderColor: role === 'PATIENT' ? 'rgba(255,255,255,0.2)' : 'rgba(156, 39, 176, 0.3)' },
+                  '&:hover fieldset': { borderColor: theme.primary },
+                  '&.Mui-focused fieldset': { borderColor: theme.primary },
+                },
+                '& .MuiInputLabel-root': { color: role === 'PATIENT' ? 'rgba(255,255,255,0.7)' : 'rgba(74, 20, 140, 0.7)' },
+                '& .MuiInputLabel-root.Mui-focused': { color: theme.primary },
+              }}
             />
             <Button
               type="submit"
               fullWidth
               variant="contained"
-              sx={{ mt: 3, mb: 2, py: 1.5 }}
+              sx={{ 
+                mt: 3, 
+                mb: 2, 
+                py: 1.5,
+                background: theme.gradient,
+                color: 'white',
+                fontWeight: 700,
+                fontSize: '1rem',
+                borderRadius: '12px',
+                boxShadow: `0 4px 16px ${theme.primary}40`,
+                '&:hover': {
+                  transform: 'scale(1.02)',
+                  boxShadow: `0 8px 24px ${theme.primary}50`,
+                },
+                transition: 'all 0.2s ease',
+              }}
               disabled={loading}
             >
-              {loading ? <CircularProgress size={24} /> : 'Sign In'}
+              {loading ? <CircularProgress size={24} sx={{ color: 'white' }} /> : 'Sign In'}
             </Button>
           </Box>
         </TabPanel>
@@ -207,6 +361,17 @@ const RealLoginPage = () => {
               value={name}
               onChange={(e) => setName(e.target.value)}
               disabled={loading}
+              sx={{
+                '& .MuiOutlinedInput-root': {
+                  color: theme.textColor,
+                  bgcolor: role === 'PATIENT' ? 'rgba(255,255,255,0.05)' : 'rgba(255,255,255,0.5)',
+                  '& fieldset': { borderColor: role === 'PATIENT' ? 'rgba(255,255,255,0.2)' : 'rgba(156, 39, 176, 0.3)' },
+                  '&:hover fieldset': { borderColor: theme.primary },
+                  '&.Mui-focused fieldset': { borderColor: theme.primary },
+                },
+                '& .MuiInputLabel-root': { color: role === 'PATIENT' ? 'rgba(255,255,255,0.7)' : 'rgba(74, 20, 140, 0.7)' },
+                '& .MuiInputLabel-root.Mui-focused': { color: theme.primary },
+              }}
             />
             <TextField
               margin="normal"
@@ -218,6 +383,17 @@ const RealLoginPage = () => {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               disabled={loading}
+              sx={{
+                '& .MuiOutlinedInput-root': {
+                  color: theme.textColor,
+                  bgcolor: role === 'PATIENT' ? 'rgba(255,255,255,0.05)' : 'rgba(255,255,255,0.5)',
+                  '& fieldset': { borderColor: role === 'PATIENT' ? 'rgba(255,255,255,0.2)' : 'rgba(156, 39, 176, 0.3)' },
+                  '&:hover fieldset': { borderColor: theme.primary },
+                  '&.Mui-focused fieldset': { borderColor: theme.primary },
+                },
+                '& .MuiInputLabel-root': { color: role === 'PATIENT' ? 'rgba(255,255,255,0.7)' : 'rgba(74, 20, 140, 0.7)' },
+                '& .MuiInputLabel-root.Mui-focused': { color: theme.primary },
+              }}
             />
             <TextField
               margin="normal"
@@ -230,38 +406,49 @@ const RealLoginPage = () => {
               onChange={(e) => setPassword(e.target.value)}
               disabled={loading}
               helperText="Minimum 6 characters"
+              sx={{
+                '& .MuiOutlinedInput-root': {
+                  color: theme.textColor,
+                  bgcolor: role === 'PATIENT' ? 'rgba(255,255,255,0.05)' : 'rgba(255,255,255,0.5)',
+                  '& fieldset': { borderColor: role === 'PATIENT' ? 'rgba(255,255,255,0.2)' : 'rgba(156, 39, 176, 0.3)' },
+                  '&:hover fieldset': { borderColor: theme.primary },
+                  '&.Mui-focused fieldset': { borderColor: theme.primary },
+                },
+                '& .MuiInputLabel-root': { color: role === 'PATIENT' ? 'rgba(255,255,255,0.7)' : 'rgba(74, 20, 140, 0.7)' },
+                '& .MuiInputLabel-root.Mui-focused': { color: theme.primary },
+                '& .MuiFormHelperText-root': { color: role === 'PATIENT' ? 'rgba(255,255,255,0.6)' : 'rgba(74, 20, 140, 0.6)' },
+              }}
             />
-            <TextField
-              margin="normal"
-              required
-              fullWidth
-              select
-              label="Role"
-              value={role}
-              onChange={(e) => setRole(e.target.value as typeof role)}
-              disabled={loading}
-              SelectProps={{ native: true }}
-            >
-              <option value="PATIENT">Patient</option>
-              <option value="CAREGIVER">Caregiver</option>
-              <option value="PROVIDER">Healthcare Provider</option>
-              <option value="INSURER">Insurance Company</option>
-            </TextField>
             <Button
               type="submit"
               fullWidth
               variant="contained"
-              sx={{ mt: 3, mb: 2, py: 1.5 }}
+              sx={{ 
+                mt: 3, 
+                mb: 2, 
+                py: 1.5,
+                background: theme.gradient,
+                color: 'white',
+                fontWeight: 700,
+                fontSize: '1rem',
+                borderRadius: '12px',
+                boxShadow: `0 4px 16px ${theme.primary}40`,
+                '&:hover': {
+                  transform: 'scale(1.02)',
+                  boxShadow: `0 8px 24px ${theme.primary}50`,
+                },
+                transition: 'all 0.2s ease',
+              }}
               disabled={loading}
             >
-              {loading ? <CircularProgress size={24} /> : 'Sign Up'}
+              {loading ? <CircularProgress size={24} sx={{ color: 'white' }} /> : 'Sign Up'}
             </Button>
           </Box>
         </TabPanel>
 
         <Box sx={{ mt: 3, textAlign: 'center' }}>
-          <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-            Quick Login:
+          <Typography variant="body2" sx={{ color: role === 'PATIENT' ? 'rgba(255,255,255,0.6)' : 'rgba(74, 20, 140, 0.6)', mb: 2 }}>
+            Quick Login (Demo):
           </Typography>
           <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', justifyContent: 'center' }}>
             <Button
@@ -270,6 +457,15 @@ const RealLoginPage = () => {
               onClick={() => {
                 setEmail('patient@test.com');
                 setPassword('password123');
+                setRole('PATIENT');
+              }}
+              sx={{
+                color: role === 'PATIENT' ? 'rgba(255,255,255,0.7)' : 'rgba(74, 20, 140, 0.7)',
+                borderColor: role === 'PATIENT' ? 'rgba(255,255,255,0.3)' : 'rgba(156, 39, 176, 0.3)',
+                '&:hover': {
+                  borderColor: roleColors.PATIENT.primary,
+                  bgcolor: `${roleColors.PATIENT.primary}10`,
+                },
               }}
             >
               Patient
@@ -280,6 +476,15 @@ const RealLoginPage = () => {
               onClick={() => {
                 setEmail('caregiver@test.com');
                 setPassword('password123');
+                setRole('CAREGIVER');
+              }}
+              sx={{
+                color: role === 'PATIENT' ? 'rgba(255,255,255,0.7)' : 'rgba(74, 20, 140, 0.7)',
+                borderColor: role === 'PATIENT' ? 'rgba(255,255,255,0.3)' : 'rgba(156, 39, 176, 0.3)',
+                '&:hover': {
+                  borderColor: roleColors.CAREGIVER.primary,
+                  bgcolor: `${roleColors.CAREGIVER.primary}10`,
+                },
               }}
             >
               Caregiver
@@ -290,6 +495,15 @@ const RealLoginPage = () => {
               onClick={() => {
                 setEmail('provider@test.com');
                 setPassword('password123');
+                setRole('PROVIDER');
+              }}
+              sx={{
+                color: role === 'PATIENT' ? 'rgba(255,255,255,0.7)' : 'rgba(74, 20, 140, 0.7)',
+                borderColor: role === 'PATIENT' ? 'rgba(255,255,255,0.3)' : 'rgba(156, 39, 176, 0.3)',
+                '&:hover': {
+                  borderColor: roleColors.PROVIDER.primary,
+                  bgcolor: `${roleColors.PROVIDER.primary}10`,
+                },
               }}
             >
               Provider
@@ -300,13 +514,22 @@ const RealLoginPage = () => {
               onClick={() => {
                 setEmail('insurer@test.com');
                 setPassword('password123');
+                setRole('INSURER');
+              }}
+              sx={{
+                color: role === 'PATIENT' ? 'rgba(255,255,255,0.7)' : 'rgba(74, 20, 140, 0.7)',
+                borderColor: role === 'PATIENT' ? 'rgba(255,255,255,0.3)' : 'rgba(156, 39, 176, 0.3)',
+                '&:hover': {
+                  borderColor: roleColors.INSURER.primary,
+                  bgcolor: `${roleColors.INSURER.primary}10`,
+                },
               }}
             >
               Insurer
             </Button>
           </Box>
         </Box>
-      </Paper>
+      </Box>
     </Box>
   );
 };

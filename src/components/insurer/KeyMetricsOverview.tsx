@@ -1,4 +1,4 @@
-import { Grid, Paper, Typography, Box, CircularProgress } from '@mui/material';
+import { Grid, Typography, Box, CircularProgress } from '@mui/material';
 import {
   People as PeopleIcon,
   AttachMoney as MoneyIcon,
@@ -8,6 +8,7 @@ import {
   HourglassEmpty as PendingIcon,
 } from '@mui/icons-material';
 import { type DashboardOverview } from '../../services/insurerService';
+import { roleColors } from '../../styles/glassmorphism';
 
 interface MetricCardProps {
   title: string;
@@ -19,22 +20,37 @@ interface MetricCardProps {
 }
 
 const MetricCard = ({ title, value, subtitle, icon, color, trend }: MetricCardProps) => (
-  <Paper sx={{ p: 3, height: '100%' }}>
+  <Box sx={{ 
+    p: 3, 
+    height: '100%',
+    background: 'rgba(255, 255, 255, 0.6)',
+    backdropFilter: 'blur(20px)',
+    WebkitBackdropFilter: 'blur(20px)',
+    border: '1px solid rgba(255, 255, 255, 0.8)',
+    borderRadius: '20px',
+    boxShadow: '0 4px 20px rgba(156, 39, 176, 0.08)',
+    transition: 'all 0.3s ease',
+    '&:hover': {
+      transform: 'translateY(-4px)',
+      boxShadow: '0 8px 32px rgba(156, 39, 176, 0.15)',
+      border: `1px solid ${color}40`,
+    },
+  }}>
     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
       <Box>
-        <Typography variant="body2" color="text.secondary" gutterBottom>
+        <Typography variant="body2" sx={{ color: 'rgba(74, 20, 140, 0.7)', fontWeight: 600, mb: 1 }}>
           {title}
         </Typography>
-        <Typography variant="h4" sx={{ fontWeight: 'bold', mb: 0.5 }}>
+        <Typography variant="h4" sx={{ fontWeight: 700, color: '#4a148c', mb: 0.5 }}>
           {value}
         </Typography>
         {subtitle && (
-          <Typography variant="body2" color="text.secondary">
+          <Typography variant="body2" sx={{ color: 'rgba(74, 20, 140, 0.6)' }}>
             {subtitle}
           </Typography>
         )}
         {trend && (
-          <Typography variant="caption" color="success.main" sx={{ display: 'flex', alignItems: 'center', mt: 1 }}>
+          <Typography variant="caption" sx={{ display: 'flex', alignItems: 'center', mt: 1, color: '#4CAF50', fontWeight: 700 }}>
             <TrendingUpIcon sx={{ fontSize: 16, mr: 0.5 }} />
             {trend}
           </Typography>
@@ -42,8 +58,8 @@ const MetricCard = ({ title, value, subtitle, icon, color, trend }: MetricCardPr
       </Box>
       <Box
         sx={{
-          bgcolor: `${color}15`,
-          borderRadius: 2,
+          background: `${color}20`,
+          borderRadius: '14px',
           p: 1.5,
           display: 'flex',
           alignItems: 'center',
@@ -53,7 +69,7 @@ const MetricCard = ({ title, value, subtitle, icon, color, trend }: MetricCardPr
         {icon}
       </Box>
     </Box>
-  </Paper>
+  </Box>
 );
 
 interface KeyMetricsOverviewProps {
@@ -65,7 +81,7 @@ const KeyMetricsOverview = ({ data, loading }: KeyMetricsOverviewProps) => {
   if (loading) {
     return (
       <Box sx={{ display: 'flex', justifyContent: 'center', p: 4 }}>
-        <CircularProgress />
+        <CircularProgress sx={{ color: roleColors.INSURER.primary }} />
       </Box>
     );
   }
