@@ -160,9 +160,9 @@ const RealLoginPage = () => {
         };
       case 'CAREGIVER':
         return {
-          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-          cardBg: 'rgba(255, 255, 255, 0.9)',
-          textColor: '#333',
+          background: 'linear-gradient(135deg, #f1f8f4 0%, #e8f5e9 50%, #dcedc8 100%)',
+          cardBg: 'rgba(255, 255, 255, 0.7)',
+          textColor: '#1b5e20',
           icon: <CaregiverIcon />,
           gradient: roleColors.CAREGIVER.gradient,
           primary: roleColors.CAREGIVER.primary,
@@ -193,7 +193,9 @@ const RealLoginPage = () => {
         WebkitBackdropFilter: 'blur(30px)',
         border: role === 'PATIENT' ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid rgba(255, 255, 255, 0.8)',
         borderRadius: '24px',
-        boxShadow: role === 'PATIENT' ? '0 8px 32px rgba(0, 0, 0, 0.4)' : '0 8px 32px rgba(156, 39, 176, 0.2)',
+        boxShadow: role === 'PATIENT' ? '0 8px 32px rgba(0, 0, 0, 0.4)' : 
+                   role === 'INSURER' ? '0 8px 32px rgba(156, 39, 176, 0.2)' :
+                   role === 'CAREGIVER' ? '0 8px 32px rgba(76, 175, 80, 0.2)' : '0 8px 32px rgba(0, 0, 0, 0.1)',
       }}>
         <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', mb: 4 }}>
           <Avatar sx={{ 
@@ -208,8 +210,15 @@ const RealLoginPage = () => {
           <Typography component="h1" variant="h4" sx={{ fontWeight: 700, color: theme.textColor, mt: 2 }}>
             inPEP™
           </Typography>
-          <Typography variant="body1" sx={{ color: role === 'PATIENT' ? 'rgba(255,255,255,0.7)' : 'rgba(74, 20, 140, 0.7)', mt: 0.5 }}>
-            {role === 'PATIENT' ? 'Patient Portal' : role === 'INSURER' ? 'Insurer Analytics' : 'Healthcare Platform'}
+          <Typography variant="body1" sx={{ 
+            color: role === 'PATIENT' ? 'rgba(255,255,255,0.7)' : 
+                   role === 'INSURER' ? 'rgba(74, 20, 140, 0.7)' :
+                   role === 'CAREGIVER' ? 'rgba(27, 94, 32, 0.7)' : 'rgba(0,0,0,0.7)',
+            mt: 0.5 
+          }}>
+            {role === 'PATIENT' ? 'Patient Portal' : 
+             role === 'INSURER' ? 'Insurer Analytics' : 
+             role === 'CAREGIVER' ? 'Caregiver Portal' : 'Healthcare Platform'}
           </Typography>
         </Box>
 
@@ -225,8 +234,12 @@ const RealLoginPage = () => {
             fullWidth
             sx={{
               '& .MuiToggleButton-root': {
-                color: role === 'PATIENT' ? 'rgba(255,255,255,0.7)' : 'rgba(74, 20, 140, 0.7)',
-                borderColor: role === 'PATIENT' ? 'rgba(255,255,255,0.2)' : 'rgba(156, 39, 176, 0.3)',
+                color: role === 'PATIENT' ? 'rgba(255,255,255,0.7)' : 
+                       role === 'INSURER' ? 'rgba(74, 20, 140, 0.7)' :
+                       role === 'CAREGIVER' ? 'rgba(27, 94, 32, 0.7)' : 'rgba(0,0,0,0.7)',
+                borderColor: role === 'PATIENT' ? 'rgba(255,255,255,0.2)' : 
+                             role === 'INSURER' ? 'rgba(156, 39, 176, 0.3)' :
+                             role === 'CAREGIVER' ? 'rgba(76, 175, 80, 0.3)' : 'rgba(0,0,0,0.2)',
                 '&.Mui-selected': {
                   background: theme.gradient,
                   color: 'white',
@@ -252,7 +265,9 @@ const RealLoginPage = () => {
           sx={{ 
             mb: 3,
             '& .MuiTab-root': {
-              color: role === 'PATIENT' ? 'rgba(255,255,255,0.7)' : 'rgba(74, 20, 140, 0.7)',
+              color: role === 'PATIENT' ? 'rgba(255,255,255,0.7)' : 
+                     role === 'INSURER' ? 'rgba(74, 20, 140, 0.7)' :
+                     role === 'CAREGIVER' ? 'rgba(27, 94, 32, 0.7)' : 'rgba(0,0,0,0.7)',
               fontWeight: 600,
               '&.Mui-selected': {
                 color: role === 'PATIENT' ? 'white' : theme.primary,
@@ -292,11 +307,19 @@ const RealLoginPage = () => {
                 '& .MuiOutlinedInput-root': {
                   color: theme.textColor,
                   bgcolor: role === 'PATIENT' ? 'rgba(255,255,255,0.05)' : 'rgba(255,255,255,0.5)',
-                  '& fieldset': { borderColor: role === 'PATIENT' ? 'rgba(255,255,255,0.2)' : 'rgba(156, 39, 176, 0.3)' },
+                  '& fieldset': { 
+                    borderColor: role === 'PATIENT' ? 'rgba(255,255,255,0.2)' : 
+                                 role === 'INSURER' ? 'rgba(156, 39, 176, 0.3)' :
+                                 role === 'CAREGIVER' ? 'rgba(76, 175, 80, 0.3)' : 'rgba(0,0,0,0.2)'
+                  },
                   '&:hover fieldset': { borderColor: theme.primary },
                   '&.Mui-focused fieldset': { borderColor: theme.primary },
                 },
-                '& .MuiInputLabel-root': { color: role === 'PATIENT' ? 'rgba(255,255,255,0.7)' : 'rgba(74, 20, 140, 0.7)' },
+                '& .MuiInputLabel-root': { 
+                  color: role === 'PATIENT' ? 'rgba(255,255,255,0.7)' : 
+                         role === 'INSURER' ? 'rgba(74, 20, 140, 0.7)' :
+                         role === 'CAREGIVER' ? 'rgba(27, 94, 32, 0.7)' : 'rgba(0,0,0,0.7)'
+                },
                 '& .MuiInputLabel-root.Mui-focused': { color: theme.primary },
               }}
             />
@@ -314,11 +337,19 @@ const RealLoginPage = () => {
                 '& .MuiOutlinedInput-root': {
                   color: theme.textColor,
                   bgcolor: role === 'PATIENT' ? 'rgba(255,255,255,0.05)' : 'rgba(255,255,255,0.5)',
-                  '& fieldset': { borderColor: role === 'PATIENT' ? 'rgba(255,255,255,0.2)' : 'rgba(156, 39, 176, 0.3)' },
+                  '& fieldset': { 
+                    borderColor: role === 'PATIENT' ? 'rgba(255,255,255,0.2)' : 
+                                 role === 'INSURER' ? 'rgba(156, 39, 176, 0.3)' :
+                                 role === 'CAREGIVER' ? 'rgba(76, 175, 80, 0.3)' : 'rgba(0,0,0,0.2)'
+                  },
                   '&:hover fieldset': { borderColor: theme.primary },
                   '&.Mui-focused fieldset': { borderColor: theme.primary },
                 },
-                '& .MuiInputLabel-root': { color: role === 'PATIENT' ? 'rgba(255,255,255,0.7)' : 'rgba(74, 20, 140, 0.7)' },
+                '& .MuiInputLabel-root': { 
+                  color: role === 'PATIENT' ? 'rgba(255,255,255,0.7)' : 
+                         role === 'INSURER' ? 'rgba(74, 20, 140, 0.7)' :
+                         role === 'CAREGIVER' ? 'rgba(27, 94, 32, 0.7)' : 'rgba(0,0,0,0.7)'
+                },
                 '& .MuiInputLabel-root.Mui-focused': { color: theme.primary },
               }}
             />
@@ -365,11 +396,19 @@ const RealLoginPage = () => {
                 '& .MuiOutlinedInput-root': {
                   color: theme.textColor,
                   bgcolor: role === 'PATIENT' ? 'rgba(255,255,255,0.05)' : 'rgba(255,255,255,0.5)',
-                  '& fieldset': { borderColor: role === 'PATIENT' ? 'rgba(255,255,255,0.2)' : 'rgba(156, 39, 176, 0.3)' },
+                  '& fieldset': { 
+                    borderColor: role === 'PATIENT' ? 'rgba(255,255,255,0.2)' : 
+                                 role === 'INSURER' ? 'rgba(156, 39, 176, 0.3)' :
+                                 role === 'CAREGIVER' ? 'rgba(76, 175, 80, 0.3)' : 'rgba(0,0,0,0.2)'
+                  },
                   '&:hover fieldset': { borderColor: theme.primary },
                   '&.Mui-focused fieldset': { borderColor: theme.primary },
                 },
-                '& .MuiInputLabel-root': { color: role === 'PATIENT' ? 'rgba(255,255,255,0.7)' : 'rgba(74, 20, 140, 0.7)' },
+                '& .MuiInputLabel-root': { 
+                  color: role === 'PATIENT' ? 'rgba(255,255,255,0.7)' : 
+                         role === 'INSURER' ? 'rgba(74, 20, 140, 0.7)' :
+                         role === 'CAREGIVER' ? 'rgba(27, 94, 32, 0.7)' : 'rgba(0,0,0,0.7)'
+                },
                 '& .MuiInputLabel-root.Mui-focused': { color: theme.primary },
               }}
             />
@@ -387,11 +426,19 @@ const RealLoginPage = () => {
                 '& .MuiOutlinedInput-root': {
                   color: theme.textColor,
                   bgcolor: role === 'PATIENT' ? 'rgba(255,255,255,0.05)' : 'rgba(255,255,255,0.5)',
-                  '& fieldset': { borderColor: role === 'PATIENT' ? 'rgba(255,255,255,0.2)' : 'rgba(156, 39, 176, 0.3)' },
+                  '& fieldset': { 
+                    borderColor: role === 'PATIENT' ? 'rgba(255,255,255,0.2)' : 
+                                 role === 'INSURER' ? 'rgba(156, 39, 176, 0.3)' :
+                                 role === 'CAREGIVER' ? 'rgba(76, 175, 80, 0.3)' : 'rgba(0,0,0,0.2)'
+                  },
                   '&:hover fieldset': { borderColor: theme.primary },
                   '&.Mui-focused fieldset': { borderColor: theme.primary },
                 },
-                '& .MuiInputLabel-root': { color: role === 'PATIENT' ? 'rgba(255,255,255,0.7)' : 'rgba(74, 20, 140, 0.7)' },
+                '& .MuiInputLabel-root': { 
+                  color: role === 'PATIENT' ? 'rgba(255,255,255,0.7)' : 
+                         role === 'INSURER' ? 'rgba(74, 20, 140, 0.7)' :
+                         role === 'CAREGIVER' ? 'rgba(27, 94, 32, 0.7)' : 'rgba(0,0,0,0.7)'
+                },
                 '& .MuiInputLabel-root.Mui-focused': { color: theme.primary },
               }}
             />
@@ -410,13 +457,25 @@ const RealLoginPage = () => {
                 '& .MuiOutlinedInput-root': {
                   color: theme.textColor,
                   bgcolor: role === 'PATIENT' ? 'rgba(255,255,255,0.05)' : 'rgba(255,255,255,0.5)',
-                  '& fieldset': { borderColor: role === 'PATIENT' ? 'rgba(255,255,255,0.2)' : 'rgba(156, 39, 176, 0.3)' },
+                  '& fieldset': { 
+                    borderColor: role === 'PATIENT' ? 'rgba(255,255,255,0.2)' : 
+                                 role === 'INSURER' ? 'rgba(156, 39, 176, 0.3)' :
+                                 role === 'CAREGIVER' ? 'rgba(76, 175, 80, 0.3)' : 'rgba(0,0,0,0.2)'
+                  },
                   '&:hover fieldset': { borderColor: theme.primary },
                   '&.Mui-focused fieldset': { borderColor: theme.primary },
                 },
-                '& .MuiInputLabel-root': { color: role === 'PATIENT' ? 'rgba(255,255,255,0.7)' : 'rgba(74, 20, 140, 0.7)' },
+                '& .MuiInputLabel-root': { 
+                  color: role === 'PATIENT' ? 'rgba(255,255,255,0.7)' : 
+                         role === 'INSURER' ? 'rgba(74, 20, 140, 0.7)' :
+                         role === 'CAREGIVER' ? 'rgba(27, 94, 32, 0.7)' : 'rgba(0,0,0,0.7)'
+                },
                 '& .MuiInputLabel-root.Mui-focused': { color: theme.primary },
-                '& .MuiFormHelperText-root': { color: role === 'PATIENT' ? 'rgba(255,255,255,0.6)' : 'rgba(74, 20, 140, 0.6)' },
+                '& .MuiFormHelperText-root': { 
+                  color: role === 'PATIENT' ? 'rgba(255,255,255,0.6)' : 
+                         role === 'INSURER' ? 'rgba(74, 20, 140, 0.6)' :
+                         role === 'CAREGIVER' ? 'rgba(27, 94, 32, 0.6)' : 'rgba(0,0,0,0.6)'
+                },
               }}
             />
             <Button
@@ -447,7 +506,12 @@ const RealLoginPage = () => {
         </TabPanel>
 
         <Box sx={{ mt: 3, textAlign: 'center' }}>
-          <Typography variant="body2" sx={{ color: role === 'PATIENT' ? 'rgba(255,255,255,0.6)' : 'rgba(74, 20, 140, 0.6)', mb: 2 }}>
+          <Typography variant="body2" sx={{ 
+            color: role === 'PATIENT' ? 'rgba(255,255,255,0.6)' : 
+                   role === 'INSURER' ? 'rgba(74, 20, 140, 0.6)' :
+                   role === 'CAREGIVER' ? 'rgba(27, 94, 32, 0.6)' : 'rgba(0,0,0,0.6)',
+            mb: 2 
+          }}>
             Quick Login (Demo):
           </Typography>
           <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', justifyContent: 'center' }}>
@@ -460,8 +524,12 @@ const RealLoginPage = () => {
                 setRole('PATIENT');
               }}
               sx={{
-                color: role === 'PATIENT' ? 'rgba(255,255,255,0.7)' : 'rgba(74, 20, 140, 0.7)',
-                borderColor: role === 'PATIENT' ? 'rgba(255,255,255,0.3)' : 'rgba(156, 39, 176, 0.3)',
+                color: role === 'PATIENT' ? 'rgba(255,255,255,0.7)' : 
+                       role === 'INSURER' ? 'rgba(74, 20, 140, 0.7)' :
+                       role === 'CAREGIVER' ? 'rgba(27, 94, 32, 0.7)' : 'rgba(0,0,0,0.7)',
+                borderColor: role === 'PATIENT' ? 'rgba(255,255,255,0.3)' : 
+                             role === 'INSURER' ? 'rgba(156, 39, 176, 0.3)' :
+                             role === 'CAREGIVER' ? 'rgba(76, 175, 80, 0.3)' : 'rgba(0,0,0,0.3)',
                 '&:hover': {
                   borderColor: roleColors.PATIENT.primary,
                   bgcolor: `${roleColors.PATIENT.primary}10`,

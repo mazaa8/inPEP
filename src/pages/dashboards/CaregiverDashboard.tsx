@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { Grid, Paper, Typography } from '@mui/material';
+import { Grid, Typography, Box } from '@mui/material';
+import { FavoriteBorder as CaregiverIcon } from '@mui/icons-material';
 import Layout from '../../components/layout/Layout';
 import TodaysSummary from '../../components/dashboards/caregiver/TodaysSummary';
 import Reminders from '../../components/dashboards/caregiver/Reminders';
@@ -8,6 +9,7 @@ import AppointmentsCalendar, { type AppointmentEvent } from '../../components/da
 import VitalsLog, { type VitalsData } from '../../components/dashboards/caregiver/VitalsLog';
 import AIInsightsDashboard from '../../components/health/AIInsightsDashboard';
 import { appointmentService } from '../../services/appointmentService';
+import { roleColors } from '../../styles/glassmorphism';
 
 const vitalsData: VitalsData[] = [
   { name: 'Mon', heartRate: 72, bp: 120 },
@@ -65,8 +67,48 @@ const CaregiverDashboard = () => {
   };
 
   return (
-    <Layout title="Caregiving Patient Monitor">
-      <Grid container spacing={3}>
+    <Box sx={{ 
+      minHeight: '100vh', 
+      background: 'linear-gradient(135deg, #f1f8f4 0%, #e8f5e9 50%, #dcedc8 100%)',
+      p: 0,
+    }}>
+      <Layout title="" darkMode={false} themeColor="CAREGIVER">
+        {/* Hero Header */}
+        <Box sx={{ 
+          background: 'rgba(255, 255, 255, 0.7)',
+          backdropFilter: 'blur(30px)',
+          WebkitBackdropFilter: 'blur(30px)',
+          border: '1px solid rgba(255, 255, 255, 0.8)',
+          borderRadius: '24px',
+          p: 4,
+          mb: 4,
+          boxShadow: '0 8px 32px 0 rgba(76, 175, 80, 0.15)',
+        }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+            <Box sx={{
+              width: 72,
+              height: 72,
+              borderRadius: '18px',
+              background: roleColors.CAREGIVER.gradient,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              boxShadow: `0 8px 24px ${roleColors.CAREGIVER.primary}40`,
+            }}>
+              <CaregiverIcon sx={{ fontSize: 40, color: 'white' }} />
+            </Box>
+            <Box>
+              <Typography variant="h3" sx={{ fontWeight: 700, color: '#1b5e20', mb: 0.5 }}>
+                Patient Monitor
+              </Typography>
+              <Typography variant="body1" sx={{ color: 'rgba(27, 94, 32, 0.7)' }}>
+                Track your loved one's health and care schedule
+              </Typography>
+            </Box>
+          </Box>
+        </Box>
+
+        <Grid container spacing={3}>
         {/* Main column for smaller components */}
         <Grid item xs={12} lg={4}>
           <Grid container spacing={3}>
@@ -90,15 +132,43 @@ const CaregiverDashboard = () => {
         </Grid>
         {/* AI Health Insights - Full width */}
         <Grid item xs={12}>
-          <Paper sx={{ p: 3 }}>
-            <Typography variant="h5" gutterBottom sx={{ mb: 3 }}>
-              🤖 Patient Health Insights
-            </Typography>
+          <Box sx={{ 
+            p: 4,
+            background: 'rgba(255, 255, 255, 0.7)',
+            backdropFilter: 'blur(20px)',
+            WebkitBackdropFilter: 'blur(20px)',
+            border: '1px solid rgba(255, 255, 255, 0.8)',
+            borderRadius: '20px',
+            boxShadow: '0 4px 20px rgba(76, 175, 80, 0.1)',
+          }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 3 }}>
+              <Box sx={{
+                width: 56,
+                height: 56,
+                borderRadius: '14px',
+                background: roleColors.CAREGIVER.gradient,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                boxShadow: `0 4px 16px ${roleColors.CAREGIVER.primary}40`,
+              }}>
+                <Typography sx={{ fontSize: '1.8rem' }}>✨</Typography>
+              </Box>
+              <Box>
+                <Typography variant="h5" sx={{ fontWeight: 700, color: '#1b5e20' }}>
+                  Patient Health Insights
+                </Typography>
+                <Typography variant="body2" sx={{ color: 'rgba(27, 94, 32, 0.7)' }}>
+                  AI-powered health monitoring and recommendations
+                </Typography>
+              </Box>
+            </Box>
             <AIInsightsDashboard patientId="b805ec90-e553-4de7-9de0-45f2eb73d1ba" />
-          </Paper>
+          </Box>
         </Grid>
       </Grid>
-    </Layout>
+      </Layout>
+    </Box>
   );
 };
 

@@ -2,17 +2,12 @@ import { useState, useEffect } from 'react';
 import {
   Box,
   Typography,
-  Paper,
   Tabs,
   Tab,
   Grid,
-  Card,
-  CardContent,
-  CardActions,
   Button,
   Chip,
   CircularProgress,
-  Alert,
   LinearProgress,
   Divider,
   List,
@@ -25,6 +20,9 @@ import {
   DialogContent,
   DialogActions,
   IconButton,
+  Card,
+  CardContent,
+  CardActions,
 } from '@mui/material';
 import {
   Restaurant as RestaurantIcon,
@@ -41,6 +39,7 @@ import {
 import Layout from '../../components/layout/Layout';
 import MealPhotoCapture from '../../components/heredibles/MealPhotoCapture';
 import { herediblesService, type MealPlan, type PlannedMeal, type Recipe, type NutritionSummary } from '../../services/herediblesService';
+import { roleColors } from '../../styles/glassmorphism';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -191,29 +190,77 @@ const CaregiverHerediblesPage = () => {
   const groceryList = getGroceryList();
 
   return (
-    <Layout title="Heredibles™ - Meal Management">
-      <Box>
+    <Box sx={{ 
+      minHeight: '100vh', 
+      background: 'linear-gradient(135deg, #f1f8f4 0%, #e8f5e9 50%, #dcedc8 100%)',
+      p: 0,
+    }}>
+      <Layout title="" darkMode={false} themeColor="CAREGIVER">
+        <Box>
         {/* Header */}
-        <Paper sx={{ p: 3, mb: 3, background: 'linear-gradient(135deg, #43cea2 0%, #185a9d 100%)', color: 'white' }}>
+        <Box sx={{ 
+          background: 'rgba(255, 255, 255, 0.7)',
+          backdropFilter: 'blur(30px)',
+          WebkitBackdropFilter: 'blur(30px)',
+          border: '1px solid rgba(255, 255, 255, 0.8)',
+          borderRadius: '24px',
+          p: 4,
+          mb: 4,
+          boxShadow: '0 8px 32px 0 rgba(76, 175, 80, 0.15)',
+        }}>
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <Box>
-              <Typography variant="h4" gutterBottom>
-                🥗 Heredibles™ Meal Manager
-              </Typography>
-              <Typography variant="body1">
-                Managing meals for Abdeen White
-              </Typography>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+              <Box sx={{
+                width: 64,
+                height: 64,
+                borderRadius: '16px',
+                background: roleColors.CAREGIVER.gradient,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                boxShadow: `0 8px 24px ${roleColors.CAREGIVER.primary}40`,
+              }}>
+                <RestaurantIcon sx={{ fontSize: 36, color: 'white' }} />
+              </Box>
+              <Box>
+                <Typography variant="h3" sx={{ fontWeight: 700, color: '#1b5e20', mb: 0.5 }}>
+                  Heredibles™ Meal Manager
+                </Typography>
+                <Typography variant="body1" sx={{ color: 'rgba(27, 94, 32, 0.7)' }}>
+                  Managing meals for Abdeen White
+                </Typography>
+              </Box>
             </Box>
-            <IconButton onClick={fetchAllData} sx={{ color: 'white' }}>
+            <IconButton 
+              onClick={fetchAllData}
+              sx={{ 
+                color: roleColors.CAREGIVER.primary,
+                bgcolor: 'rgba(76, 175, 80, 0.1)',
+                '&:hover': {
+                  bgcolor: 'rgba(76, 175, 80, 0.2)',
+                  transform: 'rotate(180deg)',
+                },
+                transition: 'all 0.3s ease',
+              }}
+            >
               <RefreshIcon />
             </IconButton>
           </Box>
-        </Paper>
+        </Box>
 
         {/* Nutrition Summary */}
         {nutritionSummary && nutritionSummary.targets && (
-          <Paper sx={{ p: 3, mb: 3 }}>
-            <Typography variant="h6" gutterBottom>
+          <Box sx={{ 
+            p: 4, 
+            mb: 4,
+            background: 'rgba(255, 255, 255, 0.7)',
+            backdropFilter: 'blur(20px)',
+            WebkitBackdropFilter: 'blur(20px)',
+            border: '1px solid rgba(255, 255, 255, 0.8)',
+            borderRadius: '20px',
+            boxShadow: '0 4px 20px rgba(76, 175, 80, 0.1)',
+          }}>
+            <Typography variant="h6" sx={{ fontWeight: 700, color: '#1b5e20', mb: 3 }}>
               Today's Nutrition Progress
             </Typography>
             <Grid container spacing={2}>
@@ -293,19 +340,46 @@ const CaregiverHerediblesPage = () => {
                 </Box>
               </Grid>
             </Grid>
-          </Paper>
+          </Box>
         )}
 
         {/* Tabs */}
-        <Paper sx={{ mb: 3 }}>
-          <Tabs value={tabValue} onChange={(_, newValue) => setTabValue(newValue)} variant="scrollable" scrollButtons="auto">
+        <Box sx={{ 
+          mb: 4,
+          background: 'rgba(255, 255, 255, 0.6)',
+          backdropFilter: 'blur(20px)',
+          WebkitBackdropFilter: 'blur(20px)',
+          border: '1px solid rgba(255, 255, 255, 0.8)',
+          borderRadius: '20px',
+          overflow: 'hidden',
+          boxShadow: '0 4px 20px rgba(76, 175, 80, 0.1)',
+        }}>
+          <Tabs 
+            value={tabValue} 
+            onChange={(_, newValue) => setTabValue(newValue)} 
+            variant="scrollable" 
+            scrollButtons="auto"
+            sx={{
+              '& .MuiTab-root': {
+                color: 'rgba(27, 94, 32, 0.7)',
+                fontWeight: 600,
+                '&.Mui-selected': {
+                  color: roleColors.CAREGIVER.primary,
+                },
+              },
+              '& .MuiTabs-indicator': {
+                background: roleColors.CAREGIVER.gradient,
+                height: 3,
+              },
+            }}
+          >
             <Tab label="Today's Meals" icon={<RestaurantIcon />} />
             <Tab label="Weekly Plan" icon={<CheckIcon />} />
             <Tab label="Recipe Browser" icon={<RestaurantIcon />} />
             <Tab label="Grocery List" icon={<CartIcon />} />
             <Tab label="Preferences" icon={<StarIcon />} />
           </Tabs>
-        </Paper>
+        </Box>
 
         {/* Tab 1: Today's Meal Checklist */}
         <TabPanel value={tabValue} index={0}>
@@ -436,11 +510,11 @@ const CaregiverHerediblesPage = () => {
               ))
             ) : (
               <Grid item xs={12}>
-                <Paper sx={{ p: 4, textAlign: 'center' }}>
+                <Box sx={{ p: 4, textAlign: 'center' }}>
                   <Typography variant="body1" color="text.secondary">
                     No meals planned for today
                   </Typography>
-                </Paper>
+                </Box>
               </Grid>
             )}
           </Grid>
@@ -460,13 +534,13 @@ const CaregiverHerediblesPage = () => {
                 const date = new Date(mealPlan.startDate);
                 date.setDate(date.getDate() + i);
                 const dateKey = date.toLocaleDateString();
-                const dayMeals = mealPlan.meals.filter(m => 
+                const dayMeals = mealPlan.meals?.filter(m => 
                   new Date(m.date).toLocaleDateString() === dateKey
-                );
+                ) || [];
 
                 return (
                   <Grid item xs={12} key={i}>
-                    <Paper sx={{ p: 2 }}>
+                    <Box sx={{ p: 2 }}>
                       <Typography variant="h6" gutterBottom>
                         {formatDate(date.toISOString())}
                       </Typography>
@@ -496,7 +570,7 @@ const CaregiverHerediblesPage = () => {
                           </Grid>
                         ))}
                       </Grid>
-                    </Paper>
+                    </Box>
                   </Grid>
                 );
               })}
@@ -613,7 +687,7 @@ const CaregiverHerediblesPage = () => {
           <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
             Ingredients needed for this week's meal plan
           </Typography>
-          <Paper>
+          <Box>
             <List>
               {groceryList.map((item, index) => (
                 <ListItem key={index}>
@@ -627,7 +701,7 @@ const CaregiverHerediblesPage = () => {
                 </ListItem>
               ))}
             </List>
-          </Paper>
+          </Box>
         </TabPanel>
 
         {/* Tab 5: Preferences Analytics */}
@@ -643,7 +717,7 @@ const CaregiverHerediblesPage = () => {
             <Grid container spacing={3}>
               {/* Top Rated Meals */}
               <Grid item xs={12} md={6}>
-                <Paper sx={{ p: 3 }}>
+                <Box sx={{ p: 3 }}>
                   <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                     <StarIcon sx={{ color: '#ffc107' }} />
                     Favorite Meals
@@ -677,12 +751,12 @@ const CaregiverHerediblesPage = () => {
                       </ListItem>
                     )}
                   </List>
-                </Paper>
+                </Box>
               </Grid>
 
               {/* Needs Improvement */}
               <Grid item xs={12} md={6}>
-                <Paper sx={{ p: 3 }}>
+                <Box sx={{ p: 3 }}>
                   <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                     <StarBorderIcon sx={{ color: '#f57c00' }} />
                     Needs Improvement
@@ -716,12 +790,12 @@ const CaregiverHerediblesPage = () => {
                       </ListItem>
                     )}
                   </List>
-                </Paper>
+                </Box>
               </Grid>
 
               {/* Insights */}
               <Grid item xs={12}>
-                <Paper sx={{ p: 3, bgcolor: '#e3f2fd' }}>
+                <Box sx={{ p: 3, bgcolor: '#e3f2fd' }}>
                   <Typography variant="h6" gutterBottom>
                     🤖 AI Insights
                   </Typography>
@@ -738,7 +812,7 @@ const CaregiverHerediblesPage = () => {
                       'Start rating meals to discover Abdeen\'s preferences and get personalized recommendations!'
                     )}
                   </Typography>
-                </Paper>
+                </Box>
               </Grid>
             </Grid>
           )}
@@ -810,22 +884,22 @@ const CaregiverHerediblesPage = () => {
                 </Typography>
                 <Grid container spacing={2} sx={{ mb: 3 }}>
                   <Grid item xs={4}>
-                    <Paper sx={{ p: 2, textAlign: 'center', bgcolor: '#f5f5f5' }}>
+                    <Box sx={{ p: 2, textAlign: 'center', bgcolor: '#f5f5f5' }}>
                       <Typography variant="h6">{selectedRecipe.calories}</Typography>
                       <Typography variant="caption">Calories</Typography>
-                    </Paper>
+                    </Box>
                   </Grid>
                   <Grid item xs={4}>
-                    <Paper sx={{ p: 2, textAlign: 'center', bgcolor: '#f5f5f5' }}>
+                    <Box sx={{ p: 2, textAlign: 'center', bgcolor: '#f5f5f5' }}>
                       <Typography variant="h6">{selectedRecipe.protein.toFixed(0)}g</Typography>
                       <Typography variant="caption">Protein</Typography>
-                    </Paper>
+                    </Box>
                   </Grid>
                   <Grid item xs={4}>
-                    <Paper sx={{ p: 2, textAlign: 'center', bgcolor: '#f5f5f5' }}>
+                    <Box sx={{ p: 2, textAlign: 'center', bgcolor: '#f5f5f5' }}>
                       <Typography variant="h6">{selectedRecipe.fiber.toFixed(0)}g</Typography>
                       <Typography variant="caption">Fiber</Typography>
-                    </Paper>
+                    </Box>
                   </Grid>
                 </Grid>
 
@@ -855,12 +929,12 @@ const CaregiverHerediblesPage = () => {
                 </List>
 
                 {selectedRecipe.tips && (
-                  <Paper sx={{ p: 2, bgcolor: '#e3f2fd', mt: 3 }}>
+                  <Box sx={{ p: 2, bgcolor: '#e3f2fd', mt: 3 }}>
                     <Typography variant="subtitle2" color="primary" gutterBottom>
                       💡 Chef's Tip
                     </Typography>
                     <Typography variant="body2">{selectedRecipe.tips}</Typography>
-                  </Paper>
+                  </Box>
                 )}
               </DialogContent>
               <DialogActions>
@@ -878,7 +952,8 @@ const CaregiverHerediblesPage = () => {
           mealName={selectedMeal?.recipeName || ''}
         />
       </Box>
-    </Layout>
+      </Layout>
+    </Box>
   );
 };
 

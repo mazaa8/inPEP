@@ -1,31 +1,50 @@
-import { Card, CardContent, Typography, Box, Avatar } from '@mui/material';
+import { Typography, Box, Avatar } from '@mui/material';
 import { WbSunny, Mood, Notes } from '@mui/icons-material';
 import { usePatientSummary } from '../../../context/PatientSummaryContext';
+import { roleColors } from '../../../styles/glassmorphism';
 
 const TodaysSummary = () => {
   const { summary } = usePatientSummary();
 
   return (
-    <Card sx={{ background: 'linear-gradient(135deg, #F4F7F6 0%, #E9EFEE 100%)', color: '#2D4A43', borderRadius: '16px', boxShadow: '0 12px 32px rgba(0,0,0,0.1)' }}>
-      <CardContent>
-        <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-          <Avatar sx={{ background: 'linear-gradient(135deg, #78A698 0%, #4A7C6E 100%)', color: '#fff', mr: 2, boxShadow: '0 4px 12px rgba(0,0,0,0.2)' }}>
-            <WbSunny />
-          </Avatar>
-          <Typography variant="h6" component="div" sx={{ fontWeight: 'bold', letterSpacing: '0.5px' }}>
-            Today's Summary
-          </Typography>
-        </Box>
-        <Box sx={{ display: 'flex', alignItems: 'center', mb: 1, pl: 1 }}>
-          <Mood sx={{ mr: 1.5, color: '#4A7C6E' }} />
-          <Typography variant="body1">Feeling: {summary.mood}</Typography>
-        </Box>
-        <Box sx={{ display: 'flex', alignItems: 'center', pl: 1 }}>
-          <Notes sx={{ mr: 1.5, color: '#4A7C6E' }} />
-          <Typography variant="body1">Notes: {summary.notes}</Typography>
-        </Box>
-      </CardContent>
-    </Card>
+    <Box sx={{ 
+      background: 'rgba(255, 255, 255, 0.7)',
+      backdropFilter: 'blur(20px)',
+      WebkitBackdropFilter: 'blur(20px)',
+      border: '1px solid rgba(255, 255, 255, 0.8)',
+      borderRadius: '20px',
+      p: 3,
+      boxShadow: '0 4px 20px rgba(76, 175, 80, 0.1)',
+      transition: 'all 0.3s ease',
+      '&:hover': {
+        transform: 'translateY(-4px)',
+        boxShadow: '0 8px 32px rgba(76, 175, 80, 0.15)',
+      },
+    }}>
+      <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
+        <Avatar sx={{ 
+          background: roleColors.CAREGIVER.gradient,
+          color: '#fff', 
+          mr: 2, 
+          width: 48,
+          height: 48,
+          boxShadow: `0 4px 16px ${roleColors.CAREGIVER.primary}40`,
+        }}>
+          <WbSunny />
+        </Avatar>
+        <Typography variant="h6" sx={{ fontWeight: 700, color: '#1b5e20' }}>
+          Today's Summary
+        </Typography>
+      </Box>
+      <Box sx={{ display: 'flex', alignItems: 'center', mb: 2, pl: 1 }}>
+        <Mood sx={{ mr: 1.5, color: roleColors.CAREGIVER.primary }} />
+        <Typography variant="body1" sx={{ color: '#1b5e20', fontWeight: 600 }}>Feeling: {summary.mood}</Typography>
+      </Box>
+      <Box sx={{ display: 'flex', alignItems: 'center', pl: 1 }}>
+        <Notes sx={{ mr: 1.5, color: roleColors.CAREGIVER.primary }} />
+        <Typography variant="body1" sx={{ color: '#1b5e20', fontWeight: 600 }}>Notes: {summary.notes}</Typography>
+      </Box>
+    </Box>
   );
 };
 

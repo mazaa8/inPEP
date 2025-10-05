@@ -176,6 +176,14 @@ const Layout = ({ children, title, darkMode = false, themeColor }: LayoutProps) 
           boxShadow: '0 4px 20px rgba(123, 31, 162, 0.3)',
           color: 'white',
         }),
+        ...(themeColor === 'CAREGIVER' && !darkMode && {
+          background: 'linear-gradient(135deg, rgba(27, 94, 32, 0.95) 0%, rgba(56, 142, 60, 0.95) 100%)',
+          backdropFilter: 'blur(20px)',
+          WebkitBackdropFilter: 'blur(20px)',
+          borderBottom: '1px solid rgba(129, 199, 132, 0.3)',
+          boxShadow: '0 4px 20px rgba(76, 175, 80, 0.3)',
+          color: 'white',
+        }),
       }}>
         <Toolbar>
           <Button color="inherit" onClick={handleLogoClick} sx={{ textTransform: 'none', p: 1 }}>
@@ -239,6 +247,13 @@ const Layout = ({ children, title, darkMode = false, themeColor }: LayoutProps) 
               borderRight: '1px solid rgba(186, 104, 200, 0.3)',
               color: 'white',
             }),
+            ...(themeColor === 'CAREGIVER' && !darkMode && {
+              background: 'linear-gradient(180deg, rgba(46, 125, 50, 0.92) 0%, rgba(76, 175, 80, 0.92) 100%)',
+              backdropFilter: 'blur(20px)',
+              WebkitBackdropFilter: 'blur(20px)',
+              borderRight: '1px solid rgba(129, 199, 132, 0.3)',
+              color: 'white',
+            }),
           },
         }}
       >
@@ -276,38 +291,74 @@ const Layout = ({ children, title, darkMode = false, themeColor }: LayoutProps) 
             {user?.role === 'CAREGIVER' && (
               <>
                 <ListItem disablePadding>
-                  <ListItemButton onClick={handleReclaiMeClick}>
-                    <ListItemIcon sx={{ color: 'primary.main' }}>
+                  <ListItemButton 
+                    onClick={handleReclaiMeClick}
+                    sx={{
+                      color: 'white',
+                      '&:hover': {
+                        bgcolor: 'rgba(76, 175, 80, 0.2)',
+                      },
+                    }}
+                  >
+                    <ListItemIcon sx={{ color: currentTheme.secondary }}>
                       <VolunteerActivism />
                     </ListItemIcon>
-                    <ListItemText primary="ReclaiMe™" />
-                    {reclaiMeOpen ? <ExpandLess /> : <ExpandMore />}
+                    <ListItemText primary="ReclaiMe™" primaryTypographyProps={{ fontWeight: 600 }} />
+                    {reclaiMeOpen ? <ExpandLess sx={{ color: 'white' }} /> : <ExpandMore sx={{ color: 'white' }} />}
                   </ListItemButton>
                 </ListItem>
                 <Collapse in={reclaiMeOpen} timeout="auto" unmountOnExit>
                   <List component="div" disablePadding>
-                    <ListItemButton sx={{ pl: 4 }} onClick={() => navigate('/profile')}>
-                      <ListItemIcon sx={{ color: 'primary.main' }}>
+                    <ListItemButton 
+                      sx={{ 
+                        pl: 4,
+                        color: 'white',
+                        '&:hover': { bgcolor: 'rgba(76, 175, 80, 0.15)' },
+                      }} 
+                      onClick={() => navigate('/profile')}
+                    >
+                      <ListItemIcon sx={{ color: currentTheme.secondary }}>
                         <Person />
                       </ListItemIcon>
                       <ListItemText primary="Profile" />
                     </ListItemButton>
                     {user?.role === 'CAREGIVER' && (
                       <>
-                        <ListItemButton sx={{ pl: 4 }} onClick={() => navigate('/champion-corner')}>
-                          <ListItemIcon sx={{ color: 'primary.main' }}>
+                        <ListItemButton 
+                          sx={{ 
+                            pl: 4,
+                            color: 'white',
+                            '&:hover': { bgcolor: 'rgba(76, 175, 80, 0.15)' },
+                          }} 
+                          onClick={() => navigate('/champion-corner')}
+                        >
+                          <ListItemIcon sx={{ color: currentTheme.secondary }}>
                             <MeetingRoom />
                           </ListItemIcon>
                           <ListItemText primary="Champion Corner" />
                         </ListItemButton>
-                        <ListItemButton sx={{ pl: 4 }} onClick={() => navigate('/reclaime')}>
-                          <ListItemIcon sx={{ color: 'primary.main' }}>
+                        <ListItemButton 
+                          sx={{ 
+                            pl: 4,
+                            color: 'white',
+                            '&:hover': { bgcolor: 'rgba(76, 175, 80, 0.15)' },
+                          }} 
+                          onClick={() => navigate('/reclaime')}
+                        >
+                          <ListItemIcon sx={{ color: currentTheme.secondary }}>
                             <WorkspacePremium />
                           </ListItemIcon>
                           <ListItemText primary="ReclaiMe Champion™" />
                         </ListItemButton>
-                        <ListItemButton sx={{ pl: 4 }} onClick={() => navigate('/caregiver-support')}>
-                          <ListItemIcon sx={{ color: 'primary.main' }}>
+                        <ListItemButton 
+                          sx={{ 
+                            pl: 4,
+                            color: 'white',
+                            '&:hover': { bgcolor: 'rgba(76, 175, 80, 0.15)' },
+                          }} 
+                          onClick={() => navigate('/caregiver-support')}
+                        >
+                          <ListItemIcon sx={{ color: currentTheme.secondary }}>
                             <SupportAgent />
                           </ListItemIcon>
                           <ListItemText primary="Caregiver Support" />
@@ -384,26 +435,54 @@ const Layout = ({ children, title, darkMode = false, themeColor }: LayoutProps) 
                     )}
                     {user?.role === 'CAREGIVER' && (
                       <>
-                        <ListItemButton sx={{ pl: 4 }} onClick={() => navigate('/dashboard/caregiver')}>
-                          <ListItemIcon sx={{ color: 'primary.main' }}>
+                        <ListItemButton 
+                          sx={{ 
+                            pl: 4,
+                            color: 'white',
+                            '&:hover': { bgcolor: 'rgba(76, 175, 80, 0.15)' },
+                          }} 
+                          onClick={() => navigate('/dashboard/caregiver')}
+                        >
+                          <ListItemIcon sx={{ color: currentTheme.secondary }}>
                             <MonitorHeart />
                           </ListItemIcon>
                           <ListItemText primary="Patient Monitor" />
                         </ListItemButton>
-                        <ListItemButton sx={{ pl: 4 }} onClick={() => navigate('/patient-support')}>
-                          <ListItemIcon sx={{ color: 'primary.main' }}>
+                        <ListItemButton 
+                          sx={{ 
+                            pl: 4,
+                            color: 'white',
+                            '&:hover': { bgcolor: 'rgba(76, 175, 80, 0.15)' },
+                          }} 
+                          onClick={() => navigate('/patient-support')}
+                        >
+                          <ListItemIcon sx={{ color: currentTheme.secondary }}>
                             <SupportAgent />
                           </ListItemIcon>
                           <ListItemText primary="Patient Support" />
                         </ListItemButton>
-                        <ListItemButton sx={{ pl: 4 }} onClick={() => navigate('/caregiver/pharmacy')}>
-                          <ListItemIcon sx={{ color: 'primary.main' }}>
+                        <ListItemButton 
+                          sx={{ 
+                            pl: 4,
+                            color: 'white',
+                            '&:hover': { bgcolor: 'rgba(76, 175, 80, 0.15)' },
+                          }} 
+                          onClick={() => navigate('/caregiver/pharmacy')}
+                        >
+                          <ListItemIcon sx={{ color: currentTheme.secondary }}>
                             <LocalPharmacy />
                           </ListItemIcon>
                           <ListItemText primary="Pharmacy" />
                         </ListItemButton>
-                        <ListItemButton sx={{ pl: 4 }} onClick={() => navigate('/caregiver/heredibles')}>
-                          <ListItemIcon sx={{ color: 'primary.main' }}>
+                        <ListItemButton 
+                          sx={{ 
+                            pl: 4,
+                            color: 'white',
+                            '&:hover': { bgcolor: 'rgba(76, 175, 80, 0.15)' },
+                          }} 
+                          onClick={() => navigate('/caregiver/heredibles')}
+                        >
+                          <ListItemIcon sx={{ color: currentTheme.secondary }}>
                             <RestaurantMenu />
                           </ListItemIcon>
                           <ListItemText primary="Heredibles™" />
@@ -418,36 +497,72 @@ const Layout = ({ children, title, darkMode = false, themeColor }: LayoutProps) 
             {user?.role === 'CAREGIVER' && (
               <>
                 <ListItem disablePadding>
-                  <ListItemButton onClick={handleCarePlanningClick}>
-                    <ListItemIcon sx={{ color: 'primary.main' }}>
+                  <ListItemButton 
+                    onClick={handleCarePlanningClick}
+                    sx={{
+                      color: 'white',
+                      '&:hover': {
+                        bgcolor: 'rgba(76, 175, 80, 0.2)',
+                      },
+                    }}
+                  >
+                    <ListItemIcon sx={{ color: currentTheme.secondary }}>
                       <EventNote />
                     </ListItemIcon>
-                    <ListItemText primary="Care Planning" />
-                    {carePlanningOpen ? <ExpandLess /> : <ExpandMore />}
+                    <ListItemText primary="Care Planning" primaryTypographyProps={{ fontWeight: 600 }} />
+                    {carePlanningOpen ? <ExpandLess sx={{ color: 'white' }} /> : <ExpandMore sx={{ color: 'white' }} />}
                   </ListItemButton>
                 </ListItem>
                 <Collapse in={carePlanningOpen} timeout="auto" unmountOnExit>
                   <List component="div" disablePadding>
-                    <ListItemButton sx={{ pl: 4 }} onClick={() => navigate('/care-planning')}>
-                      <ListItemIcon sx={{ color: 'primary.main' }}>
+                    <ListItemButton 
+                      sx={{ 
+                        pl: 4,
+                        color: 'white',
+                        '&:hover': { bgcolor: 'rgba(76, 175, 80, 0.15)' },
+                      }} 
+                      onClick={() => navigate('/care-planning')}
+                    >
+                      <ListItemIcon sx={{ color: currentTheme.secondary }}>
                         <AllInclusive />
                       </ListItemIcon>
                       <ListItemText primary="Wellness Plan" />
                     </ListItemButton>
-                    <ListItemButton sx={{ pl: 4 }} onClick={() => navigate('/caregiver/heredibles')}> 
-                      <ListItemIcon sx={{ color: 'primary.main' }}>
+                    <ListItemButton 
+                      sx={{ 
+                        pl: 4,
+                        color: 'white',
+                        '&:hover': { bgcolor: 'rgba(76, 175, 80, 0.15)' },
+                      }} 
+                      onClick={() => navigate('/caregiver/heredibles')}
+                    > 
+                      <ListItemIcon sx={{ color: currentTheme.secondary }}>
                         <RestaurantMenu />
                       </ListItemIcon>
                       <ListItemText primary="Heredibles™" />
                     </ListItemButton>
-                    <ListItemButton sx={{ pl: 4 }} onClick={() => navigate('/caregiver/grocery-list')}>
-                      <ListItemIcon sx={{ color: 'primary.main' }}>
+                    <ListItemButton 
+                      sx={{ 
+                        pl: 4,
+                        color: 'white',
+                        '&:hover': { bgcolor: 'rgba(76, 175, 80, 0.15)' },
+                      }} 
+                      onClick={() => navigate('/caregiver/grocery-list')}
+                    >
+                      <ListItemIcon sx={{ color: currentTheme.secondary }}>
                         <ShoppingCart />
                       </ListItemIcon>
                       <ListItemText primary="Grocery List" />
                     </ListItemButton>
-                    <ListItemButton sx={{ pl: 4 }} onClick={() => navigate('/caregiver/medication-schedule')}>
-                      <ListItemIcon sx={{ color: 'primary.main' }}>
+                    <ListItemButton 
+                      sx={{ 
+                        pl: 4,
+                        color: 'white',
+                        '&:hover': { bgcolor: 'rgba(76, 175, 80, 0.15)' },
+                      }} 
+                      onClick={() => navigate('/caregiver/medication-schedule')}
+                    >
+                      <ListItemIcon sx={{ color: currentTheme.secondary }}>
                         <ScheduleIcon />
                       </ListItemIcon>
                       <ListItemText primary="Medication Scheduler" />
@@ -470,6 +585,9 @@ const Layout = ({ children, title, darkMode = false, themeColor }: LayoutProps) 
         ...(themeColor === 'INSURER' && !darkMode && {
           background: 'transparent',
         }),
+        ...(themeColor === 'CAREGIVER' && !darkMode && {
+          background: 'transparent',
+        }),
       }}>
         <Box component="main" sx={{ 
           flexGrow: 1, 
@@ -481,20 +599,51 @@ const Layout = ({ children, title, darkMode = false, themeColor }: LayoutProps) 
           ...(themeColor === 'INSURER' && !darkMode && {
             background: 'transparent',
           }),
+          ...(themeColor === 'CAREGIVER' && !darkMode && {
+            background: 'transparent',
+          }),
         }}>
           {title && <Typography variant="h4" gutterBottom sx={{ 
             ...(darkMode && { color: 'white' }),
             ...(themeColor === 'INSURER' && !darkMode && { color: '#4a148c' }),
+            ...(themeColor === 'CAREGIVER' && !darkMode && { color: '#1b5e20' }),
           }}>{title}</Typography>}
           {children}
         </Box>
-        {!darkMode && themeColor !== 'INSURER' && <Footer />}
+        {!darkMode && themeColor !== 'INSURER' && themeColor !== 'CAREGIVER' && <Footer />}
         {themeColor === 'INSURER' && !darkMode && (
           <Box sx={{
             background: 'linear-gradient(135deg, rgba(74, 20, 140, 0.95) 0%, rgba(123, 31, 162, 0.95) 100%)',
             backdropFilter: 'blur(20px)',
             WebkitBackdropFilter: 'blur(20px)',
             borderTop: '1px solid rgba(186, 104, 200, 0.3)',
+            py: 3,
+            px: 4,
+          }}>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.7)' }}>
+                © 2024 inPEP™. All rights reserved.
+              </Typography>
+              <Box sx={{ display: 'flex', gap: 3 }}>
+                <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.7)', cursor: 'pointer', '&:hover': { color: currentTheme.secondary } }}>
+                  Privacy Policy
+                </Typography>
+                <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.7)', cursor: 'pointer', '&:hover': { color: currentTheme.secondary } }}>
+                  Terms of Service
+                </Typography>
+                <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.7)', cursor: 'pointer', '&:hover': { color: currentTheme.secondary } }}>
+                  Contact Support
+                </Typography>
+              </Box>
+            </Box>
+          </Box>
+        )}
+        {themeColor === 'CAREGIVER' && !darkMode && (
+          <Box sx={{
+            background: 'linear-gradient(135deg, rgba(27, 94, 32, 0.95) 0%, rgba(56, 142, 60, 0.95) 100%)',
+            backdropFilter: 'blur(20px)',
+            WebkitBackdropFilter: 'blur(20px)',
+            borderTop: '1px solid rgba(129, 199, 132, 0.3)',
             py: 3,
             px: 4,
           }}>
