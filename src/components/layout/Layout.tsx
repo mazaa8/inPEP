@@ -72,15 +72,26 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 interface LayoutProps {
   children: React.ReactNode;
   title?: string;
+  darkMode?: boolean;
+  themeColor?: 'PATIENT' | 'CAREGIVER' | 'PROVIDER' | 'INSURER';
 }
 
-const Layout = ({ children, title }: LayoutProps) => {
+const Layout = ({ children, title, darkMode = false, themeColor }: LayoutProps) => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [dashboardOpen, setDashboardOpen] = useState(true);
   const [carePlanningOpen, setCarePlanningOpen] = useState(false);
   const [reclaiMeOpen, setReclaiMeOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+
+  // Determine theme colors
+  const roleColors = {
+    PATIENT: { primary: '#2196F3', secondary: '#21CBF3', gradient: 'linear-gradient(135deg, #2196F3 0%, #21CBF3 100%)' },
+    CAREGIVER: { primary: '#4CAF50', secondary: '#8BC34A', gradient: 'linear-gradient(135deg, #4CAF50 0%, #8BC34A 100%)' },
+    PROVIDER: { primary: '#FF9800', secondary: '#FFC107', gradient: 'linear-gradient(135deg, #FF9800 0%, #FFC107 100%)' },
+    INSURER: { primary: '#9C27B0', secondary: '#E91E63', gradient: 'linear-gradient(135deg, #9C27B0 0%, #E91E63 100%)' },
+  };
+  const currentTheme = themeColor ? roleColors[themeColor] : roleColors.PATIENT;
 
   const handleProfileMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -148,7 +159,16 @@ const Layout = ({ children, title }: LayoutProps) => {
 
   return (
     <Box sx={{ display: 'flex' }}>
-      <AppBar position="fixed" sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}>
+      <AppBar position="fixed" sx={{ 
+        zIndex: (theme) => theme.zIndex.drawer + 1,
+        ...(darkMode && {
+          background: 'rgba(15, 32, 39, 0.8)',
+          backdropFilter: 'blur(20px)',
+          WebkitBackdropFilter: 'blur(20px)',
+          borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
+          boxShadow: '0 4px 20px rgba(0, 0, 0, 0.3)',
+        }),
+      }}>
         <Toolbar>
           <Button color="inherit" onClick={handleLogoClick} sx={{ textTransform: 'none', p: 1 }}>
             <Apartment sx={{ mr: 1 }} />
@@ -194,7 +214,17 @@ const Layout = ({ children, title }: LayoutProps) => {
         sx={{
           width: drawerWidth,
           flexShrink: 0,
-          [`& .MuiDrawer-paper`]: { width: drawerWidth, boxSizing: 'border-box' },
+          [`& .MuiDrawer-paper`]: { 
+            width: drawerWidth, 
+            boxSizing: 'border-box',
+            ...(darkMode && {
+              background: 'rgba(15, 32, 39, 0.95)',
+              backdropFilter: 'blur(20px)',
+              WebkitBackdropFilter: 'blur(20px)',
+              borderRight: '1px solid rgba(255, 255, 255, 0.1)',
+              color: 'white',
+            }),
+          },
         }}
       >
         <Toolbar />
@@ -288,38 +318,38 @@ const Layout = ({ children, title }: LayoutProps) => {
             ) : (
               <>
                 <ListItem disablePadding>
-                  <ListItemButton onClick={handleDashboardClick}>
-                    <ListItemIcon sx={{ color: 'primary.main' }}>
+                  <ListItemButton onClick={handleDashboardClick} sx={{ ...(darkMode && { color: 'white', '&:hover': { bgcolor: 'rgba(33, 150, 243, 0.1)' } }) }}>
+                    <ListItemIcon sx={{ color: darkMode ? currentTheme.secondary : 'primary.main' }}>
                       <Dashboard />
                     </ListItemIcon>
                     <ListItemText primary="Patient Hub" />
-                    {dashboardOpen ? <ExpandLess /> : <ExpandMore />}
+                    {dashboardOpen ? <ExpandLess sx={{ color: darkMode ? 'white' : 'inherit' }} /> : <ExpandMore sx={{ color: darkMode ? 'white' : 'inherit' }} />}
                   </ListItemButton>
                 </ListItem>
                 <Collapse in={dashboardOpen} timeout="auto" unmountOnExit>
                   <List component="div" disablePadding>
                     {user?.role === 'PATIENT' && (
                       <>
-                        <ListItemButton sx={{ pl: 4 }} onClick={() => navigate('/dashboard/patient')}>
-                          <ListItemIcon sx={{ color: 'primary.main' }}>
+                        <ListItemButton sx={{ pl: 4, ...(darkMode && { color: 'white', '&:hover': { bgcolor: 'rgba(33, 150, 243, 0.1)' } }) }} onClick={() => navigate('/dashboard/patient')}>
+                          <ListItemIcon sx={{ color: darkMode ? currentTheme.secondary : 'primary.main' }}>
                             <Dashboard />
                           </ListItemIcon>
                           <ListItemText primary="My Health Hub" />
                         </ListItemButton>
-                        <ListItemButton sx={{ pl: 4 }} onClick={() => navigate('/patient/appointments')}>
-                          <ListItemIcon sx={{ color: 'primary.main' }}>
+                        <ListItemButton sx={{ pl: 4, ...(darkMode && { color: 'white', '&:hover': { bgcolor: 'rgba(33, 150, 243, 0.1)' } }) }} onClick={() => navigate('/patient/appointments')}>
+                          <ListItemIcon sx={{ color: darkMode ? currentTheme.secondary : 'primary.main' }}>
                             <EventNote />
                           </ListItemIcon>
                           <ListItemText primary="Appointments" />
                         </ListItemButton>
-                        <ListItemButton sx={{ pl: 4 }} onClick={() => navigate('/messages')}>
-                          <ListItemIcon sx={{ color: 'primary.main' }}>
+                        <ListItemButton sx={{ pl: 4, ...(darkMode && { color: 'white', '&:hover': { bgcolor: 'rgba(33, 150, 243, 0.1)' } }) }} onClick={() => navigate('/messages')}>
+                          <ListItemIcon sx={{ color: darkMode ? currentTheme.secondary : 'primary.main' }}>
                             <MessageIcon />
                           </ListItemIcon>
                           <ListItemText primary="Messages" />
                         </ListItemButton>
-                        <ListItemButton sx={{ pl: 4 }} onClick={() => navigate('/patient/meal-plan')}>
-                          <ListItemIcon sx={{ color: 'primary.main' }}>
+                        <ListItemButton sx={{ pl: 4, ...(darkMode && { color: 'white', '&:hover': { bgcolor: 'rgba(33, 150, 243, 0.1)' } }) }} onClick={() => navigate('/patient/meal-plan')}>
+                          <ListItemIcon sx={{ color: darkMode ? currentTheme.secondary : 'primary.main' }}>
                             <RestaurantMenu />
                           </ListItemIcon>
                           <ListItemText primary="Heredibles™" />
@@ -403,12 +433,27 @@ const Layout = ({ children, title }: LayoutProps) => {
           </List>
         </Box>
       </Drawer>
-      <Box sx={{ display: 'flex', flexDirection: 'column', flexGrow: 1, minHeight: '100vh' }}>
-        <Box component="main" sx={{ flexGrow: 1, p: 3, mt: '64px' }}>
-          {title && <Typography variant="h4" gutterBottom>{title}</Typography>}
+      <Box sx={{ 
+        display: 'flex', 
+        flexDirection: 'column', 
+        flexGrow: 1, 
+        minHeight: '100vh',
+        ...(darkMode && {
+          background: 'transparent',
+        }),
+      }}>
+        <Box component="main" sx={{ 
+          flexGrow: 1, 
+          p: 3, 
+          mt: '64px',
+          ...(darkMode && {
+            background: 'transparent',
+          }),
+        }}>
+          {title && <Typography variant="h4" gutterBottom sx={{ ...(darkMode && { color: 'white' }) }}>{title}</Typography>}
           {children}
         </Box>
-        <Footer />
+        {!darkMode && <Footer />}
       </Box>
     </Box>
   );

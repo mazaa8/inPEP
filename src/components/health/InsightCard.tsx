@@ -1,6 +1,4 @@
 import {
-  Card,
-  CardContent,
   Typography,
   Chip,
   IconButton,
@@ -37,119 +35,134 @@ const InsightCard = ({ insight, onDismiss }: InsightCardProps) => {
     }
   };
 
-  const getSeverityColor = () => {
-    switch (insight.severity) {
-      case 'CRITICAL':
-        return 'error';
-      case 'ALERT':
-        return 'error';
-      case 'WARNING':
-        return 'warning';
-      case 'INFO':
-        return 'info';
-      default:
-        return 'default';
-    }
-  };
-
   const getBackgroundColor = () => {
     switch (insight.severity) {
       case 'CRITICAL':
-        return '#ffebee';
+        return 'rgba(244, 67, 54, 0.1)';
       case 'ALERT':
-        return '#fff3e0';
+        return 'rgba(255, 152, 0, 0.1)';
       case 'WARNING':
-        return '#fff9c4';
+        return 'rgba(255, 193, 7, 0.1)';
       case 'INFO':
-        return insight.insightType === 'ACHIEVEMENT' ? '#e8f5e9' : '#e3f2fd';
+        return insight.insightType === 'ACHIEVEMENT' ? 'rgba(76, 175, 80, 0.1)' : 'rgba(33, 150, 243, 0.1)';
       default:
-        return '#f5f5f5';
+        return 'rgba(255,255,255,0.05)';
     }
   };
 
   const getIconColor = () => {
     switch (insight.severity) {
       case 'CRITICAL':
-        return '#d32f2f';
+        return '#f44336';
       case 'ALERT':
-        return '#f57c00';
+        return '#FF9800';
       case 'WARNING':
-        return '#fbc02d';
+        return '#FFC107';
       case 'INFO':
-        return insight.insightType === 'ACHIEVEMENT' ? '#388e3c' : '#1976d2';
+        return insight.insightType === 'ACHIEVEMENT' ? '#4CAF50' : '#2196F3';
       default:
-        return '#757575';
+        return '#9E9E9E';
     }
   };
 
   return (
-    <Card
-      elevation={2}
+    <Box
       sx={{
-        bgcolor: getBackgroundColor(),
+        background: getBackgroundColor(),
+        backdropFilter: 'blur(10px)',
+        WebkitBackdropFilter: 'blur(10px)',
         borderLeft: `4px solid ${getIconColor()}`,
+        borderRadius: '12px',
+        border: `1px solid ${getIconColor()}40`,
+        p: 2.5,
+        transition: 'all 0.3s ease',
+        '&:hover': {
+          transform: 'translateX(4px)',
+          boxShadow: `0 4px 20px ${getIconColor()}30`,
+        },
       }}
     >
-      <CardContent>
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-          <Box sx={{ display: 'flex', alignItems: 'flex-start', flex: 1 }}>
-            <Box
-              sx={{
-                color: getIconColor(),
-                mr: 2,
-                mt: 0.5,
-              }}
-            >
-              {getIcon()}
-            </Box>
-            <Box sx={{ flex: 1 }}>
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
-                <Typography variant="h6" sx={{ fontSize: '1rem', fontWeight: 600 }}>
-                  {insight.title}
-                </Typography>
-                <Chip
-                  label={insight.insightType}
-                  size="small"
-                  color={getSeverityColor() as any}
-                  variant="outlined"
-                />
-              </Box>
-              <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-                {insight.description}
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+        <Box sx={{ display: 'flex', alignItems: 'flex-start', flex: 1 }}>
+          <Box
+            sx={{
+              color: getIconColor(),
+              mr: 2,
+              mt: 0.5,
+            }}
+          >
+            {getIcon()}
+          </Box>
+          <Box sx={{ flex: 1 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+              <Typography variant="h6" sx={{ fontSize: '1rem', fontWeight: 700, color: 'white' }}>
+                {insight.title}
               </Typography>
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mt: 2 }}>
-                <Box sx={{ flex: 1 }}>
-                  <Typography variant="caption" color="text.secondary" sx={{ mb: 0.5, display: 'block' }}>
-                    Confidence: {Math.round(insight.confidence * 100)}%
-                  </Typography>
-                  <LinearProgress
-                    variant="determinate"
-                    value={insight.confidence * 100}
-                    sx={{ height: 6, borderRadius: 3 }}
-                    color={getSeverityColor() as any}
-                  />
-                </Box>
-                <Chip
-                  label={insight.category}
-                  size="small"
-                  variant="outlined"
-                  sx={{ fontSize: '0.7rem' }}
+              <Chip
+                label={insight.insightType}
+                size="small"
+                sx={{
+                  bgcolor: `${getIconColor()}30`,
+                  color: getIconColor(),
+                  fontWeight: 700,
+                  border: 'none',
+                }}
+              />
+            </Box>
+            <Typography variant="body2" sx={{ mb: 1.5, color: 'rgba(255,255,255,0.8)' }}>
+              {insight.description}
+            </Typography>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mt: 2 }}>
+              <Box sx={{ flex: 1 }}>
+                <Typography variant="caption" sx={{ mb: 0.5, display: 'block', color: 'rgba(255,255,255,0.6)', fontWeight: 600 }}>
+                  Confidence: {Math.round(insight.confidence * 100)}%
+                </Typography>
+                <LinearProgress
+                  variant="determinate"
+                  value={insight.confidence * 100}
+                  sx={{ 
+                    height: 6, 
+                    borderRadius: 3,
+                    bgcolor: 'rgba(255,255,255,0.1)',
+                    '& .MuiLinearProgress-bar': {
+                      bgcolor: getIconColor(),
+                      borderRadius: 3,
+                    },
+                  }}
                 />
               </Box>
+              <Chip
+                label={insight.category}
+                size="small"
+                sx={{ 
+                  fontSize: '0.7rem',
+                  bgcolor: 'rgba(255,255,255,0.1)',
+                  color: 'rgba(255,255,255,0.8)',
+                  fontWeight: 600,
+                  border: '1px solid rgba(255,255,255,0.2)',
+                }}
+              />
             </Box>
           </Box>
-          {onDismiss && (
-            <IconButton
-              size="small"
-              onClick={() => onDismiss(insight.id)}
-              sx={{ ml: 1 }}
-            >
-              <CloseIcon fontSize="small" />
-            </IconButton>
-          )}
         </Box>
-      </CardContent>
-    </Card>
+        {onDismiss && (
+          <IconButton
+            size="small"
+            onClick={() => onDismiss(insight.id)}
+            sx={{ 
+              ml: 1,
+              color: 'rgba(255,255,255,0.6)',
+              '&:hover': {
+                color: 'white',
+                bgcolor: 'rgba(255,255,255,0.1)',
+              },
+            }}
+          >
+            <CloseIcon fontSize="small" />
+          </IconButton>
+        )}
+      </Box>
+    </Box>
   );
 };
 

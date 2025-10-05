@@ -1,8 +1,9 @@
 import { useEffect } from 'react';
-import { Typography, Box, Button, Alert, Grid, Card, CardContent } from '@mui/material';
+import { Typography, Box, Button, Grid } from '@mui/material';
 import Layout from '../../components/layout/Layout';
 import { useVideoCall } from '../../context/VideoCallContext';
 import VideoCall from '../../components/video/VideoCall';
+import { glassStyles, roleColors, dashboardBackgrounds } from '../../styles/glassmorphism';
 
 const PatientMonitorPage = () => {
   const { 
@@ -37,24 +38,23 @@ const PatientMonitorPage = () => {
   }, [incomingCall]);
 
   return (
-    <Layout title="Patient Monitor">
-      {/* PERMANENT CALL BANNER - ALWAYS VISIBLE */}
-      <Alert
-        severity={incomingCall ? "success" : "info"}
-        sx={{ 
-          mb: 3, 
-          bgcolor: incomingCall ? '#4CAF50' : '#2196F3',
-          color: 'white',
-          fontSize: '1.2rem',
-          fontWeight: 'bold',
-          animation: incomingCall ? 'pulse 1s infinite' : 'none',
-          '@keyframes pulse': {
-            '0%': { boxShadow: '0 0 0 0 rgba(76, 175, 80, 0.7)' },
-            '50%': { boxShadow: '0 0 0 10px rgba(76, 175, 80, 0)' },
-            '100%': { boxShadow: '0 0 0 0 rgba(76, 175, 80, 0)' },
-          },
-        }}
-      >
+    <Box sx={{ minHeight: '100vh', background: dashboardBackgrounds.CAREGIVER, p: 3 }}>
+      <Layout title="Patient Monitor">
+        {/* PERMANENT CALL BANNER - ALWAYS VISIBLE */}
+        <Box
+          sx={{ 
+            ...glassStyles.solidCard('CAREGIVER'),
+            mb: 3,
+            p: 3,
+            animation: incomingCall ? 'pulse 1s infinite' : 'none',
+            '@keyframes pulse': {
+              '0%': { boxShadow: `0 0 0 0 ${roleColors.CAREGIVER.primary}70` },
+              '50%': { boxShadow: `0 0 0 15px ${roleColors.CAREGIVER.primary}00` },
+              '100%': { boxShadow: `0 0 0 0 ${roleColors.CAREGIVER.primary}00` },
+            },
+            opacity: incomingCall ? 1 : 0.8,
+          }}
+        >
         <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
           <Box>
             <Typography variant="h4" sx={{ color: 'white', fontWeight: 'bold', mb: 0.5 }}>
@@ -127,29 +127,32 @@ const PatientMonitorPage = () => {
             )}
           </Box>
         </Box>
-      </Alert>
+        </Box>
 
-      <Grid container spacing={3}>
-        <Grid item xs={12}>
-          <Card sx={{ bgcolor: '#e3f2fd' }}>
-            <CardContent>
-              <Typography variant="h4" gutterBottom>
+        <Grid container spacing={3}>
+          <Grid item xs={12}>
+            <Box sx={{ 
+              ...glassStyles.cardWithTint('CAREGIVER', 0.2),
+              p: 3,
+            }}>
+              <Typography variant="h4" gutterBottom sx={{ fontWeight: 'bold', color: roleColors.CAREGIVER.primary }}>
                 Patient Monitor
               </Typography>
-              <Typography variant="body1" color="text.secondary">
+              <Typography variant="body1" sx={{ opacity: 0.8 }}>
                 Monitor Abdeen's health status, activities, and well-being in real-time.
               </Typography>
-            </CardContent>
-          </Card>
-        </Grid>
+            </Box>
+          </Grid>
 
-        <Grid item xs={12}>
-          <Card>
-            <CardContent>
-              <Typography variant="h6" gutterBottom>
+          <Grid item xs={12}>
+            <Box sx={{ 
+              ...glassStyles.cardWithTint('CAREGIVER', 0.15),
+              p: 3,
+            }}>
+              <Typography variant="h6" gutterBottom sx={{ fontWeight: 'bold', color: roleColors.CAREGIVER.primary }}>
                 📊 Real-Time Monitoring
               </Typography>
-              <Typography variant="body2" color="text.secondary">
+              <Typography variant="body2" sx={{ mb: 2, opacity: 0.8 }}>
                 Patient monitoring features will be displayed here, including:
               </Typography>
               <Box component="ul" sx={{ mt: 2 }}>
@@ -159,27 +162,27 @@ const PatientMonitorPage = () => {
                 <li>Meal completion status</li>
                 <li>Sleep patterns</li>
               </Box>
-            </CardContent>
-          </Card>
+            </Box>
+          </Grid>
         </Grid>
-      </Grid>
 
-      {/* Video Call Dialog */}
-      {callState.isInCall && (
-        <VideoCall
-          open={callState.isInCall}
-          isInitiator={callState.isInitiator}
-          remoteName={callState.remoteName || 'Abdeen'}
-          onEndCall={endCall}
-          onOffer={sendOffer}
-          onAnswer={sendAnswer}
-          onIceCandidate={sendIceCandidate}
-          remoteOffer={remoteOffer}
-          remoteAnswer={remoteAnswer}
-          remoteIceCandidate={remoteIceCandidate}
-        />
-      )}
-    </Layout>
+        {/* Video Call Dialog */}
+        {callState.isInCall && (
+          <VideoCall
+            open={callState.isInCall}
+            isInitiator={callState.isInitiator}
+            remoteName={callState.remoteName || 'Abdeen'}
+            onEndCall={endCall}
+            onOffer={sendOffer}
+            onAnswer={sendAnswer}
+            onIceCandidate={sendIceCandidate}
+            remoteOffer={remoteOffer}
+            remoteAnswer={remoteAnswer}
+            remoteIceCandidate={remoteIceCandidate}
+          />
+        )}
+      </Layout>
+    </Box>
   );
 };
 
