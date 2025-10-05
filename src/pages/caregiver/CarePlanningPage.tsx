@@ -30,7 +30,7 @@ import Layout from '../../components/layout/Layout';
 
 const initialCarePlanData = {
   individualNeeds: {
-    name: 'Abdelrahman Zeinelabdin',
+    name: 'Abdeen White',
     dob: 'October 15, 1945',
     conditions: ['Heart Diseases', 'Chronic Pancreatitis', 'Mild Cognitive Impairment'],
     personalCare: ['Assistance with bathing twice a week', 'Medication reminders', 'Meal preparation'],
@@ -54,8 +54,8 @@ const initialCarePlanData = {
     homeHealthAide: { name: 'Sarah Connor', agency: 'FutureCare Home Health', contact: '555-0103' },
   },
   roles: {
-    primaryCaregiver: { name: 'Mourouge (Daughter)', responsibilities: 'Assists with daily needs, groceries, meals, and companionship.' },
-    secondaryCaregiver: { name: 'Shaza (Daughter)', responsibilities: 'Manages finances, schedules appointments, provides transport.' },
+    primaryCaregiver: { name: 'Nora (Daughter)', responsibilities: 'Assists with daily needs, groceries, meals, and companionship.' },
+    secondaryCaregiver: { name: 'Sarah (Daughter)', responsibilities: 'Manages finances, schedules appointments, provides transport.' },
   },
 };
 

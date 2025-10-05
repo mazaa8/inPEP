@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
-import { Grid } from '@mui/material';
+import { Grid, Paper, Typography } from '@mui/material';
 import Layout from '../../components/layout/Layout';
 import TodaysSummary from '../../components/dashboards/caregiver/TodaysSummary';
 import Reminders from '../../components/dashboards/caregiver/Reminders';
 import MedicationChecklist, { type Medication } from '../../components/dashboards/caregiver/MedicationChecklist';
 import AppointmentsCalendar, { type AppointmentEvent } from '../../components/dashboards/caregiver/AppointmentsCalendar';
 import VitalsLog, { type VitalsData } from '../../components/dashboards/caregiver/VitalsLog';
+import AIInsightsDashboard from '../../components/health/AIInsightsDashboard';
 import { appointmentService } from '../../services/appointmentService';
 
 const vitalsData: VitalsData[] = [
@@ -81,11 +82,20 @@ const CaregiverDashboard = () => {
             <Grid item xs={12}>
               <VitalsLog data={vitalsData} />
             </Grid>
-                                  </Grid>
+          </Grid>
         </Grid>
         {/* Larger column for the calendar */}
         <Grid item xs={12} lg={8}>
           <AppointmentsCalendar events={appointments} />
+        </Grid>
+        {/* AI Health Insights - Full width */}
+        <Grid item xs={12}>
+          <Paper sx={{ p: 3 }}>
+            <Typography variant="h5" gutterBottom sx={{ mb: 3 }}>
+              🤖 Patient Health Insights
+            </Typography>
+            <AIInsightsDashboard patientId="b805ec90-e553-4de7-9de0-45f2eb73d1ba" />
+          </Paper>
         </Grid>
       </Grid>
     </Layout>

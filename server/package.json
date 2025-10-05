@@ -11,7 +11,9 @@
     "db:generate": "prisma generate",
     "db:push": "prisma db push",
     "db:studio": "prisma studio",
-    "seed:providers": "tsx src/scripts/seedProviders.ts"
+    "seed:providers": "tsx src/scripts/seedProviders.ts",
+    "seed:health": "tsx src/scripts/seedHealthData.ts",
+    "update:characters": "tsx src/scripts/updateMainCharacters.ts"
   },
   "keywords": ["healthcare", "api", "typescript"],
   "author": "",

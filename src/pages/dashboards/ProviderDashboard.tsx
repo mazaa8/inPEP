@@ -9,6 +9,7 @@ import PatientJourneys from '../../components/dashboards/provider/PatientJourney
 import WelcomeMessage from '../../components/dashboards/provider/WelcomeMessage';
 import QuickActions from '../../components/dashboards/provider/QuickActions';
 import EMRIntegration from '../../components/dashboards/provider/EMRIntegration';
+import PatientDirectory from '../../components/provider/PatientDirectory';
 
 const ProviderDashboard = () => {
   const { isEscalated, patientName, patientId, alertLevel, resetAlert } = useEmergencyAlert();
@@ -74,11 +75,9 @@ const ProviderDashboard = () => {
         {/* Right Sidebar */}
         <Grid item xs={12} md={4}>
           <Grid container spacing={3}>
-            {/* Patient List */}
+            {/* Patient Directory */}
             <Grid item xs={12}>
-              <DashboardCard title="Patient List">
-                <PatientList />
-              </DashboardCard>
+              <PatientDirectory />
             </Grid>
             {/* EMR Integration */}
             <Grid item xs={12}>

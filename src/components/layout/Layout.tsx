@@ -300,6 +300,12 @@ const Layout = ({ children, title }: LayoutProps) => {
                   <List component="div" disablePadding>
                     {user?.role === 'PATIENT' && (
                       <>
+                        <ListItemButton sx={{ pl: 4 }} onClick={() => navigate('/dashboard/patient')}>
+                          <ListItemIcon sx={{ color: 'primary.main' }}>
+                            <Dashboard />
+                          </ListItemIcon>
+                          <ListItemText primary="My Health Hub" />
+                        </ListItemButton>
                         <ListItemButton sx={{ pl: 4 }} onClick={() => navigate('/patient/appointments')}>
                           <ListItemIcon sx={{ color: 'primary.main' }}>
                             <EventNote />
