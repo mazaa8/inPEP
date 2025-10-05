@@ -489,7 +489,7 @@ const PatientDashboard = () => {
                   mr: 2,
                   boxShadow: `0 4px 16px ${roleColors.PATIENT.primary}40`,
                 }}>
-                  <Typography sx={{ fontSize: '1.8rem' }}>🤖</Typography>
+                  <Typography sx={{ fontSize: '1.8rem' }}>✨</Typography>
                 </Box>
                 <Box>
                   <Typography variant="h5" sx={{ fontWeight: 700, color: 'white' }}>
