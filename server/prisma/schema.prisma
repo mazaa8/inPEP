@@ -101,3 +101,171 @@ model InsurerProfile {
   
   @@map("insurer_profiles")
 }
+
+model Appointment {
+  id                String   @id @default(uuid())
+  
+  // Who is the appointment for
+  patientId         String
+  patientName       String   // Denormalized for easier queries
+  
+  // Who is providing the service
+  providerId        String
+  providerName      String   // Denormalized
+  
+  // Appointment details
+  title             String
+  description       String?
+  specialty         String?  // e.g., "Cardiology", "Dermatology"
+  appointmentType   String?  // e.g., "Consultation", "Follow-up", "Procedure"
+  
+  // Date and time
+  startTime         DateTime
+  endTime           DateTime
+  duration          Int      // Duration in minutes
+  
+  // Location
+  location          String?
+  isVirtual         Boolean  @default(false)
+  meetingLink       String?
+  
+  // Status
+  status            String   @default("SCHEDULED") // SCHEDULED, CONFIRMED, CANCELLED, COMPLETED, NO_SHOW
+  
+  // Additional info
+  notes             String?
+  cancelReason      String?
+  reminderSent      Boolean  @default(false)
+  
+  // Metadata
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  createdBy         String   // User ID who created the appointment
+  
+  @@map("appointments")
+  @@index([patientId])
+  @@index([providerId])
+  @@index([startTime])
+  @@index([status])
+}
+
+model Conversation {
+  id                String   @id @default(uuid())
+  
+  // Participants (stored as JSON array of user IDs)
+  participantIds    String   // JSON array: ["userId1", "userId2"]
+  participantNames  String   // JSON array: ["Name1", "Name2"]
+  
+  // Conversation metadata
+  subject           String?
+  lastMessageAt     DateTime @default(now())
+  lastMessageText   String?
+  
+  // Status
+  isArchived        Boolean  @default(false)
+  
+  // Metadata
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  // Relations
+  messages          Message[]
+  
+  @@map("conversations")
+  @@index([lastMessageAt])
+}
+
+model Message {
+  id                String   @id @default(uuid())
+  
+  // Conversation
+  conversationId    String
+  conversation      Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  
+  // Sender
+  senderId          String
+  senderName        String
+  senderRole        String   // PATIENT, CAREGIVER, PROVIDER, INSURER
+  
+  // Message content
+  content           String
+  messageType       String   @default("TEXT") // TEXT, IMAGE, FILE, SYSTEM
+  attachmentUrl     String?
+  
+  // Status
+  isRead            Boolean  @default(false)
+  readAt            DateTime?
+  
+  // Metadata
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  @@map("messages")
+  @@index([conversationId])
+  @@index([senderId])
+  @@index([createdAt])
+}
+
+model HealthMetric {
+  id                String   @id @default(uuid())
+  
+  // Patient
+  patientId         String
+  
+  // Metric details
+  metricType        String   // BLOOD_PRESSURE, HEART_RATE, WEIGHT, GLUCOSE, TEMPERATURE, OXYGEN_SATURATION
+  value             Float
+  unit              String   // e.g., "mmHg", "bpm", "kg", "mg/dL", "°F", "%"
+  
+  // Additional data (JSON for complex metrics like BP)
+  additionalData    String?  // JSON: {"systolic": 120, "diastolic": 80}
+  
+  // Context
+  notes             String?
+  recordedBy        String?  // User ID who recorded it
+  source            String   @default("MANUAL") // MANUAL, DEVICE, IMPORTED
+  
+  // Metadata
+  recordedAt        DateTime @default(now())
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  @@map("health_metrics")
+  @@index([patientId])
+  @@index([metricType])
+  @@index([recordedAt])
+}
+
+model HealthInsight {
+  id                String   @id @default(uuid())
+  
+  // Patient
+  patientId         String
+  
+  // Insight details
+  insightType       String   // TREND, RISK, RECOMMENDATION, ACHIEVEMENT
+  category          String   // CARDIOVASCULAR, DIABETES, WEIGHT, GENERAL
+  title             String
+  description       String
+  severity          String   @default("INFO") // INFO, WARNING, ALERT, CRITICAL
+  
+  // AI-generated data
+  confidence        Float    @default(0.8) // 0.0 to 1.0
+  dataPoints        String?  // JSON array of related metric IDs
+  
+  // Status
+  isRead            Boolean  @default(false)
+  isDismissed       Boolean  @default(false)
+  
+  // Metadata
+  generatedAt       DateTime @default(now())
+  expiresAt         DateTime?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  @@map("health_insights")
+  @@index([patientId])
+  @@index([insightType])
+  @@index([severity])
+  @@index([generatedAt])
+}

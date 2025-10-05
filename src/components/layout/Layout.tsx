@@ -21,6 +21,7 @@ import {
   Search as SearchIcon,
   NotificationsOutlined as NotificationsIcon,
   AccountCircle,
+  MessageOutlined as MessageIcon,
 } from '@mui/icons-material';
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -119,6 +120,8 @@ const Layout = ({ children, title }: LayoutProps) => {
       navigate('/caregiver/messages');
     } else if (user?.role === 'INSURER') {
       navigate('/insurer/messages');
+    } else if (user?.role === 'PATIENT') {
+      navigate('/messages');
     }
   };
 
@@ -208,6 +211,14 @@ const Layout = ({ children, title }: LayoutProps) => {
                   </ListItemButton>
                 </ListItem>
                 <ListItem disablePadding>
+                  <ListItemButton onClick={() => navigate('/provider/directory')}>
+                    <ListItemIcon>
+                      <Person />
+                    </ListItemIcon>
+                    <ListItemText primary="Provider Directory" />
+                  </ListItemButton>
+                </ListItem>
+                <ListItem disablePadding>
                   <ListItemButton onClick={() => navigate('/dashboard/analytics')}>
                     <ListItemIcon>
                       <AnalyticsIcon />
@@ -289,11 +300,17 @@ const Layout = ({ children, title }: LayoutProps) => {
                   <List component="div" disablePadding>
                     {user?.role === 'PATIENT' && (
                       <>
-                        <ListItemButton sx={{ pl: 4 }} onClick={() => navigate('/dashboard/patient')}>
+                        <ListItemButton sx={{ pl: 4 }} onClick={() => navigate('/patient/appointments')}>
                           <ListItemIcon sx={{ color: 'primary.main' }}>
                             <EventNote />
                           </ListItemIcon>
                           <ListItemText primary="Appointments" />
+                        </ListItemButton>
+                        <ListItemButton sx={{ pl: 4 }} onClick={() => navigate('/messages')}>
+                          <ListItemIcon sx={{ color: 'primary.main' }}>
+                            <MessageIcon />
+                          </ListItemIcon>
+                          <ListItemText primary="Messages" />
                         </ListItemButton>
                         <ListItemButton sx={{ pl: 4 }} onClick={() => navigate('/dashboard/patient')}>
                           <ListItemIcon sx={{ color: 'primary.main' }}>

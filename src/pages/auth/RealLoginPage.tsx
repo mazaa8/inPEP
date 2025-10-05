@@ -260,9 +260,51 @@ const RealLoginPage = () => {
         </TabPanel>
 
         <Box sx={{ mt: 3, textAlign: 'center' }}>
-          <Typography variant="body2" color="text.secondary">
-            Demo Credentials: role@test.com / password123
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+            Quick Login:
           </Typography>
+          <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', justifyContent: 'center' }}>
+            <Button
+              size="small"
+              variant="outlined"
+              onClick={() => {
+                setEmail('patient@test.com');
+                setPassword('password123');
+              }}
+            >
+              Patient
+            </Button>
+            <Button
+              size="small"
+              variant="outlined"
+              onClick={() => {
+                setEmail('caregiver@test.com');
+                setPassword('password123');
+              }}
+            >
+              Caregiver
+            </Button>
+            <Button
+              size="small"
+              variant="outlined"
+              onClick={() => {
+                setEmail('provider@test.com');
+                setPassword('password123');
+              }}
+            >
+              Provider
+            </Button>
+            <Button
+              size="small"
+              variant="outlined"
+              onClick={() => {
+                setEmail('insurer@test.com');
+                setPassword('password123');
+              }}
+            >
+              Insurer
+            </Button>
+          </Box>
         </Box>
       </Paper>
     </Box>

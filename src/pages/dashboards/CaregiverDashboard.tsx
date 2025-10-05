@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Grid } from '@mui/material';
 import Layout from '../../components/layout/Layout';
 import TodaysSummary from '../../components/dashboards/caregiver/TodaysSummary';
@@ -6,25 +6,7 @@ import Reminders from '../../components/dashboards/caregiver/Reminders';
 import MedicationChecklist, { type Medication } from '../../components/dashboards/caregiver/MedicationChecklist';
 import AppointmentsCalendar, { type AppointmentEvent } from '../../components/dashboards/caregiver/AppointmentsCalendar';
 import VitalsLog, { type VitalsData } from '../../components/dashboards/caregiver/VitalsLog';
-
-const appointmentsData: AppointmentEvent[] = [
-  {
-    title: 'Dr. Smith Appointment',
-    start: new Date(2025, 8, 2, 10, 0),
-    end: new Date(2025, 8, 2, 11, 0),
-    description: 'Routine check-up with Dr. Smith. Remember to bring the latest test results.',
-    specialty: 'Cardiology',
-    location: 'Springfield General Hospital, 123 Health St.',
-  },
-  {
-    title: 'Physical Therapy',
-    start: new Date(2025, 8, 4, 14, 0),
-    end: new Date(2025, 8, 4, 15, 0),
-    description: 'Session focusing on lower back exercises.',
-    specialty: 'Orthopedic Physical Therapy',
-    location: 'Community Rehab Center, 456 Wellness Ave.',
-  },
-];
+import { appointmentService } from '../../services/appointmentService';
 
 const vitalsData: VitalsData[] = [
   { name: 'Mon', heartRate: 72, bp: 120 },
@@ -47,6 +29,31 @@ const remindersData = ['Morning medication due', 'Check blood pressure at 3 PM']
 
 const CaregiverDashboard = () => {
   const [medications, setMedications] = useState<Medication[]>(initialMedications);
+  const [appointments, setAppointments] = useState<AppointmentEvent[]>([]);
+
+  useEffect(() => {
+    const fetchAppointments = async () => {
+      try {
+        const data = await appointmentService.getAppointments();
+        
+        // Transform API data to calendar event format
+        const transformedAppointments: AppointmentEvent[] = data.map((apt) => ({
+          title: apt.title,
+          start: new Date(apt.startTime),
+          end: new Date(apt.endTime),
+          description: apt.description || '',
+          specialty: apt.specialty || '',
+          location: apt.location || '',
+        }));
+        
+        setAppointments(transformedAppointments);
+      } catch (err) {
+        console.error('Failed to load appointments:', err);
+      }
+    };
+
+    fetchAppointments();
+  }, []);
 
   const handleToggleMedication = (id: number) => {
     setMedications(
@@ -78,7 +85,7 @@ const CaregiverDashboard = () => {
         </Grid>
         {/* Larger column for the calendar */}
         <Grid item xs={12} lg={8}>
-          <AppointmentsCalendar events={appointmentsData} />
+          <AppointmentsCalendar events={appointments} />
         </Grid>
       </Grid>
     </Layout>

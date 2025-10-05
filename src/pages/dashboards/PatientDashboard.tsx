@@ -1,4 +1,5 @@
-import { Grid, Paper, Button, Box, Typography } from '@mui/material';
+import { useState, useEffect } from 'react';
+import { Grid, Paper, Button, Box, Typography, CircularProgress, Alert } from '@mui/material';
 import { Warning as WarningIcon } from '@mui/icons-material';
 import { useEmergencyAlert } from '../../context/EmergencyAlertContext';
 import Layout from '../../components/layout/Layout';
@@ -6,22 +7,51 @@ import UpcomingAppointments, { type Appointment } from '../../components/dashboa
 import RecentMessages, { type Message } from '../../components/dashboards/patient/RecentMessages';
 import { Link } from 'react-router-dom';
 import MyWellnessPlan from '../../components/dashboards/patient/MyWellnessPlan';
-
-const appointmentsData: Appointment[] = [
-  { id: 1, doctor: 'Dr. Smith', specialty: 'Cardiology', date: '2025-09-15', time: '10:00 AM' },
-  { id: 2, doctor: 'Dr. Jones', specialty: 'Dermatology', date: '2025-09-22', time: '02:30 PM' },
-];
+import { appointmentService } from '../../services/appointmentService';
 
 const messagesData: Message[] = [
   { id: 1, from: 'Dr. Smith', subject: 'Re: Your recent lab results', snippet: 'Everything looks good...', avatar: 'DS' },
   { id: 2, from: 'Clinic Admin', subject: 'Appointment Reminder', snippet: 'Your appointment is confirmed for...', avatar: 'CA' },
 ];
 
-
-
-
 const PatientDashboard = () => {
   const { triggerAlert } = useEmergencyAlert();
+  const [appointments, setAppointments] = useState<Appointment[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchAppointments = async () => {
+      try {
+        setLoading(true);
+        const data = await appointmentService.getAppointments();
+        
+        console.log('Patient Dashboard - Fetched appointments:', data);
+        
+        // Transform API data to component format
+        const transformedAppointments: Appointment[] = data.map((apt) => ({
+          id: parseInt(apt.id.substring(0, 8), 16), // Convert UUID to number for component
+          doctor: apt.providerName,
+          specialty: apt.specialty || 'General',
+          date: new Date(apt.startTime).toLocaleDateString('en-US'),
+          time: new Date(apt.startTime).toLocaleTimeString('en-US', { 
+            hour: '2-digit', 
+            minute: '2-digit' 
+          }),
+        }));
+        
+        console.log('Patient Dashboard - Transformed appointments:', transformedAppointments);
+        setAppointments(transformedAppointments);
+      } catch (err) {
+        console.error('Failed to load appointments:', err);
+        setError('Failed to load appointments');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchAppointments();
+  }, []);
 
   const handleEmergencyClick = () => {
     // In a real app, you'd get the patient's name and ID from auth context or props
@@ -47,7 +77,15 @@ const PatientDashboard = () => {
         </Grid>
         <Grid item xs={12} md={4}>
           <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column', height: '100%' }}>
-            <UpcomingAppointments appointments={appointmentsData} />
+            {loading ? (
+              <Box sx={{ display: 'flex', justifyContent: 'center', p: 3 }}>
+                <CircularProgress />
+              </Box>
+            ) : error ? (
+              <Alert severity="error">{error}</Alert>
+            ) : (
+              <UpcomingAppointments appointments={appointments} />
+            )}
           </Paper>
         </Grid>
         <Grid item xs={12} md={4}>

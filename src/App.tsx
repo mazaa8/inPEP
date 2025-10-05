@@ -9,12 +9,14 @@ import RealLoginPage from './pages/auth/RealLoginPage';
 import TestLogin from './pages/auth/TestLogin';
 import PatientDashboard from './pages/dashboards/PatientDashboard';
 import PatientSupportPage from './pages/patient/PatientSupportPage';
+import PatientAppointmentsPage from './pages/patient/PatientAppointmentsPage';
 import MealPlanPage from './pages/patient/MealPlanPage';
 import PatientHerediblesPage from './pages/patient/HerediblesPage';
 import CaregiverDashboard from './pages/dashboards/CaregiverDashboard';
 import ProviderDashboard from './pages/dashboards/ProviderDashboard';
 import ProviderMessagesPage from './pages/provider/ProviderMessagesPage';
 import ProviderAppointmentsPage from './pages/provider/ProviderAppointmentsPage';
+import ProviderDirectoryPage from './pages/provider/ProviderDirectoryPage';
 import AnalyticsPage from './pages/dashboards/AnalyticsPage';
 import InsurerDashboard from './pages/dashboards/InsurerDashboard';
 import InsurerMessagesPage from './pages/insurer/InsurerMessagesPage';
@@ -61,8 +63,10 @@ function App() {
             <Route element={<ProtectedRoute allowedRoles={['PATIENT']} />}>
               <Route path="/welcome-home/patient" element={<WelcomeHomePatient />} />
               <Route path="/dashboard/patient" element={<PatientDashboard />} />
-                            <Route path="/patient/meal-plan" element={<MealPlanPage />} />
+              <Route path="/patient/appointments" element={<PatientAppointmentsPage />} />
+              <Route path="/patient/meal-plan" element={<MealPlanPage />} />
               <Route path="/patient/heredibles" element={<PatientHerediblesPage />} />
+              <Route path="/messages" element={<MessagesPage />} />
             </Route>
             <Route element={<ProtectedRoute allowedRoles={['CAREGIVER']} />}>
               <Route path="/patient-support" element={<PatientSupportPage />} />
@@ -88,6 +92,7 @@ function App() {
               <Route path="/dashboard/analytics" element={<AnalyticsPage />} />
               <Route path="/provider/messages" element={<ProviderMessagesPage />} />
               <Route path="/provider/appointments" element={<ProviderAppointmentsPage />} />
+              <Route path="/provider/directory" element={<ProviderDirectoryPage />} />
             </Route>
             <Route element={<ProtectedRoute allowedRoles={['INSURER']} />}>
               <Route path="/welcome-home/insurer" element={<WelcomeHomeInsurer />} />

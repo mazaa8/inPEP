@@ -47,10 +47,16 @@ const startServer = async () => {
       console.log(`📝 Environment: ${config.nodeEnv}`);
       console.log(`🔗 Frontend URL: ${config.frontendUrl}`);
       console.log(`\n📚 API Endpoints:`);
-      console.log(`   GET  /api/health          - Health check`);
-      console.log(`   POST /api/auth/register   - Register new user`);
-      console.log(`   POST /api/auth/login      - Login user`);
-      console.log(`   GET  /api/auth/profile    - Get user profile (protected)`);
+      console.log(`   GET  /api/health                          - Health check`);
+      console.log(`   POST /api/auth/register                   - Register new user`);
+      console.log(`   POST /api/auth/login                      - Login user`);
+      console.log(`   GET  /api/auth/profile                    - Get user profile (protected)`);
+      console.log(`   GET  /api/appointments                    - Get appointments (protected)`);
+      console.log(`   POST /api/appointments                    - Create appointment (protected)`);
+      console.log(`   GET  /api/messages/conversations          - Get conversations (protected)`);
+      console.log(`   POST /api/messages/conversations          - Create conversation (protected)`);
+      console.log(`   GET  /api/messages/conversations/:id/messages - Get messages (protected)`);
+      console.log(`   POST /api/messages/messages               - Send message (protected)`);
     });
   } catch (error) {
     console.error('❌ Failed to start server:', error);
