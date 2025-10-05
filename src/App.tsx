@@ -28,7 +28,7 @@ import CarePlanningPage from './pages/caregiver/CarePlanningPage';
 import CaregiverSupportPage from './pages/caregiver/CaregiverSupportPage';
 import ReclaimePage from './pages/caregiver/ReclaimePage';
 import GroceryShoppingListPage from './pages/caregiver/features/GroceryShoppingListPage';
-import CaregiverHerediblesPage from './pages/caregiver/features/HerediblesPage';
+import CaregiverHerediblesPage from './pages/caregiver/CaregiverHerediblesPage';
 import PharmacyPage from './pages/caregiver/features/PharmacyPage';
 import CaregivingTipsPage from './pages/caregiver/features/CaregivingTipsPage';
 import ChampionCornerPage from './pages/caregiver/features/ChampionCornerPage';
@@ -45,13 +45,15 @@ import PrivacyPolicy from './pages/support/PrivacyPolicy';
 import { AuthProvider } from './context/AuthContext';
 import { EmergencyAlertProvider } from './context/EmergencyAlertContext';
 import { PatientSummaryProvider } from './context/PatientSummaryContext';
+import { VideoCallProvider } from './context/VideoCallContext';
 
 function App() {
   return (
     <AuthProvider>
-      <EmergencyAlertProvider>
-        <PatientSummaryProvider>
-          <Router>
+      <VideoCallProvider>
+        <EmergencyAlertProvider>
+          <PatientSummaryProvider>
+            <Router>
           <Routes>
             <Route path="/" element={<LandingPage />} />
             <Route path="/login" element={<LoginPage />} />
@@ -72,11 +74,11 @@ function App() {
               <Route path="/patient-support" element={<PatientSupportPage />} />
               <Route path="/dashboard/caregiver" element={<CaregiverDashboard />} />
               <Route path="/patient-monitor" element={<PatientMonitorPage />} />
+              <Route path="/caregiver/heredibles" element={<CaregiverHerediblesPage />} />
               <Route path="/care-planning" element={<CarePlanningPage />} />
               <Route path="/caregiver-support" element={<CaregiverSupportPage />} />
               <Route path="/reclaime" element={<ReclaimePage />} />
               <Route path="/caregiver/grocery-list" element={<GroceryShoppingListPage />} />
-              <Route path="/caregiver/heredibles" element={<CaregiverHerediblesPage />} />
               <Route path="/caregiver/pharmacy" element={<PharmacyPage />} />
               <Route path="/caregiver/care-tips" element={<CaregivingTipsPage />} />
               <Route path="/caregiver/appointments-billing" element={<AppointmentsBillingPage />} />
@@ -110,6 +112,7 @@ function App() {
           </Router>
         </PatientSummaryProvider>
       </EmergencyAlertProvider>
+      </VideoCallProvider>
     </AuthProvider>
   );
 }

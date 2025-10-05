@@ -98,26 +98,28 @@ const CaregiverWelcomeLand = () => {
         </DialogActions>
       </Dialog>
 
-      <Box sx={{ p: 3 }}>
-        <Typography variant="h4" component="h1" sx={{ fontWeight: 'bold', color: 'primary.main' }}>
-          Welcome Back!
-        </Typography>
-        <Typography color="text.secondary" sx={{ mb: 4 }}>
-          Here's a quick look at your day.
-        </Typography>
+      <Grid container spacing={3}>
+        {/* Header */}
+        <Grid item xs={12}>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+            <Typography variant="h4">
+              Welcome back, {user?.name || 'Caregiver'}!
+            </Typography>
+            <Button
+              variant="outlined"
+              startIcon={<SettingsIcon />}
+              onClick={() => setIsModalOpen(true)}
+            >
+              Customize Dashboard
+            </Button>
+          </Box>
+        </Grid>
 
-        <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 2 }}>
-          <Button startIcon={<SettingsIcon />} onClick={() => setIsModalOpen(true)}>
-            Customize Dashboard
-          </Button>
-        </Box>
-        <Grid container spacing={3}>
-          {/* Fixed Cards */}
-          <Grid item xs={12} md={6} lg={4}>
+        {/* Fixed Cards */}
+        <Grid item xs={12} md={6} lg={4}>
             <Card sx={{ background: (theme) => theme.palette.primary.main, backgroundImage: 'none', color: 'primary.contrastText' }}>
               <CardActionArea onClick={() => navigate('/dashboard/caregiver')}>
                 <CardContent>
-                  <Typography variant="h6" color="inherit">Upcoming Appointments</Typography>
                   <Typography color="inherit" sx={{ opacity: 0.8 }}>View your scheduled appointments.</Typography>
                 </CardContent>
               </CardActionArea>
@@ -144,26 +146,27 @@ const CaregiverWelcomeLand = () => {
             </Card>
           </Grid>
 
-          {/* Customizable Cards */}
-          {customizableFeatures.map((feature) => {
-            if (feature.roles && !feature.roles.includes(user?.role as string)) {
-              return null;
-            }
-            return (
-              <Grid item xs={12} md={6} lg={4} key={feature.id}>
-                <Card>
-                  <CardActionArea onClick={() => navigate(feature.path)}>
-                    <CardContent>
-                      <Typography variant="h6">{feature.title}</Typography>
-                      <Typography color="text.secondary">{feature.description}</Typography>
-                    </CardContent>
-                  </CardActionArea>
-                </Card>
-              </Grid>
-            );
-          })}
-        </Grid>
-      </Box>
+        {/* Customizable Cards */}
+        {customizableFeatures.map((feature) => {
+          if (feature.roles && !feature.roles.includes(user?.role as string)) {
+            return null;
+          }
+          return (
+            <Grid item xs={12} md={6} lg={4} key={feature.id}>
+              <Card>
+                <CardActionArea onClick={() => navigate(feature.path)}>
+                  <CardContent>
+                    <Typography variant="h6">{feature.title}</Typography>
+                    <Typography color="text.secondary">{feature.description}</Typography>
+                  </CardContent>
+                </CardActionArea>
+              </Card>
+            </Grid>
+          );
+        })}
+      </Grid>
+
+      {/* Modals and Dialogs */}
       <DashboardCustomizeModal
         open={isModalOpen}
         onClose={() => setIsModalOpen(false)}

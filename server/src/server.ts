@@ -1,11 +1,14 @@
 import express from 'express';
+import { createServer } from 'http';
 import cors from 'cors';
 import { config } from './config/env.js';
 import routes from './routes/index.js';
 import { errorHandler } from './middleware/errorHandler.js';
 import prisma from './config/database.js';
+import { initializeVideoCallService } from './services/videoCallService.js';
 
 const app = express();
+const httpServer = createServer(app);
 
 // Middleware
 app.use(cors({
@@ -42,10 +45,15 @@ const startServer = async () => {
     await prisma.$connect();
     console.log('✅ Database connected successfully');
 
-    app.listen(config.port, () => {
+    // Initialize video call service
+    initializeVideoCallService(httpServer);
+    console.log('✅ Video call service initialized');
+
+    httpServer.listen(config.port, () => {
       console.log(`🚀 Server running on http://localhost:${config.port}`);
       console.log(`📝 Environment: ${config.nodeEnv}`);
       console.log(`🔗 Frontend URL: ${config.frontendUrl}`);
+      console.log(`📹 WebRTC signaling enabled`);
       console.log(`\n📚 API Endpoints:`);
       console.log(`   GET  /api/health                          - Health check`);
       console.log(`   POST /api/auth/register                   - Register new user`);

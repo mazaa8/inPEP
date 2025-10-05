@@ -4,6 +4,8 @@ import appointmentRoutes from './appointmentRoutes.js';
 import messageRoutes from './messageRoutes.js';
 import providerRoutes from './providerRoutes.js';
 import healthRoutes from './healthRoutes.js';
+import insurerRoutes from './insurerRoutes.js';
+import herediblesRoutes from './herediblesRoutes.js';
 
 const router = Router();
 
@@ -22,5 +24,7 @@ router.use('/appointments', appointmentRoutes);
 router.use('/messages', messageRoutes);
 router.use('/providers', providerRoutes);
 router.use('/health', healthRoutes);
+router.use('/insurer', insurerRoutes);
+router.use('/heredibles', herediblesRoutes);
 
 export default router;

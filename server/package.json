@@ -13,9 +13,17 @@
     "db:studio": "prisma studio",
     "seed:providers": "tsx src/scripts/seedProviders.ts",
     "seed:health": "tsx src/scripts/seedHealthData.ts",
+    "seed:insurer": "tsx src/scripts/seedInsurerData.ts",
+    "seed:heredibles": "tsx src/scripts/seedHeredibles.ts",
+    "seed:cultural": "tsx src/scripts/seedCulturalRecipes.ts",
+    "reset:heredibles": "tsx src/scripts/resetHeredibles.ts",
     "update:characters": "tsx src/scripts/updateMainCharacters.ts"
   },
-  "keywords": ["healthcare", "api", "typescript"],
+  "keywords": [
+    "healthcare",
+    "api",
+    "typescript"
+  ],
   "author": "",
   "license": "ISC",
   "dependencies": {
@@ -26,6 +34,8 @@
     "express": "^4.21.1",
     "express-validator": "^7.2.0",
     "jsonwebtoken": "^9.0.2",
+    "socket.io": "^4.8.1",
+    "socket.io-client": "^4.8.1",
     "zod": "^3.23.8"
   },
   "devDependencies": {

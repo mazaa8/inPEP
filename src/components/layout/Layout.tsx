@@ -318,12 +318,6 @@ const Layout = ({ children, title }: LayoutProps) => {
                           </ListItemIcon>
                           <ListItemText primary="Messages" />
                         </ListItemButton>
-                        <ListItemButton sx={{ pl: 4 }} onClick={() => navigate('/dashboard/patient')}>
-                          <ListItemIcon sx={{ color: 'primary.main' }}>
-                            <MonitorHeart />
-                          </ListItemIcon>
-                          <ListItemText primary="Health Summary" />
-                        </ListItemButton>
                         <ListItemButton sx={{ pl: 4 }} onClick={() => navigate('/patient/meal-plan')}>
                           <ListItemIcon sx={{ color: 'primary.main' }}>
                             <RestaurantMenu />
@@ -351,6 +345,12 @@ const Layout = ({ children, title }: LayoutProps) => {
                             <LocalPharmacy />
                           </ListItemIcon>
                           <ListItemText primary="Pharmacy" />
+                        </ListItemButton>
+                        <ListItemButton sx={{ pl: 4 }} onClick={() => navigate('/caregiver/heredibles')}>
+                          <ListItemIcon sx={{ color: 'primary.main' }}>
+                            <RestaurantMenu />
+                          </ListItemIcon>
+                          <ListItemText primary="Heredibles™" />
                         </ListItemButton>
                       </>
                     )}

@@ -1,12 +1,13 @@
 import { useState, useEffect } from 'react';
-import { Grid, Paper, Button, Box, Typography, CircularProgress, Alert } from '@mui/material';
-import { Warning as WarningIcon } from '@mui/icons-material';
+import { Grid, Paper, Button, Box, Typography, CircularProgress, Alert, Card, CardContent } from '@mui/material';
+import { Warning as WarningIcon, VideoCall as VideoCallIcon } from '@mui/icons-material';
 import { useEmergencyAlert } from '../../context/EmergencyAlertContext';
 import { useAuth } from '../../context/AuthContext';
+import { useVideoCall } from '../../context/VideoCallContext';
 import Layout from '../../components/layout/Layout';
+import VideoCall from '../../components/video/VideoCall';
 import UpcomingAppointments, { type Appointment } from '../../components/dashboards/patient/UpcomingAppointments';
 import RecentMessages, { type Message } from '../../components/dashboards/patient/RecentMessages';
-import { Link } from 'react-router-dom';
 import MyWellnessPlan from '../../components/dashboards/patient/MyWellnessPlan';
 import HealthSummary, { type HealthMetric } from '../../components/dashboards/patient/HealthSummary';
 import HealthDataChart, { type HealthData } from '../../components/dashboards/patient/HealthDataChart';
@@ -36,6 +37,17 @@ const messagesData: Message[] = [
 const PatientDashboard = () => {
   const { triggerAlert } = useEmergencyAlert();
   const { user } = useAuth();
+  const { 
+    callState, 
+    initiateCall, 
+    endCall,
+    sendOffer,
+    sendAnswer,
+    sendIceCandidate,
+    remoteOffer,
+    remoteAnswer,
+    remoteIceCandidate,
+  } = useVideoCall();
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -79,6 +91,12 @@ const PatientDashboard = () => {
     alert('A high-priority emergency alert has been sent to your caregiver.');
   };
 
+  const handleCallNora = () => {
+    // The caregiver will be matched by their logged-in user.id in Socket.io
+    // For demo, we use a known identifier that matches when caregiver logs in
+    initiateCall(user?.id || 'patient-id', 'Nora');
+  };
+
   return (
     <Layout title="My Health Hub">
       <Grid container spacing={3}>
@@ -92,6 +110,49 @@ const PatientDashboard = () => {
             </Typography>
           </Paper>
         </Grid>
+
+        {/* Call Nora Button - Big and Prominent */}
+        <Grid item xs={12}>
+          <Card sx={{ 
+            background: 'linear-gradient(135deg, #4CAF50 0%, #45a049 100%)',
+            boxShadow: 3,
+          }}>
+            <CardContent sx={{ p: 3 }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <Box>
+                  <Typography variant="h5" sx={{ color: 'white', fontWeight: 'bold', mb: 1 }}>
+                    📹 Call Nora
+                  </Typography>
+                  <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.9)' }}>
+                    Click to video call Nora anytime
+                  </Typography>
+                </Box>
+                <Button
+                  variant="contained"
+                  size="large"
+                  startIcon={<VideoCallIcon />}
+                  onClick={handleCallNora}
+                  sx={{
+                    bgcolor: 'white',
+                    color: '#4CAF50',
+                    fontWeight: 'bold',
+                    fontSize: '1.1rem',
+                    px: 4,
+                    py: 1.5,
+                    '&:hover': {
+                      bgcolor: '#f1f8f4',
+                      transform: 'scale(1.05)',
+                    },
+                    transition: 'all 0.2s',
+                  }}
+                >
+                  Call Now
+                </Button>
+              </Box>
+            </CardContent>
+          </Card>
+        </Grid>
+
         <Grid item xs={12}>
           <Paper sx={{ p: 2, backgroundColor: 'error.main', color: 'white' }}>
             <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -149,17 +210,23 @@ const PatientDashboard = () => {
             <AIInsightsDashboard />
           </Paper>
         </Grid>
-        <Grid item xs={12}>
-          <Paper sx={{ p: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <Typography variant="h6" component="div">
-              Weekly Meal Plan
-            </Typography>
-            <Button component={Link} to="/patient/meal-plan" variant="contained">
-              View Plan
-            </Button>
-          </Paper>
-        </Grid>
       </Grid>
+
+      {/* Video Call Dialog */}
+      {callState.isInCall && (
+        <VideoCall
+          open={callState.isInCall}
+          isInitiator={callState.isInitiator}
+          remoteName={callState.remoteName || 'Nora'}
+          onEndCall={endCall}
+          onOffer={sendOffer}
+          onAnswer={sendAnswer}
+          onIceCandidate={sendIceCandidate}
+          remoteOffer={remoteOffer}
+          remoteAnswer={remoteAnswer}
+          remoteIceCandidate={remoteIceCandidate}
+        />
+      )}
     </Layout>
   );
 };

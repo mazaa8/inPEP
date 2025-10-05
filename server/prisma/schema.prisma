@@ -269,3 +269,260 @@ model HealthInsight {
   @@index([severity])
   @@index([generatedAt])
 }
+
+model Claim {
+  id                String   @id @default(uuid())
+  
+  // Patient and Provider
+  patientId         String
+  patientName       String
+  providerId        String
+  providerName      String
+  
+  // Claim details
+  claimNumber       String   @unique
+  claimType         String   // MEDICAL, PHARMACY, DENTAL, VISION
+  serviceDate       DateTime
+  submittedDate     DateTime @default(now())
+  
+  // Financial
+  claimedAmount     Float
+  approvedAmount    Float?
+  deductible        Float    @default(0)
+  copay             Float    @default(0)
+  
+  // Status
+  status            String   @default("PENDING") // PENDING, APPROVED, DENIED, UNDER_REVIEW
+  denialReason      String?
+  
+  // Diagnosis and procedure
+  diagnosisCode     String?  // ICD-10
+  procedureCode     String?  // CPT
+  description       String
+  
+  // Risk flags
+  isHighCost        Boolean  @default(false)
+  isFraudSuspect    Boolean  @default(false)
+  riskScore         Float    @default(0) // 0-100
+  
+  // Metadata
+  processedDate     DateTime?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  @@map("claims")
+  @@index([patientId])
+  @@index([providerId])
+  @@index([status])
+  @@index([claimNumber])
+  @@index([serviceDate])
+}
+
+model RiskAssessment {
+  id                String   @id @default(uuid())
+  
+  // Patient
+  patientId         String
+  patientName       String
+  
+  // Risk scoring
+  overallRiskScore  Float    // 0-100
+  riskLevel         String   // LOW, MEDIUM, HIGH, CRITICAL
+  
+  // Risk factors
+  chronicConditions String?  // JSON array
+  recentHospitalizations Int @default(0)
+  medicationCount   Int      @default(0)
+  missedAppointments Int     @default(0)
+  
+  // Predictions
+  hospitalizationRisk Float  @default(0) // 0-100
+  costPrediction    Float    @default(0) // Predicted annual cost
+  
+  // Recommendations
+  interventions     String?  // JSON array of recommended actions
+  
+  // Metadata
+  assessmentDate    DateTime @default(now())
+  nextAssessment    DateTime?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  @@map("risk_assessments")
+  @@index([patientId])
+  @@index([riskLevel])
+  @@index([assessmentDate])
+}
+
+model Recipe {
+  id                String   @id @default(uuid())
+  
+  // Basic info
+  name              String
+  description       String
+  imageUrl          String?
+  prepTime          Int      // minutes
+  cookTime          Int      // minutes
+  servings          Int
+  difficulty        String   // EASY, MEDIUM, HARD
+  
+  // Categorization
+  category          String   // BREAKFAST, LUNCH, DINNER, SNACK, DESSERT
+  cuisine           String?  // AMERICAN, ITALIAN, ASIAN, etc.
+  dietaryTags       String   // JSON array: VEGETARIAN, VEGAN, GLUTEN_FREE, etc.
+  
+  // Nutrition (per serving)
+  calories          Int
+  protein           Float    // grams
+  carbs             Float    // grams
+  fat               Float    // grams
+  fiber             Float    // grams
+  sugar             Float    // grams
+  sodium            Float    // mg
+  
+  // Health conditions
+  goodFor           String?  // JSON array: DIABETES, HEART_DISEASE, HYPERTENSION
+  restrictions      String?  // JSON array: allergies, intolerances
+  
+  // Content
+  ingredients       String   // JSON array of {name, amount, unit}
+  instructions      String   // JSON array of steps
+  tips              String?
+  
+  // Metadata
+  createdBy         String?
+  isPublic          Boolean  @default(true)
+  rating            Float    @default(0)
+  reviewCount       Int      @default(0)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  @@map("recipes")
+  @@index([category])
+  @@index([difficulty])
+  @@index([calories])
+}
+
+model MealPlan {
+  id                String   @id @default(uuid())
+  
+  // Patient
+  patientId         String
+  patientName       String
+  
+  // Plan details
+  planName          String
+  startDate         DateTime
+  endDate           DateTime
+  isActive          Boolean  @default(true)
+  
+  // Goals
+  targetCalories    Int?
+  targetProtein     Float?
+  targetCarbs       Float?
+  targetFat         Float?
+  
+  // Dietary preferences
+  dietType          String?  // BALANCED, LOW_CARB, LOW_FAT, MEDITERRANEAN, etc.
+  culturalCuisine   String?  // AMERICAN, ARABIC, INDIAN, BRAZILIAN, ITALIAN, TURKISH, MEXICAN, ASIAN
+  restrictions      String?  // JSON array
+  allergies         String?  // JSON array
+  
+  // Health integration
+  healthConditions  String?  // JSON array
+  medicationInteractions String? // JSON array
+  
+  // Metadata
+  createdBy         String?  // Provider or caregiver ID
+  notes             String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  @@map("meal_plans")
+  @@index([patientId])
+  @@index([isActive])
+  @@index([startDate])
+}
+
+model PlannedMeal {
+  id                String   @id @default(uuid())
+  
+  // Meal plan
+  mealPlanId        String
+  
+  // Meal details
+  date              DateTime
+  mealType          String   // BREAKFAST, LUNCH, DINNER, SNACK, DESSERT
+  recipeId          String?
+  recipeName        String
+  
+  // Nutrition
+  calories          Int
+  protein           Float
+  carbs             Float
+  fat               Float
+  
+  // Status
+  isCompleted       Boolean  @default(false)
+  completedAt       DateTime?
+  notes             String?
+  
+  // Photo documentation
+  photoUrl          String?
+  photoTakenBy      String?  // Caregiver ID
+  photoTakenAt      DateTime?
+  
+  // Patient preference tracking
+  rating            Int?     // 1-5 stars
+  ratedBy           String?  // Caregiver ID
+  ratedAt           DateTime?
+  feedback          String?  // What patient said about the meal
+  
+  // Metadata
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  @@map("planned_meals")
+  @@index([mealPlanId])
+  @@index([date])
+  @@index([mealType])
+}
+
+model NutritionLog {
+  id                String   @id @default(uuid())
+  
+  // Patient
+  patientId         String
+  
+  // Log details
+  date              DateTime
+  mealType          String   // BREAKFAST, LUNCH, DINNER, SNACK
+  foodName          String
+  
+  // Nutrition
+  calories          Int
+  protein           Float
+  carbs             Float
+  fat               Float
+  fiber             Float?
+  sugar             Float?
+  sodium            Float?
+  
+  // Portion
+  servingSize       String
+  servings          Float    @default(1)
+  
+  // Source
+  recipeId          String?
+  plannedMealId     String?
+  
+  // Metadata
+  notes             String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  @@map("nutrition_logs")
+  @@index([patientId])
+  @@index([date])
+  @@index([mealType])
+}
