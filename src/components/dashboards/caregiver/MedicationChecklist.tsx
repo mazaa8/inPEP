@@ -114,7 +114,7 @@ const MedicationChecklist = ({ patientId }: MedicationChecklistProps) => {
         </Typography>
       </Box>
       <List sx={{ p: 0 }}>
-        {prescriptions.map((prescription, index) => {
+        {prescriptions && prescriptions.length > 0 ? prescriptions.map((prescription, index) => {
           const isTaken = takenToday.has(prescription.id);
           const needsRefill = prescription.refillsRemaining === 0;
           
@@ -160,9 +160,9 @@ const MedicationChecklist = ({ patientId }: MedicationChecklistProps) => {
               {index < prescriptions.length - 1 && <Divider variant="inset" component="li" sx={{ ml: '56px', bgcolor: 'rgba(76, 175, 80, 0.1)' }} />}
             </div>
           );
-        })}
+        }) : null}
       </List>
-      {prescriptions.length === 0 && (
+      {(!prescriptions || prescriptions.length === 0) && (
         <Typography variant="body2" sx={{ textAlign: 'center', color: 'rgba(27, 94, 32, 0.6)', py: 3 }}>
           No active prescriptions
         </Typography>

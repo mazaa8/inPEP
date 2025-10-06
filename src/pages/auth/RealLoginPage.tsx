@@ -20,7 +20,6 @@ import {
   FavoriteBorder as CaregiverIcon,
 } from '@mui/icons-material';
 import { useAuth } from '../../context/AuthContext';
-import { authService } from '../../services/authService';
 import { roleColors } from '../../styles/glassmorphism';
 
 interface TabPanelProps {
@@ -78,11 +77,12 @@ const RealLoginPage = () => {
     console.log('Login attempt:', { email, password: '***' });
 
     try {
-      const response = await authService.login({ email, password });
+      // Use AuthContext login which handles both API call and state update
+      await login({ email, password });
       
-      console.log('Login successful, user:', response.user);
+      console.log('Login successful');
       
-      // Navigate to appropriate dashboard based on user role
+      // Navigate to appropriate dashboard based on selected role
       const dashboardRoutes: Record<string, string> = {
         PATIENT: '/dashboard/patient',
         CAREGIVER: '/dashboard/caregiver',
@@ -90,11 +90,8 @@ const RealLoginPage = () => {
         INSURER: '/dashboard/insurer',
       };
       
-      const destination = dashboardRoutes[response.user.role] || '/dashboard/patient';
+      const destination = dashboardRoutes[role] || '/dashboard/patient';
       console.log('Navigating to:', destination);
-      
-      // Also update the auth context
-      await login({ email, password });
       
       navigate(destination);
     } catch (err) {
@@ -518,10 +515,20 @@ const RealLoginPage = () => {
             <Button
               size="small"
               variant="outlined"
-              onClick={() => {
+              onClick={async () => {
                 setEmail('patient@test.com');
                 setPassword('password123');
                 setRole('PATIENT');
+                setLoading(true);
+                setError('');
+                try {
+                  await login({ email: 'patient@test.com', password: 'password123' });
+                  navigate('/dashboard/patient');
+                } catch (err) {
+                  setError(err instanceof Error ? err.message : 'Login failed');
+                } finally {
+                  setLoading(false);
+                }
               }}
               sx={{
                 color: role === 'PATIENT' ? 'rgba(255,255,255,0.7)' : 
@@ -541,10 +548,25 @@ const RealLoginPage = () => {
             <Button
               size="small"
               variant="outlined"
-              onClick={() => {
+              onClick={async () => {
+                console.log('🔵 Caregiver quick login clicked');
                 setEmail('caregiver@test.com');
                 setPassword('password123');
                 setRole('CAREGIVER');
+                setLoading(true);
+                setError('');
+                try {
+                  console.log('🔵 Calling login...');
+                  await login({ email: 'caregiver@test.com', password: 'password123' });
+                  console.log('✅ Login successful! Navigating to /dashboard/caregiver');
+                  navigate('/dashboard/caregiver');
+                  console.log('✅ Navigation called');
+                } catch (err) {
+                  console.error('❌ Login error:', err);
+                  setError(err instanceof Error ? err.message : 'Login failed');
+                } finally {
+                  setLoading(false);
+                }
               }}
               sx={{
                 color: role === 'PATIENT' ? 'rgba(255,255,255,0.7)' : 'rgba(74, 20, 140, 0.7)',
@@ -560,10 +582,20 @@ const RealLoginPage = () => {
             <Button
               size="small"
               variant="outlined"
-              onClick={() => {
+              onClick={async () => {
                 setEmail('provider@test.com');
                 setPassword('password123');
                 setRole('PROVIDER');
+                setLoading(true);
+                setError('');
+                try {
+                  await login({ email: 'provider@test.com', password: 'password123' });
+                  navigate('/dashboard/provider');
+                } catch (err) {
+                  setError(err instanceof Error ? err.message : 'Login failed');
+                } finally {
+                  setLoading(false);
+                }
               }}
               sx={{
                 color: role === 'PATIENT' ? 'rgba(255,255,255,0.7)' : 'rgba(74, 20, 140, 0.7)',
@@ -579,10 +611,20 @@ const RealLoginPage = () => {
             <Button
               size="small"
               variant="outlined"
-              onClick={() => {
+              onClick={async () => {
                 setEmail('insurer@test.com');
                 setPassword('password123');
                 setRole('INSURER');
+                setLoading(true);
+                setError('');
+                try {
+                  await login({ email: 'insurer@test.com', password: 'password123' });
+                  navigate('/dashboard/insurer');
+                } catch (err) {
+                  setError(err instanceof Error ? err.message : 'Login failed');
+                } finally {
+                  setLoading(false);
+                }
               }}
               sx={{
                 color: role === 'PATIENT' ? 'rgba(255,255,255,0.7)' : 'rgba(74, 20, 140, 0.7)',

@@ -34,6 +34,8 @@ export const apiRequest = async <T>(
     const response = await fetch(url, {
       ...options,
       headers,
+      mode: 'cors',
+      credentials: 'include',
     });
 
     console.log('API Response:', {
@@ -52,7 +54,17 @@ export const apiRequest = async <T>(
     console.log('API Success:', data);
     return data;
   } catch (error) {
-    console.error('API Request Failed:', error);
+    console.error('❌ API Request Failed:', {
+      url,
+      error: error instanceof Error ? error.message : String(error),
+      stack: error instanceof Error ? error.stack : undefined,
+    });
+    
+    // Provide more helpful error messages
+    if (error instanceof TypeError && error.message.includes('Failed to fetch')) {
+      throw new Error('Cannot connect to server. Please ensure the backend is running on http://localhost:3000');
+    }
+    
     throw error;
   }
 };
