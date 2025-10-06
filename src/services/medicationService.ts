@@ -126,100 +126,84 @@ class MedicationService {
     if (search) params.append('search', search);
     if (category) params.append('category', category);
     
-    const response = await api.get(`/medications?${params.toString()}`);
-    return response.data;
+    return await api.get<Medication[]>(`/medications?${params.toString()}`);
   }
 
   async getMedicationById(id: string): Promise<Medication> {
-    const response = await api.get(`/medications/${id}`);
-    return response.data;
+    return await api.get<Medication>(`/medications/${id}`);
   }
 
   async getMedicationAlternatives(id: string): Promise<MedicationAlternative[]> {
-    const response = await api.get(`/medications/${id}/alternatives`);
-    return response.data;
+    return await api.get<MedicationAlternative[]>(`/medications/${id}/alternatives`);
   }
 
   async checkDrugInteractions(medicationIds: string[]): Promise<DrugInteraction[]> {
-    const response = await api.post('/medications/check-interactions', { medicationIds });
-    return response.data;
+    return await api.post<DrugInteraction[]>('/medications/check-interactions', { medicationIds });
   }
 
   async searchByBarcode(ndc: string): Promise<Medication> {
-    const response = await api.get(`/medications/barcode/${ndc}`);
-    return response.data;
+    return await api.get<Medication>(`/medications/barcode/${ndc}`);
   }
 
   // Prescriptions
   async getPatientPrescriptions(patientId: string, status?: string): Promise<Prescription[]> {
     const params = status ? `?status=${status}` : '';
-    const response = await api.get(`/prescriptions/patient/${patientId}${params}`);
-    return response.data;
+    return await api.get<Prescription[]>(`/prescriptions/patient/${patientId}${params}`);
   }
 
   async getPrescriptionById(id: string): Promise<Prescription> {
-    const response = await api.get(`/prescriptions/${id}`);
-    return response.data;
+    return await api.get<Prescription>(`/prescriptions/${id}`);
   }
 
   async createPrescription(data: any): Promise<Prescription> {
-    const response = await api.post('/prescriptions', data);
-    return response.data;
+    return await api.post<Prescription>('/prescriptions', data);
   }
 
   async requestRefill(prescriptionId: string, data: any): Promise<RefillRequest> {
-    const response = await api.post(`/prescriptions/${prescriptionId}/refill`, data);
-    return response.data;
+    return await api.post<RefillRequest>(`/prescriptions/${prescriptionId}/refill`, data);
   }
 
   async approveRefill(refillId: string): Promise<RefillRequest> {
-    const response = await api.patch(`/prescriptions/refill/${refillId}/approve`);
-    return response.data;
+    return await api.patch<RefillRequest>(`/prescriptions/refill/${refillId}/approve`);
   }
 
   async markRefillFilled(refillId: string, quantity: number): Promise<RefillRequest> {
-    const response = await api.patch(`/prescriptions/refill/${refillId}/filled`, { quantity });
-    return response.data;
+    return await api.patch<RefillRequest>(`/prescriptions/refill/${refillId}/filled`, { quantity });
   }
 
   // Stock Management
   async getPatientStock(patientId: string): Promise<MedicationStock[]> {
-    const response = await api.get(`/medication-stock/patient/${patientId}`);
-    return response.data;
+    return await api.get<MedicationStock[]>(`/medication-stock/patient/${patientId}`);
   }
 
   async getLowStockAlerts(patientId: string): Promise<MedicationStock[]> {
-    const response = await api.get(`/medication-stock/patient/${patientId}/low-stock`);
-    return response.data;
+    return await api.get<MedicationStock[]>(`/medication-stock/patient/${patientId}/low-stock`);
   }
 
   async updateStock(stockId: string, change: number, action?: string, notes?: string): Promise<MedicationStock> {
-    const response = await api.post('/medication-stock/update', {
+    return await api.post<MedicationStock>('/medication-stock/update', {
       stockId,
       change,
       action,
       notes,
     });
-    return response.data;
   }
 
   async logDoseTaken(patientId: string, medicationId: string, dosageTaken: string, notes?: string): Promise<MedicationHistory> {
-    const response = await api.post('/medication-stock/log-dose', {
+    return await api.post<MedicationHistory>('/medication-stock/log-dose', {
       patientId,
       medicationId,
       dosageTaken,
       notes,
     });
-    return response.data;
   }
 
   async logMissedDose(patientId: string, medicationId: string, notes?: string): Promise<MedicationHistory> {
-    const response = await api.post('/medication-stock/log-missed', {
+    return await api.post<MedicationHistory>('/medication-stock/log-missed', {
       patientId,
       medicationId,
       notes,
     });
-    return response.data;
   }
 
   // History & Analytics
@@ -229,8 +213,7 @@ class MedicationService {
     if (startDate) params.append('startDate', startDate);
     if (endDate) params.append('endDate', endDate);
     
-    const response = await api.get(`/medication-stock/patient/${patientId}/adherence?${params.toString()}`);
-    return response.data;
+    return await api.get<AdherenceData>(`/medication-stock/patient/${patientId}/adherence?${params.toString()}`);
   }
 
   async getMedicationHistory(patientId: string, medicationId?: string, action?: string, limit?: number): Promise<MedicationHistory[]> {
@@ -239,8 +222,7 @@ class MedicationService {
     if (action) params.append('action', action);
     if (limit) params.append('limit', limit.toString());
     
-    const response = await api.get(`/medication-stock/patient/${patientId}/history?${params.toString()}`);
-    return response.data;
+    return await api.get<MedicationHistory[]>(`/medication-stock/patient/${patientId}/history?${params.toString()}`);
   }
 }
 

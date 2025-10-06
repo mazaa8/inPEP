@@ -11,7 +11,6 @@ import {
   ListItem,
   ListItemText,
   ListItemIcon,
-  Paper,
   Button,
   TextField,
   Stack,
@@ -26,7 +25,9 @@ import {
   AddCircleOutline,
 } from '@mui/icons-material';
 import { IconButton } from '@mui/material';
-import Layout from '../../components/layout/Layout';
+import CaregiverPageWrapper from '../../components/layout/CaregiverPageWrapper';
+import { Assignment as PlanIcon } from '@mui/icons-material';
+import { roleColors } from '../../styles/glassmorphism';
 
 const initialCarePlanData = {
   individualNeeds: {
@@ -187,27 +188,65 @@ const CarePlanningPage = () => {
   };
 
   return (
-    <Layout title="Care Planning">
-            <Paper sx={{ p: 3, background: 'linear-gradient(to right, #e3f2fd, #f3e5f5)', borderRadius: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <div>
-          <Typography variant="h4" gutterBottom sx={{ fontWeight: 'bold', color: 'primary.dark' }}>
-            Wellness Care Plan for {carePlanData.individualNeeds.name}
-          </Typography>
-          <Typography variant="subtitle1" gutterBottom>
-            A person-centered roadmap for health, social, and personal care.
-          </Typography>
-        </div>
+    <CaregiverPageWrapper
+      title={`Wellness Care Plan for ${carePlanData.individualNeeds.name}`}
+      subtitle="A person-centered roadmap for health, social, and personal care"
+      icon={<PlanIcon />}
+    >
+      {/* Edit Controls */}
+      <Box sx={{ 
+        background: 'rgba(255, 255, 255, 0.7)',
+        backdropFilter: 'blur(20px)',
+        WebkitBackdropFilter: 'blur(20px)',
+        border: '1px solid rgba(255, 255, 255, 0.8)',
+        borderRadius: '16px',
+        p: 2,
+        mb: 3,
+        display: 'flex',
+        justifyContent: 'flex-end',
+        boxShadow: '0 4px 20px rgba(76, 175, 80, 0.1)',
+      }}>
         <Stack direction="row" spacing={1}>
           {isEditing ? (
             <>
-              <Button variant="contained" color="primary" onClick={handleSave}>Save</Button>
-              <Button variant="outlined" onClick={() => { setIsEditing(false); setCarePlanData(initialCarePlanData); setErrors({}); }}>Cancel</Button>
+              <Button 
+                variant="contained" 
+                onClick={handleSave}
+                sx={{
+                  background: roleColors.CAREGIVER.gradient,
+                  color: 'white',
+                  fontWeight: 700,
+                }}
+              >
+                Save
+              </Button>
+              <Button 
+                variant="outlined" 
+                onClick={() => { setIsEditing(false); setCarePlanData(initialCarePlanData); setErrors({}); }}
+                sx={{
+                  borderColor: roleColors.CAREGIVER.primary,
+                  color: roleColors.CAREGIVER.primary,
+                  fontWeight: 600,
+                }}
+              >
+                Cancel
+              </Button>
             </>
           ) : (
-            <Button variant="contained" onClick={() => setIsEditing(true)}>Edit Plan</Button>
+            <Button 
+              variant="contained" 
+              onClick={() => setIsEditing(true)}
+              sx={{
+                background: roleColors.CAREGIVER.gradient,
+                color: 'white',
+                fontWeight: 700,
+              }}
+            >
+              Edit Plan
+            </Button>
           )}
         </Stack>
-      </Paper>
+      </Box>
 
       <Box sx={{ mt: 3 }}>
         <Section icon={<AccessibilityNewOutlined />} title="Patient Profile">
@@ -427,7 +466,7 @@ const CarePlanningPage = () => {
             </Stack>
         </Section>
       </Box>
-    </Layout>
+    </CaregiverPageWrapper>
   );
 };
 

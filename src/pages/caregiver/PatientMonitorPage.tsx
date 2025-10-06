@@ -1,9 +1,10 @@
 import { useEffect } from 'react';
 import { Typography, Box, Button, Grid } from '@mui/material';
-import Layout from '../../components/layout/Layout';
+import CaregiverPageWrapper from '../../components/layout/CaregiverPageWrapper';
+import { MonitorHeart as MonitorIcon } from '@mui/icons-material';
 import { useVideoCall } from '../../context/VideoCallContext';
 import VideoCall from '../../components/video/VideoCall';
-import { glassStyles, roleColors, dashboardBackgrounds } from '../../styles/glassmorphism';
+import { glassStyles, roleColors } from '../../styles/glassmorphism';
 
 const PatientMonitorPage = () => {
   const { 
@@ -38,8 +39,11 @@ const PatientMonitorPage = () => {
   }, [incomingCall]);
 
   return (
-    <Box sx={{ minHeight: '100vh', background: dashboardBackgrounds.CAREGIVER, p: 3 }}>
-      <Layout title="Patient Monitor">
+    <CaregiverPageWrapper
+      title="Patient Monitor"
+      subtitle="Real-time monitoring and video calls with Abdeen White"
+      icon={<MonitorIcon />}
+    >
         {/* PERMANENT CALL BANNER - ALWAYS VISIBLE */}
         <Box
           sx={{ 
@@ -181,8 +185,7 @@ const PatientMonitorPage = () => {
             remoteIceCandidate={remoteIceCandidate}
           />
         )}
-      </Layout>
-    </Box>
+    </CaregiverPageWrapper>
   );
 };
 

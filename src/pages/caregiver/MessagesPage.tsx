@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Box, Typography, List, ListItem, ListItemAvatar, Avatar, ListItemText, Paper, TextField, Button, Divider, Grid } from '@mui/material';
-import { Send as SendIcon } from '@mui/icons-material';
-import Layout from '../../components/layout/Layout';
+import { Send as SendIcon, Message as MessageIcon } from '@mui/icons-material';
+import CaregiverPageWrapper from '../../components/layout/CaregiverPageWrapper';
 
 const mockConversations = [
   {
@@ -38,8 +38,22 @@ const MessagesPage = () => {
   const [selectedConversation, setSelectedConversation] = useState(mockConversations[0]);
 
   return (
-    <Layout title="Messages">
-      <Grid container component={Paper} sx={{ height: 'calc(100vh - 64px)', m: 0 }}>
+    <CaregiverPageWrapper
+      title="Messages"
+      subtitle="Communicate with healthcare providers and support team"
+      icon={<MessageIcon />}
+    >
+      <Grid container component={Paper} sx={{ 
+        height: 'calc(100vh - 300px)', 
+        m: 0,
+        background: 'rgba(255, 255, 255, 0.7)',
+        backdropFilter: 'blur(20px)',
+        WebkitBackdropFilter: 'blur(20px)',
+        border: '1px solid rgba(255, 255, 255, 0.8)',
+        borderRadius: '20px',
+        overflow: 'hidden',
+        boxShadow: '0 4px 20px rgba(76, 175, 80, 0.1)',
+      }}>
         <Grid item xs={4} sx={{ borderRight: '1px solid #ddd' }}>
           <List>
             {mockConversations.map((conv) => (
@@ -72,7 +86,7 @@ const MessagesPage = () => {
           </Box>
         </Grid>
       </Grid>
-    </Layout>
+    </CaregiverPageWrapper>
   );
 };
 

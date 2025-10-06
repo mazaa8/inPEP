@@ -30,11 +30,11 @@ import BlockIcon from '@mui/icons-material/Block';
 import { Rating } from '@mui/material';
 import { format, startOfWeek, endOfWeek } from 'date-fns';
 import { useLocation } from 'react-router-dom';
-import Layout from '../../../components/layout/Layout';
+import CaregiverPageWrapper from '../../../components/layout/CaregiverPageWrapper';
+import { ShoppingCart as ShoppingCartIcon } from '@mui/icons-material';
 import { mealPlans } from '../../../data/mealPlans';
 import { transformMenuForGroceryList } from '../../../utils/dataTransformation';
 import { getCategory } from '../../../utils/categorizeIngredients';
-import { herediblesService } from '../../../services/herediblesService';
 import type { WeeklyMenu, MealItem, Ingredient } from '../../../types';
 
 const GROCERY_STORAGE_KEY = 'heredibles-weekly-menu';
@@ -366,18 +366,35 @@ const GroceryShoppingListPage = () => {
   };
 
   return (
-    <Layout title="Grocery Shopping List">
-      <Button variant="outlined" onClick={() => navigate(-1)} sx={{ mb: 2 }}>
-        Back
-      </Button>
-      <Typography variant="h5" gutterBottom sx={{ mb: 2 }}>
-        Shopping List for {format(startOfWeek(currentWeek, { weekStartsOn: 1 }), 'MMM d')} - {format(endOfWeek(currentWeek, { weekStartsOn: 1 }), 'MMM d, yyyy')}
-      </Typography>
+    <CaregiverPageWrapper
+      title="Grocery Shopping List"
+      subtitle={`Shopping List for ${format(startOfWeek(currentWeek, { weekStartsOn: 1 }), 'MMM d')} - ${format(endOfWeek(currentWeek, { weekStartsOn: 1 }), 'MMM d, yyyy')}`}
+      icon={<ShoppingCartIcon />}
+    >
       <Grid container spacing={3}>
         {/* Left Side: Weekly Plan & Aggregated List */}
         <Grid item xs={12} md={8}>
-          <Paper sx={{ mb: 3, flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
-            <Typography variant="h6" sx={{ bgcolor: 'primary.main', color: 'white', p: 1, borderTopLeftRadius: 4, borderTopRightRadius: 4 }}>Weekly Meal Plan & Ingredients</Typography>
+          <Paper sx={{ 
+            mb: 3, 
+            flexGrow: 1, 
+            display: 'flex', 
+            flexDirection: 'column',
+            background: 'rgba(255, 255, 255, 0.7)',
+            backdropFilter: 'blur(20px)',
+            WebkitBackdropFilter: 'blur(20px)',
+            border: '1px solid rgba(255, 255, 255, 0.8)',
+            borderRadius: '20px',
+            overflow: 'hidden',
+            boxShadow: '0 4px 20px rgba(76, 175, 80, 0.1)',
+          }}>
+            <Typography variant="h6" sx={{ 
+              background: 'linear-gradient(135deg, #4CAF50 0%, #8BC34A 100%)', 
+              color: 'white', 
+              p: 2, 
+              fontWeight: 700 
+            }}>
+              Weekly Meal Plan & Ingredients
+            </Typography>
             <Box sx={{ overflow: 'auto', flexGrow: 1 }}>
               {Object.entries(weeklyMenu).map(([day, meals]: [string, MealItem[]]) => (
                 <Accordion key={day}>
@@ -401,10 +418,39 @@ const GroceryShoppingListPage = () => {
             </Box>
           </Paper>
 
-          <Paper sx={{ width: '100%' }}>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', bgcolor: 'primary.main', color: 'white', p: 1, borderTopLeftRadius: 4, borderTopRightRadius: 4 }}>
-              <Typography variant="h6" sx={{ color: 'white' }}>Allergic or Prohibited Foods</Typography>
-              <Button variant="contained" size="small" onClick={() => handleAllergyOpen()} sx={{ bgcolor: 'white', color: 'primary.dark', '&:hover': { bgcolor: 'grey.200' }, fontWeight: 900 }}>Add</Button>
+          <Paper sx={{ 
+            width: '100%',
+            background: 'rgba(255, 255, 255, 0.7)',
+            backdropFilter: 'blur(20px)',
+            WebkitBackdropFilter: 'blur(20px)',
+            border: '1px solid rgba(255, 255, 255, 0.8)',
+            borderRadius: '20px',
+            overflow: 'hidden',
+            boxShadow: '0 4px 20px rgba(76, 175, 80, 0.1)',
+          }}>
+            <Box sx={{ 
+              display: 'flex', 
+              justifyContent: 'space-between', 
+              alignItems: 'center', 
+              background: 'linear-gradient(135deg, #4CAF50 0%, #8BC34A 100%)', 
+              color: 'white', 
+              p: 2 
+            }}>
+              <Typography variant="h6" sx={{ color: 'white', fontWeight: 700 }}>Allergic or Prohibited Foods</Typography>
+              <Button 
+                variant="contained" 
+                size="small" 
+                onClick={() => handleAllergyOpen()} 
+                sx={{ 
+                  bgcolor: 'white', 
+                  color: '#4CAF50', 
+                  '&:hover': { bgcolor: 'rgba(255, 255, 255, 0.9)' }, 
+                  fontWeight: 700,
+                  borderRadius: '10px',
+                }}
+              >
+                Add
+              </Button>
             </Box>
             <List sx={{ maxHeight: 200, overflow: 'auto' }}>
               {allergicFoods.map((food, i) => (
@@ -426,10 +472,38 @@ const GroceryShoppingListPage = () => {
 
         {/* Right Side: Favorite Shops */}
         <Grid item xs={12} md={4}>
-          <Paper sx={{}}>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', bgcolor: 'primary.main', color: 'white', p: 1, borderTopLeftRadius: 4, borderTopRightRadius: 4 }}>
-              <Typography variant="h6" sx={{ color: 'white' }}>Favorite Grocery Shops</Typography>
-              <Button variant="contained" size="small" onClick={() => handleOpen()} sx={{ bgcolor: 'white', color: 'primary.dark', '&:hover': { bgcolor: 'grey.200' }, fontWeight: 900 }}>Add</Button>
+          <Paper sx={{
+            background: 'rgba(255, 255, 255, 0.7)',
+            backdropFilter: 'blur(20px)',
+            WebkitBackdropFilter: 'blur(20px)',
+            border: '1px solid rgba(255, 255, 255, 0.8)',
+            borderRadius: '20px',
+            overflow: 'hidden',
+            boxShadow: '0 4px 20px rgba(76, 175, 80, 0.1)',
+          }}>
+            <Box sx={{ 
+              display: 'flex', 
+              justifyContent: 'space-between', 
+              alignItems: 'center', 
+              background: 'linear-gradient(135deg, #4CAF50 0%, #8BC34A 100%)', 
+              color: 'white', 
+              p: 2 
+            }}>
+              <Typography variant="h6" sx={{ color: 'white', fontWeight: 700 }}>Favorite Grocery Shops</Typography>
+              <Button 
+                variant="contained" 
+                size="small" 
+                onClick={() => handleOpen()} 
+                sx={{ 
+                  bgcolor: 'white', 
+                  color: '#4CAF50', 
+                  '&:hover': { bgcolor: 'rgba(255, 255, 255, 0.9)' }, 
+                  fontWeight: 700,
+                  borderRadius: '10px',
+                }}
+              >
+                Add
+              </Button>
             </Box>
             <List>
               {favoriteShops.map((shop, i) => (
@@ -455,8 +529,24 @@ const GroceryShoppingListPage = () => {
             </List>
           </Paper>
 
-          <Paper sx={{ mt: 3 }}>
-            <Typography variant="h6" sx={{ bgcolor: 'primary.main', color: 'white', p: 1, borderTopLeftRadius: 4, borderTopRightRadius: 4 }}>Confectioneries</Typography>
+          <Paper sx={{ 
+            mt: 3,
+            background: 'rgba(255, 255, 255, 0.7)',
+            backdropFilter: 'blur(20px)',
+            WebkitBackdropFilter: 'blur(20px)',
+            border: '1px solid rgba(255, 255, 255, 0.8)',
+            borderRadius: '20px',
+            overflow: 'hidden',
+            boxShadow: '0 4px 20px rgba(76, 175, 80, 0.1)',
+          }}>
+            <Typography variant="h6" sx={{ 
+              background: 'linear-gradient(135deg, #4CAF50 0%, #8BC34A 100%)', 
+              color: 'white', 
+              p: 2, 
+              fontWeight: 700 
+            }}>
+              Confectioneries
+            </Typography>
             <List sx={{ maxHeight: 380, overflow: 'auto' }}>
               {initialConfectioneries.map(({ item }) => {
                 const isChecked = checklist.some(checklistItem => checklistItem.item === item);
@@ -605,7 +695,7 @@ const GroceryShoppingListPage = () => {
           <Button onClick={handleSaveFeedback} variant="contained">Save Feedback</Button>
         </DialogActions>
       </Dialog>
-    </Layout>
+    </CaregiverPageWrapper>
   );
 };
 

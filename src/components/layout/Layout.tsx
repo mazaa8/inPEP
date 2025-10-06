@@ -22,6 +22,7 @@ import {
   NotificationsOutlined as NotificationsIcon,
   AccountCircle,
   MessageOutlined as MessageIcon,
+  CreditCardOutlined as CreditCard,
 } from '@mui/icons-material';
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -343,6 +344,19 @@ const Layout = ({ children, title, darkMode = false, themeColor }: LayoutProps) 
                             color: 'white',
                             '&:hover': { bgcolor: 'rgba(76, 175, 80, 0.15)' },
                           }} 
+                          onClick={() => navigate('/reclaime')}
+                        >
+                          <ListItemIcon sx={{ color: currentTheme.secondary }}>
+                            <WorkspacePremium />
+                          </ListItemIcon>
+                          <ListItemText primary="ReclaiMe Champion™" />
+                        </ListItemButton>
+                        <ListItemButton 
+                          sx={{ 
+                            pl: 4,
+                            color: 'white',
+                            '&:hover': { bgcolor: 'rgba(76, 175, 80, 0.15)' },
+                          }} 
                           onClick={() => navigate('/champion-corner')}
                         >
                           <ListItemIcon sx={{ color: currentTheme.secondary }}>
@@ -356,12 +370,12 @@ const Layout = ({ children, title, darkMode = false, themeColor }: LayoutProps) 
                             color: 'white',
                             '&:hover': { bgcolor: 'rgba(76, 175, 80, 0.15)' },
                           }} 
-                          onClick={() => navigate('/reclaime')}
+                          onClick={() => navigate('/caregiver/appointments-billing')}
                         >
                           <ListItemIcon sx={{ color: currentTheme.secondary }}>
-                            <WorkspacePremium />
+                            <EventNote />
                           </ListItemIcon>
-                          <ListItemText primary="ReclaiMe Champion™" />
+                          <ListItemText primary="Appointments & Billing" />
                         </ListItemButton>
                         <ListItemButton 
                           sx={{ 
@@ -467,6 +481,19 @@ const Layout = ({ children, title, darkMode = false, themeColor }: LayoutProps) 
                             color: 'white',
                             '&:hover': { bgcolor: 'rgba(76, 175, 80, 0.15)' },
                           }} 
+                          onClick={() => navigate('/caregiver/payment-methods')}
+                        >
+                          <ListItemIcon sx={{ color: currentTheme.secondary }}>
+                            <CreditCard />
+                          </ListItemIcon>
+                          <ListItemText primary="Payment Methods" />
+                        </ListItemButton>
+                        <ListItemButton 
+                          sx={{ 
+                            pl: 4,
+                            color: 'white',
+                            '&:hover': { bgcolor: 'rgba(76, 175, 80, 0.15)' },
+                          }} 
                           onClick={() => navigate('/patient-support')}
                         >
                           <ListItemIcon sx={{ color: currentTheme.secondary }}>
@@ -499,6 +526,19 @@ const Layout = ({ children, title, darkMode = false, themeColor }: LayoutProps) 
                             <RestaurantMenu />
                           </ListItemIcon>
                           <ListItemText primary="Heredibles™" />
+                        </ListItemButton>
+                        <ListItemButton 
+                          sx={{ 
+                            pl: 4,
+                            color: 'white',
+                            '&:hover': { bgcolor: 'rgba(76, 175, 80, 0.15)' },
+                          }} 
+                          onClick={() => navigate('/caregiver/grocery-list')}
+                        >
+                          <ListItemIcon sx={{ color: currentTheme.secondary }}>
+                            <ShoppingCart />
+                          </ListItemIcon>
+                          <ListItemText primary="Grocery List" />
                         </ListItemButton>
                       </>
                     )}
@@ -579,6 +619,19 @@ const Layout = ({ children, title, darkMode = false, themeColor }: LayoutProps) 
                         <ScheduleIcon />
                       </ListItemIcon>
                       <ListItemText primary="Medication Scheduler" />
+                    </ListItemButton>
+                    <ListItemButton 
+                      sx={{ 
+                        pl: 4,
+                        color: 'white',
+                        '&:hover': { bgcolor: 'rgba(76, 175, 80, 0.15)' },
+                      }} 
+                      onClick={() => navigate('/caregiver/appointments-billing')}
+                    >
+                      <ListItemIcon sx={{ color: currentTheme.secondary }}>
+                        <EventNote />
+                      </ListItemIcon>
+                      <ListItemText primary="Appointments & Billing" />
                     </ListItemButton>
                   </List>
                 </Collapse>
