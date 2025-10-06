@@ -10,10 +10,10 @@ import {
   List,
   ListItem,
   ListItemText,
-  ListItemIcon,
   Button,
   TextField,
   Stack,
+  Chip,
 } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import {
@@ -23,10 +23,10 @@ import {
   AssignmentIndOutlined,
   RemoveCircleOutline,
   AddCircleOutline,
+  FavoriteBorder,
 } from '@mui/icons-material';
 import { IconButton } from '@mui/material';
 import CaregiverPageWrapper from '../../components/layout/CaregiverPageWrapper';
-import { Assignment as PlanIcon } from '@mui/icons-material';
 import { roleColors } from '../../styles/glassmorphism';
 
 const initialCarePlanData = {
@@ -39,7 +39,7 @@ const initialCarePlanData = {
   preferences: {
     goals: 'Maintain independence at home for as long as possible.',
     lifestyle: 'Enjoys listening to classical music, gardening, and watching old movies.',
-    values: 'Values quiet time in the morning and social interaction in the afternoon.',
+    values: 'Quiet mornings and social interactions in the afternoon.',
   },
   medicalInfo: {
     primaryCarePhysician: { name: 'Dr. Alan Grant', contact: '555-0101' },
@@ -61,12 +61,58 @@ const initialCarePlanData = {
 };
 
 const Section = ({ icon, title, children }: { icon: React.ReactNode; title: string; children: React.ReactNode }) => (
-  <Accordion defaultExpanded sx={{ mb: 2 }}>
-    <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-      <ListItemIcon sx={{ mr: 1, color: 'primary.main' }}>{icon}</ListItemIcon>
-      <Typography variant="h6">{title}</Typography>
+  <Accordion 
+    defaultExpanded 
+    sx={{ 
+      mb: 3,
+      background: 'rgba(255, 255, 255, 0.25)',
+      backdropFilter: 'blur(20px)',
+      WebkitBackdropFilter: 'blur(20px)',
+      border: '1px solid rgba(255, 255, 255, 0.3)',
+      borderRadius: '20px !important',
+      boxShadow: '0 4px 20px rgba(76, 175, 80, 0.1)',
+      '&:before': {
+        display: 'none',
+      },
+      '&.Mui-expanded': {
+        margin: '0 0 24px 0',
+      },
+    }}
+  >
+    <AccordionSummary 
+      expandIcon={<ExpandMoreIcon sx={{ color: roleColors.CAREGIVER.primary }} />}
+      sx={{
+        borderRadius: '20px',
+        '&:hover': {
+          background: 'rgba(76, 175, 80, 0.05)',
+        },
+      }}
+    >
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+        <Box sx={{
+          width: 48,
+          height: 48,
+          borderRadius: '12px',
+          background: roleColors.CAREGIVER.gradient,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          boxShadow: `0 4px 16px ${roleColors.CAREGIVER.primary}40`,
+        }}>
+          <Box sx={{ color: 'white', fontSize: 24, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            {icon}
+          </Box>
+        </Box>
+        <Typography variant="h6" sx={{ fontWeight: 700, color: '#1b5e20' }}>{title}</Typography>
+      </Box>
     </AccordionSummary>
-    <AccordionDetails sx={{ backgroundColor: '#f9f9f9' }}>
+    <AccordionDetails sx={{ 
+      backgroundColor: 'rgba(255, 255, 255, 0.4)',
+      backdropFilter: 'blur(10px)',
+      WebkitBackdropFilter: 'blur(10px)',
+      borderRadius: '0 0 20px 20px',
+      p: 3,
+    }}>
       {children}
     </AccordionDetails>
   </Accordion>
@@ -191,7 +237,7 @@ const CarePlanningPage = () => {
     <CaregiverPageWrapper
       title={`Wellness Care Plan for ${carePlanData.individualNeeds.name}`}
       subtitle="A person-centered roadmap for health, social, and personal care"
-      icon={<PlanIcon />}
+      icon={<FavoriteBorder />}
     >
       {/* Edit Controls */}
       <Box sx={{ 
@@ -251,80 +297,273 @@ const CarePlanningPage = () => {
       <Box sx={{ mt: 3 }}>
         <Section icon={<AccessibilityNewOutlined />} title="Patient Profile">
           <Grid container spacing={2}>
-            <Grid item xs={12} md={6}>
-                            {isEditing ? (
-                <TextField
-                  label="Date of Birth"
-                  variant="outlined"
-                  fullWidth
-                  size="small"
-                  value={carePlanData.individualNeeds.dob}
-                  onChange={(e) => handleInputChange('individualNeeds.dob', e.target.value)}
-                />
-              ) : (
-                <Typography variant="subtitle1" gutterBottom><strong>Date of Birth:</strong> {carePlanData.individualNeeds.dob}</Typography>
-              )}
-              <Typography variant="subtitle1" gutterBottom><strong>Health Conditions:</strong></Typography>
-              <List dense>
-                {carePlanData.individualNeeds.conditions.map((item, index) => (
-                  isEditing ? (
-                    <Stack direction="row" spacing={1} key={index} sx={{ mb: 1, width: '100%' }}>
-                      <TextField size="small" fullWidth defaultValue={item} onChange={e => handleInputChange(`individualNeeds.conditions[${index}]`, e.target.value)} />
-                      <IconButton size="small" onClick={() => handleRemoveItem('individualNeeds.conditions', index)}><RemoveCircleOutline /></IconButton>
-                    </Stack>
-                  ) : (
-                    <ListItem key={index}><ListItemText primary={item} /></ListItem>
-                  )
-                ))}
-              </List>
-              {isEditing && (
-                <Button startIcon={<AddCircleOutline />} onClick={() => handleAddItem('individualNeeds.conditions', '')} sx={{ mt: 1 }}>
-                  Add Condition
-                </Button>
-              )}
-            </Grid>
-            <Grid item xs={12} md={6}>
-              <Typography variant="subtitle1" gutterBottom><strong>Personal Care:</strong></Typography>
-              <List dense>
-                {carePlanData.individualNeeds.personalCare.map((item, index) => (
-                  isEditing ? (
-                    <Stack direction="row" spacing={1} key={index} sx={{ mb: 1, width: '100%' }}>
-                      <TextField size="small" fullWidth defaultValue={item} onChange={e => handleInputChange(`individualNeeds.personalCare[${index}]`, e.target.value)} />
-                      <IconButton size="small" onClick={() => handleRemoveItem('individualNeeds.personalCare', index)}><RemoveCircleOutline /></IconButton>
-                    </Stack>
-                  ) : (
-                    <ListItem key={index}><ListItemText primary={item} /></ListItem>
-                  )
-                ))}
-              </List>
-              {isEditing && (
-                <Button startIcon={<AddCircleOutline />} onClick={() => handleAddItem('individualNeeds.personalCare', '')} sx={{ mt: 1 }}>
-                  Add Personal Care Item
-                </Button>
-              )}
-            </Grid>
+            {/* Basic Info Row */}
             <Grid item xs={12}>
-                            {isEditing ? (
-                <TextField
-                  label="Personal Goals"
-                  variant="outlined"
-                  fullWidth
-                  multiline
-                  rows={2}
-                  value={carePlanData.preferences.goals}
-                  onChange={(e) => handleInputChange('preferences.goals', e.target.value)}
-                />
-              ) : (
-                <Typography variant="subtitle1" gutterBottom><strong>Personal Goals:</strong> {carePlanData.preferences.goals}</Typography>
-              )}
-                            {isEditing ? (
-                <>
-                  <TextField label="Lifestyle" variant="outlined" fullWidth multiline rows={2} defaultValue={carePlanData.preferences.lifestyle} onChange={(e) => handleInputChange('preferences.lifestyle', e.target.value)} sx={{ mb: 1 }} />
-                  <TextField label="Values" variant="outlined" fullWidth multiline rows={2} defaultValue={carePlanData.preferences.values} onChange={(e) => handleInputChange('preferences.values', e.target.value)} />
-                </>
-              ) : (
-                <Typography variant="subtitle1" gutterBottom><strong>Lifestyle & Values:</strong> {carePlanData.preferences.lifestyle} {carePlanData.preferences.values}</Typography>
-              )}
+              <Box sx={{
+                background: 'rgba(76, 175, 80, 0.08)',
+                borderRadius: '12px',
+                p: 2,
+                border: '1px solid rgba(76, 175, 80, 0.2)',
+              }}>
+                <Grid container spacing={2} alignItems="center">
+                  <Grid item xs={12} sm={4}>
+                    {isEditing ? (
+                      <TextField
+                        label="Date of Birth"
+                        variant="outlined"
+                        fullWidth
+                        size="small"
+                        value={carePlanData.individualNeeds.dob}
+                        onChange={(e) => handleInputChange('individualNeeds.dob', e.target.value)}
+                        sx={{
+                          '& .MuiOutlinedInput-root': {
+                            bgcolor: 'white',
+                            borderRadius: '8px',
+                          },
+                        }}
+                      />
+                    ) : (
+                      <Box>
+                        <Typography variant="caption" sx={{ color: 'rgba(27, 94, 32, 0.6)', fontWeight: 600, textTransform: 'uppercase', fontSize: '0.7rem' }}>
+                          Date of Birth
+                        </Typography>
+                        <Typography variant="body1" sx={{ color: '#1b5e20', fontWeight: 600, mt: 0.5 }}>
+                          {carePlanData.individualNeeds.dob}
+                        </Typography>
+                      </Box>
+                    )}
+                  </Grid>
+                  <Grid item xs={12} sm={8}>
+                    <Typography variant="caption" sx={{ color: 'rgba(27, 94, 32, 0.6)', fontWeight: 600, textTransform: 'uppercase', fontSize: '0.7rem', display: 'block', mb: 0.5 }}>
+                      Health Conditions
+                    </Typography>
+                    {isEditing ? (
+                      <Box>
+                        {carePlanData.individualNeeds.conditions.map((item, index) => (
+                          <Stack direction="row" spacing={1} key={index} sx={{ mb: 0.5 }}>
+                            <TextField 
+                              size="small" 
+                              fullWidth 
+                              defaultValue={item} 
+                              onChange={e => handleInputChange(`individualNeeds.conditions[${index}]`, e.target.value)}
+                              sx={{
+                                '& .MuiOutlinedInput-root': {
+                                  bgcolor: 'white',
+                                  borderRadius: '8px',
+                                },
+                              }}
+                            />
+                            <IconButton 
+                              size="small" 
+                              onClick={() => handleRemoveItem('individualNeeds.conditions', index)}
+                              sx={{ color: '#d32f2f' }}
+                            >
+                              <RemoveCircleOutline fontSize="small" />
+                            </IconButton>
+                          </Stack>
+                        ))}
+                        <Button 
+                          size="small"
+                          startIcon={<AddCircleOutline />} 
+                          onClick={() => handleAddItem('individualNeeds.conditions', '')} 
+                          sx={{ 
+                            mt: 0.5,
+                            color: roleColors.CAREGIVER.primary,
+                            fontSize: '0.8rem',
+                          }}
+                        >
+                          Add Condition
+                        </Button>
+                      </Box>
+                    ) : (
+                      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                        {carePlanData.individualNeeds.conditions.map((item, index) => (
+                          <Chip 
+                            key={index}
+                            label={item} 
+                            size="small"
+                            sx={{ 
+                              bgcolor: 'rgba(76, 175, 80, 0.15)',
+                              color: '#1b5e20',
+                              fontWeight: 500,
+                              fontSize: '0.8rem',
+                            }}
+                          />
+                        ))}
+                      </Box>
+                    )}
+                  </Grid>
+                </Grid>
+              </Box>
+            </Grid>
+
+            {/* Personal Care */}
+            <Grid item xs={12}>
+              <Box sx={{
+                background: 'rgba(76, 175, 84, 0.08)',
+                borderRadius: '12px',
+                p: 2,
+                border: '1px solid rgba(76, 175, 80, 0.2)',
+              }}>
+                <Typography variant="caption" sx={{ color: 'rgba(27, 94, 32, 0.6)', fontWeight: 600, textTransform: 'uppercase', fontSize: '0.7rem', display: 'block', mb: 1 }}>
+                  Personal Care Needs
+                </Typography>
+                {isEditing ? (
+                  <Box>
+                    {carePlanData.individualNeeds.personalCare.map((item, index) => (
+                      <Stack direction="row" spacing={1} key={index} sx={{ mb: 0.5 }}>
+                        <TextField 
+                          size="small" 
+                          fullWidth 
+                          defaultValue={item} 
+                          onChange={e => handleInputChange(`individualNeeds.personalCare[${index}]`, e.target.value)}
+                          sx={{
+                            '& .MuiOutlinedInput-root': {
+                              bgcolor: 'white',
+                              borderRadius: '8px',
+                            },
+                          }}
+                        />
+                        <IconButton 
+                          size="small" 
+                          onClick={() => handleRemoveItem('individualNeeds.personalCare', index)}
+                          sx={{ color: '#d32f2f' }}
+                        >
+                          <RemoveCircleOutline fontSize="small" />
+                        </IconButton>
+                      </Stack>
+                    ))}
+                    <Button 
+                      size="small"
+                      startIcon={<AddCircleOutline />} 
+                      onClick={() => handleAddItem('individualNeeds.personalCare', '')} 
+                      sx={{ 
+                        mt: 0.5,
+                        color: roleColors.CAREGIVER.primary,
+                        fontSize: '0.8rem',
+                      }}
+                    >
+                      Add Item
+                    </Button>
+                  </Box>
+                ) : (
+                  <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                    {carePlanData.individualNeeds.personalCare.map((item, index) => (
+                      <Chip 
+                        key={index}
+                        label={item} 
+                        size="small"
+                        sx={{ 
+                          bgcolor: 'rgba(76, 175, 80, 0.15)',
+                          color: '#1b5e20',
+                          fontWeight: 500,
+                          fontSize: '0.8rem',
+                        }}
+                      />
+                    ))}
+                  </Box>
+                )}
+              </Box>
+            </Grid>
+
+            {/* Goals & Preferences */}
+            <Grid item xs={12}>
+              <Box sx={{
+                background: '#3f704d ',
+                borderRadius: '12px',
+                p: 2,
+                border: '1px solid #3f704d ',
+              }}>
+                <Grid container spacing={2}>
+                  <Grid item xs={12}>
+                    {isEditing ? (
+                      <TextField
+                        label="Personal Goals"
+                        variant="outlined"
+                        fullWidth
+                        size="small"
+                        multiline
+                        rows={2}
+                        value={carePlanData.preferences.goals}
+                        onChange={(e) => handleInputChange('preferences.goals', e.target.value)}
+                        sx={{
+                          '& .MuiOutlinedInput-root': {
+                            bgcolor: 'white',
+                            borderRadius: '8px',
+                          },
+                        }}
+                      />
+                    ) : (
+                      <Box>
+                        <Typography variant="caption" sx={{ color: '#6cd780', fontWeight: 600, textTransform: 'uppercase', fontSize: '0.7rem' }}>
+                          Personal Goals
+                        </Typography>
+                        <Typography variant="body2" sx={{ color: '#fff', fontWeight: 500, mt: 0.5 }}>
+                          {carePlanData.preferences.goals}
+                        </Typography>
+                      </Box>
+                    )}
+                  </Grid>
+                  <Grid item xs={12} sm={6}>
+                    {isEditing ? (
+                      <TextField 
+                        label="Lifestyle" 
+                        variant="outlined" 
+                        fullWidth 
+                        size="small"
+                        multiline 
+                        rows={2} 
+                        defaultValue={carePlanData.preferences.lifestyle} 
+                        onChange={(e) => handleInputChange('preferences.lifestyle', e.target.value)} 
+                        sx={{ 
+                          '& .MuiOutlinedInput-root': {
+                            bgcolor: 'white',
+                            borderRadius: '8px',
+                          },
+                        }} 
+                      />
+                    ) : (
+                      <Box>
+                        <Typography variant="caption" sx={{ color: '#6cd780', fontWeight: 600, textTransform: 'uppercase', fontSize: '0.7rem' }}>
+                        Lifestyle
+                        </Typography>
+                        <Typography variant="body2" sx={{ color: '#ffff', fontWeight: 500, mt: 0.5 }}>
+                          {carePlanData.preferences.lifestyle}
+                        </Typography>
+                      </Box>
+                    )}
+                  </Grid>
+                  <Grid item xs={12} sm={6}>
+                    {isEditing ? (
+                      <TextField 
+                        label="Values" 
+                        variant="outlined" 
+                        fullWidth 
+                        size="small"
+                        multiline 
+                        rows={2} 
+                        defaultValue={carePlanData.preferences.values} 
+                        onChange={(e) => handleInputChange('preferences.values', e.target.value)}
+                        sx={{
+                          '& .MuiOutlinedInput-root': {
+                            bgcolor: 'white',
+                            borderRadius: '8px',
+                          },
+                        }}
+                      />
+                    ) : (
+                      <Box>
+                        <Typography variant="caption" sx={{ color: '#6cd780', fontWeight: 600, textTransform: 'uppercase', fontSize: '0.7rem' }}>
+                        Values
+                        </Typography>
+                        <Typography variant="body2" sx={{ color: '#ffff', fontWeight: 500, mt: 0.5 }}>
+                          {carePlanData.preferences.values}
+                        </Typography>
+                      </Box>
+                    )}
+                  </Grid>
+                </Grid>
+              </Box>
             </Grid>
           </Grid>
         </Section>

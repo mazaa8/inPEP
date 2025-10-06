@@ -510,19 +510,6 @@ const Layout = ({ children, title, darkMode = false, themeColor }: LayoutProps) 
                           </ListItemIcon>
                           <ListItemText primary="Patient Support" />
                         </ListItemButton>
-                        <ListItemButton 
-                          sx={{ 
-                            pl: 4,
-                            color: 'white',
-                            '&:hover': { bgcolor: 'rgba(76, 175, 80, 0.15)' },
-                          }} 
-                          onClick={() => navigate('/caregiver/pharmacy')}
-                        >
-                          <ListItemIcon sx={{ color: 'white' }}>
-                            <LocalPharmacy />
-                          </ListItemIcon>
-                          <ListItemText primary="Pharmacy" />
-                        </ListItemButton>
                       </>
                     )}
                   </List>
@@ -589,6 +576,19 @@ const Layout = ({ children, title, darkMode = false, themeColor }: LayoutProps) 
                         <ShoppingCart />
                       </ListItemIcon>
                       <ListItemText primary="Grocery List" />
+                    </ListItemButton>
+                    <ListItemButton 
+                      sx={{ 
+                        pl: 4,
+                        color: 'white',
+                        '&:hover': { bgcolor: 'rgba(76, 175, 80, 0.15)' },
+                      }} 
+                      onClick={() => navigate('/caregiver/pharmacy')}
+                    >
+                      <ListItemIcon sx={{ color: 'white' }}>
+                        <LocalPharmacy />
+                      </ListItemIcon>
+                      <ListItemText primary="Pharmacy" />
                     </ListItemButton>
                     <ListItemButton 
                       sx={{ 

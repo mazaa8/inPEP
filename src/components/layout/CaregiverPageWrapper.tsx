@@ -6,7 +6,7 @@ interface CaregiverPageWrapperProps {
   children: React.ReactNode;
   title: string;
   subtitle?: string;
-  icon: React.ReactNode;
+  icon?: React.ReactNode;
 }
 
 /**
@@ -33,28 +33,30 @@ const CaregiverPageWrapper = ({ children, title, subtitle, icon }: CaregiverPage
           boxShadow: '0 8px 32px 0 rgba(76, 175, 80, 0.15)',
         }}>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-            <Box sx={{
-              width: 72,
-              height: 72,
-              borderRadius: '18px',
-              background: roleColors.CAREGIVER.gradient,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              boxShadow: `0 8px 24px ${roleColors.CAREGIVER.primary}40`,
-            }}>
-              <Avatar sx={{ 
-                width: 72, 
-                height: 72, 
-                bgcolor: 'transparent',
-                '& .MuiSvgIcon-root': {
-                  fontSize: 40,
-                  color: 'white',
-                },
+            {icon && (
+              <Box sx={{
+                width: 72,
+                height: 72,
+                borderRadius: '18px',
+                background: roleColors.CAREGIVER.gradient,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                boxShadow: `0 8px 24px ${roleColors.CAREGIVER.primary}40`,
               }}>
-                {icon}
-              </Avatar>
-            </Box>
+                <Avatar sx={{ 
+                  width: 72, 
+                  height: 72, 
+                  bgcolor: 'transparent',
+                  '& .MuiSvgIcon-root': {
+                    fontSize: 40,
+                    color: 'white',
+                  },
+                }}>
+                  {icon}
+                </Avatar>
+              </Box>
+            )}
             <Box>
               <Typography variant="h3" sx={{ fontWeight: 700, color: '#1b5e20', mb: 0.5 }}>
                 {title}
