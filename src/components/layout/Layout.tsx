@@ -186,28 +186,41 @@ const Layout = ({ children, title, darkMode = false, themeColor }: LayoutProps) 
         }),
       }}>
         <Toolbar>
-          <Button color="inherit" onClick={handleLogoClick} sx={{ textTransform: 'none', p: 1 }}>
-            <Apartment sx={{ mr: 1 }} />
-            <Typography variant="h6" noWrap component="div">
+          <Button 
+            onClick={handleLogoClick} 
+            sx={{ 
+              textTransform: 'none', 
+              p: 1,
+              color: 'white',
+            }}
+          >
+            <Apartment sx={{ mr: 1, color: 'white' }} />
+            <Typography variant="h6" noWrap component="div" sx={{ color: 'white' }}>
               InPEP™
             </Typography>
           </Button>
           <Box sx={{ flexGrow: 1 }} />
           <Search>
             <SearchIconWrapper>
-              <SearchIcon />
+              <SearchIcon sx={{ color: 'white' }} />
             </SearchIconWrapper>
             <StyledInputBase
               placeholder="Search Patients…"
               inputProps={{ 'aria-label': 'search' }}
+              sx={{ color: 'white', '& input::placeholder': { color: 'rgba(255,255,255,0.7)' } }}
             />
           </Search>
           <Box sx={{ flexGrow: 1 }} />
           {user && (
             <Box sx={{ display: 'flex', alignItems: 'center' }}>
-              <IconButton size="large" aria-label="show 17 new notifications" color="inherit" onClick={handleNotificationClick}>
+              <IconButton 
+                size="large" 
+                aria-label="show 17 new notifications" 
+                onClick={handleNotificationClick}
+                sx={{ color: 'white' }}
+              >
                 <Badge badgeContent={17} color="error">
-                  <NotificationsIcon />
+                  <NotificationsIcon sx={{ color: 'white' }} />
                 </Badge>
               </IconButton>
               <IconButton
@@ -216,9 +229,9 @@ const Layout = ({ children, title, darkMode = false, themeColor }: LayoutProps) 
                 aria-label="account of current user"
                 aria-haspopup="true"
                 onClick={handleProfileMenuOpen}
-                color="inherit"
+                sx={{ color: 'white' }}
               >
-                <AccountCircle />
+                <AccountCircle sx={{ color: 'white' }} />
               </IconButton>
             </Box>
           )}

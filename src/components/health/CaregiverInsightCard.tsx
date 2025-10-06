@@ -13,13 +13,14 @@ import {
   Close as CloseIcon,
 } from '@mui/icons-material';
 import { type HealthInsight } from '../../services/healthService';
+import { roleColors } from '../../styles/glassmorphism';
 
 interface InsightCardProps {
   insight: HealthInsight;
   onDismiss?: (id: string) => void;
 }
 
-const InsightCard = ({ insight, onDismiss }: InsightCardProps) => {
+const CaregiverInsightCard = ({ insight, onDismiss }: InsightCardProps) => {
   const getIcon = () => {
     switch (insight.insightType) {
       case 'TREND':
@@ -44,9 +45,9 @@ const InsightCard = ({ insight, onDismiss }: InsightCardProps) => {
       case 'WARNING':
         return 'rgba(255, 193, 7, 0.1)';
       case 'INFO':
-        return 'rgba(33, 150, 243, 0.1)';
+        return insight.insightType === 'ACHIEVEMENT' ? 'rgba(76, 175, 80, 0.1)' : 'rgba(76, 175, 80, 0.08)';
       default:
-        return 'rgba(255,255,255,0.05)';
+        return 'rgba(76, 175, 80, 0.05)';
     }
   };
 
@@ -59,7 +60,7 @@ const InsightCard = ({ insight, onDismiss }: InsightCardProps) => {
       case 'WARNING':
         return '#FFC107';
       case 'INFO':
-        return '#2196F3';
+        return insight.insightType === 'ACHIEVEMENT' ? roleColors.CAREGIVER.primary : roleColors.CAREGIVER.secondary;
       default:
         return '#9E9E9E';
     }
@@ -95,7 +96,7 @@ const InsightCard = ({ insight, onDismiss }: InsightCardProps) => {
           </Box>
           <Box sx={{ flex: 1 }}>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
-              <Typography variant="h6" sx={{ fontSize: '1rem', fontWeight: 700, color: 'white' }}>
+              <Typography variant="h6" sx={{ fontSize: '1rem', fontWeight: 700, color: '#1b5e20' }}>
                 {insight.title}
               </Typography>
               <Chip
@@ -109,12 +110,12 @@ const InsightCard = ({ insight, onDismiss }: InsightCardProps) => {
                 }}
               />
             </Box>
-            <Typography variant="body2" sx={{ mb: 1.5, color: 'rgba(255,255,255,0.8)' }}>
+            <Typography variant="body2" sx={{ mb: 1.5, color: 'rgba(27, 94, 32, 0.85)', fontWeight: 500 }}>
               {insight.description}
             </Typography>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mt: 2 }}>
               <Box sx={{ flex: 1 }}>
-                <Typography variant="caption" sx={{ mb: 0.5, display: 'block', color: 'rgba(255,255,255,0.6)', fontWeight: 600 }}>
+                <Typography variant="caption" sx={{ mb: 0.5, display: 'block', color: 'rgba(27, 94, 32, 0.7)', fontWeight: 700 }}>
                   Confidence: {Math.round(insight.confidence * 100)}%
                 </Typography>
                 <LinearProgress
@@ -123,7 +124,7 @@ const InsightCard = ({ insight, onDismiss }: InsightCardProps) => {
                   sx={{ 
                     height: 6, 
                     borderRadius: 3,
-                    bgcolor: 'rgba(255,255,255,0.1)',
+                    bgcolor: 'rgba(76, 175, 80, 0.15)',
                     '& .MuiLinearProgress-bar': {
                       bgcolor: getIconColor(),
                       borderRadius: 3,
@@ -136,10 +137,10 @@ const InsightCard = ({ insight, onDismiss }: InsightCardProps) => {
                 size="small"
                 sx={{ 
                   fontSize: '0.7rem',
-                  bgcolor: 'rgba(255,255,255,0.1)',
-                  color: 'rgba(255,255,255,0.8)',
-                  fontWeight: 600,
-                  border: '1px solid rgba(255,255,255,0.2)',
+                  bgcolor: 'rgba(76, 175, 80, 0.15)',
+                  color: '#1b5e20',
+                  fontWeight: 700,
+                  border: '1px solid rgba(76, 175, 80, 0.3)',
                 }}
               />
             </Box>
@@ -151,10 +152,10 @@ const InsightCard = ({ insight, onDismiss }: InsightCardProps) => {
             onClick={() => onDismiss(insight.id)}
             sx={{ 
               ml: 1,
-              color: 'rgba(255,255,255,0.6)',
+              color: 'rgba(27, 94, 32, 0.5)',
               '&:hover': {
-                color: 'white',
-                bgcolor: 'rgba(255,255,255,0.1)',
+                color: '#1b5e20',
+                bgcolor: 'rgba(76, 175, 80, 0.15)',
               },
             }}
           >
@@ -166,4 +167,4 @@ const InsightCard = ({ insight, onDismiss }: InsightCardProps) => {
   );
 };
 
-export default InsightCard;
+export default CaregiverInsightCard;

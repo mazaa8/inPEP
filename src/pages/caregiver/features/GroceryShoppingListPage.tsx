@@ -34,6 +34,7 @@ import Layout from '../../../components/layout/Layout';
 import { mealPlans } from '../../../data/mealPlans';
 import { transformMenuForGroceryList } from '../../../utils/dataTransformation';
 import { getCategory } from '../../../utils/categorizeIngredients';
+import { herediblesService } from '../../../services/herediblesService';
 import type { WeeklyMenu, MealItem, Ingredient } from '../../../types';
 
 const GROCERY_STORAGE_KEY = 'heredibles-weekly-menu';

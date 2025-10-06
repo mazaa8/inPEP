@@ -240,8 +240,80 @@ export class AIInsightsGenerator {
     return insights;
   }
 
+  // Analyze medication adherence
+  static async analyzeMedicationAdherence(patientId: string, prisma: any): Promise<GeneratedInsight[]> {
+    const insights: GeneratedInsight[] = [];
+
+    try {
+      // Get medication history for last 30 days
+      const thirtyDaysAgo = new Date();
+      thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+      const history = await prisma.medicationHistory.findMany({
+        where: {
+          patientId,
+          timestamp: { gte: thirtyDaysAgo },
+          action: { in: ['taken', 'missed'] },
+        },
+        include: {
+          medication: true,
+        },
+      });
+
+      if (history.length === 0) return insights;
+
+      const taken = history.filter((h: any) => h.action === 'taken').length;
+      const missed = history.filter((h: any) => h.action === 'missed').length;
+      const total = taken + missed;
+      const adherenceRate = (taken / total) * 100;
+
+      // Poor adherence alert
+      if (adherenceRate < 70) {
+        insights.push({
+          insightType: 'RISK',
+          category: 'GENERAL',
+          title: 'Low Medication Adherence Detected',
+          description: `You've taken only ${Math.round(adherenceRate)}% of your scheduled medications in the last 30 days. Missing doses can affect your health outcomes. Consider setting reminders or talking to your caregiver.`,
+          severity: adherenceRate < 50 ? 'ALERT' : 'WARNING',
+          confidence: 0.95,
+        });
+      }
+
+      // Good adherence achievement
+      if (adherenceRate >= 90 && total >= 20) {
+        insights.push({
+          insightType: 'ACHIEVEMENT',
+          category: 'GENERAL',
+          title: 'Excellent Medication Adherence!',
+          description: `Outstanding! You've maintained ${Math.round(adherenceRate)}% medication adherence over the last 30 days. This consistency is key to managing your health conditions effectively.`,
+          severity: 'INFO',
+          confidence: 0.93,
+        });
+      }
+
+      // Missed dose pattern detection
+      const recentMissed = history.filter((h: any) => h.action === 'missed').slice(-5);
+      if (recentMissed.length >= 3) {
+        const medications = [...new Set(recentMissed.map((h: any) => h.medication.name))];
+        insights.push({
+          insightType: 'RECOMMENDATION',
+          category: 'GENERAL',
+          title: 'Frequent Missed Doses',
+          description: `You've missed ${recentMissed.length} doses recently, particularly ${medications.join(', ')}. Try setting phone reminders or using a pill organizer to improve consistency.`,
+          severity: 'WARNING',
+          confidence: 0.87,
+        });
+      }
+
+    } catch (error) {
+      console.error('Error analyzing medication adherence:', error);
+    }
+
+    return insights;
+  }
+
   // Main function to generate all insights
-  static generateInsights(metricsByType: Map<string, HealthMetric[]>): GeneratedInsight[] {
+  static async generateInsights(metricsByType: Map<string, HealthMetric[]>, patientId: string, prisma: any): Promise<GeneratedInsight[]> {
     const allInsights: GeneratedInsight[] = [];
 
     // Analyze each metric type
@@ -255,6 +327,10 @@ export class AIInsightsGenerator {
     allInsights.push(...this.analyzeWeight(weightMetrics));
     allInsights.push(...this.analyzeGlucose(glucoseMetrics));
     allInsights.push(...this.generateRecommendations(metricsByType));
+    
+    // Analyze medication adherence
+    const medicationInsights = await this.analyzeMedicationAdherence(patientId, prisma);
+    allInsights.push(...medicationInsights);
 
     return allInsights;
   }

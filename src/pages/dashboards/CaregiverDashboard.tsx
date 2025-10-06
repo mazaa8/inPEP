@@ -4,10 +4,10 @@ import { FavoriteBorder as CaregiverIcon } from '@mui/icons-material';
 import Layout from '../../components/layout/Layout';
 import TodaysSummary from '../../components/dashboards/caregiver/TodaysSummary';
 import Reminders from '../../components/dashboards/caregiver/Reminders';
-import MedicationChecklist, { type Medication } from '../../components/dashboards/caregiver/MedicationChecklist';
+import MedicationChecklist from '../../components/dashboards/caregiver/MedicationChecklist';
 import AppointmentsCalendar, { type AppointmentEvent } from '../../components/dashboards/caregiver/AppointmentsCalendar';
 import VitalsLog, { type VitalsData } from '../../components/dashboards/caregiver/VitalsLog';
-import AIInsightsDashboard from '../../components/health/AIInsightsDashboard';
+import CaregiverAIInsightsDashboard from '../../components/health/CaregiverAIInsightsDashboard';
 import { appointmentService } from '../../services/appointmentService';
 import { roleColors } from '../../styles/glassmorphism';
 
@@ -21,17 +21,11 @@ const vitalsData: VitalsData[] = [
   { name: 'Sun', heartRate: 71, bp: 119 },
 ];
 
-const initialMedications: Medication[] = [
-  { id: 1, name: 'Lisinopril', dose: '10mg', time: '8:00 AM', taken: true },
-  { id: 2, name: 'Metformin', dose: '500mg', time: '8:00 AM', taken: true },
-  { id: 3, name: 'Atorvastatin', dose: '20mg', time: '8:00 PM', taken: false },
-  { id: 4, name: 'Aspirin', dose: '81mg', time: '8:00 PM', taken: false },
-];
+const patientId = 'b805ec90-e553-4de7-9de0-45f2eb73d1ba'; // Abdeen White
 
 const remindersData = ['Morning medication due', 'Check blood pressure at 3 PM'];
 
 const CaregiverDashboard = () => {
-  const [medications, setMedications] = useState<Medication[]>(initialMedications);
   const [appointments, setAppointments] = useState<AppointmentEvent[]>([]);
 
   useEffect(() => {
@@ -58,18 +52,9 @@ const CaregiverDashboard = () => {
     fetchAppointments();
   }, []);
 
-  const handleToggleMedication = (id: number) => {
-    setMedications(
-      medications.map((med) =>
-        med.id === id ? { ...med, taken: !med.taken } : med
-      )
-    );
-  };
-
   return (
     <Box sx={{ 
       minHeight: '100vh', 
-      background: 'linear-gradient(135deg, #f1f8f4 0%, #e8f5e9 50%, #dcedc8 100%)',
       p: 0,
     }}>
       <Layout title="" darkMode={false} themeColor="CAREGIVER">
@@ -119,7 +104,7 @@ const CaregiverDashboard = () => {
               <Reminders tasks={remindersData} />
             </Grid>
             <Grid item xs={12}>
-              <MedicationChecklist medications={medications} onToggle={handleToggleMedication} />
+              <MedicationChecklist patientId={patientId} />
             </Grid>
             <Grid item xs={12}>
               <VitalsLog data={vitalsData} />
@@ -163,7 +148,7 @@ const CaregiverDashboard = () => {
                 </Typography>
               </Box>
             </Box>
-            <AIInsightsDashboard patientId="b805ec90-e553-4de7-9de0-45f2eb73d1ba" />
+            <CaregiverAIInsightsDashboard patientId="b805ec90-e553-4de7-9de0-45f2eb73d1ba" />
           </Box>
         </Grid>
       </Grid>

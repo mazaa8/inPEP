@@ -38,7 +38,10 @@ import {
 } from '@mui/icons-material';
 import Layout from '../../components/layout/Layout';
 import MealPhotoCapture from '../../components/heredibles/MealPhotoCapture';
+import FoodDrugInteractionWarning from '../../components/heredibles/FoodDrugInteractionWarning';
 import { herediblesService, type MealPlan, type PlannedMeal, type Recipe, type NutritionSummary } from '../../services/herediblesService';
+import { medicationService, type Prescription } from '../../services/medicationService';
+import { FoodDrugInteractionChecker } from '../../utils/foodDrugInteractions';
 import { roleColors } from '../../styles/glassmorphism';
 
 interface TabPanelProps {
@@ -67,6 +70,7 @@ const CaregiverHerediblesPage = () => {
   const [photoDialogOpen, setPhotoDialogOpen] = useState(false);
   const [selectedMeal, setSelectedMeal] = useState<PlannedMeal | null>(null);
   const [cuisineFilter, setCuisineFilter] = useState<string>('ALL');
+  const [prescriptions, setPrescriptions] = useState<Prescription[]>([]);
 
   const patientId = 'b805ec90-e553-4de7-9de0-45f2eb73d1ba'; // Abdeen White
 
@@ -77,14 +81,16 @@ const CaregiverHerediblesPage = () => {
   const fetchAllData = async () => {
     try {
       setLoading(true);
-      const [mealPlanData, recipesData, nutritionData] = await Promise.all([
+      const [mealPlanData, recipesData, nutritionData, prescriptionsData] = await Promise.all([
         herediblesService.getActiveMealPlan(patientId),
         herediblesService.getRecipes(),
         herediblesService.getNutritionSummary(patientId),
+        medicationService.getPatientPrescriptions(patientId, 'active'),
       ]);
       setMealPlan(mealPlanData);
       setRecipes(recipesData);
       setNutritionSummary(nutritionData);
+      setPrescriptions(prescriptionsData);
     } catch (err) {
       console.error('Failed to load Heredibles data:', err);
     } finally {
@@ -836,6 +842,17 @@ const CaregiverHerediblesPage = () => {
                 </Box>
               </DialogTitle>
               <DialogContent dividers>
+                {/* Food-Drug Interaction Warning */}
+                {prescriptions.length > 0 && (() => {
+                  const ingredients = selectedRecipe.ingredients ? JSON.parse(selectedRecipe.ingredients) : [];
+                  const medications = prescriptions.map(p => ({
+                    name: p.medication.name,
+                    category: p.medication.category,
+                  }));
+                  const interactions = FoodDrugInteractionChecker.checkRecipeInteractions(ingredients, medications);
+                  return <FoodDrugInteractionWarning interactions={interactions} />;
+                })()}
+
                 <Typography variant="body1" color="text.secondary" paragraph>
                   {selectedRecipe.description}
                 </Typography>

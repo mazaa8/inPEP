@@ -526,3 +526,236 @@ model NutritionLog {
   @@index([date])
   @@index([mealType])
 }
+
+// ==================== PHARMACY & MEDICATION MANAGEMENT ====================
+
+model Medication {
+  id                String   @id @default(uuid())
+  
+  // Basic Info
+  name              String
+  genericName       String?
+  brandName         String?
+  ndc               String?  @unique // National Drug Code
+  
+  // Details
+  dosage            String
+  form              String   // tablet, capsule, liquid, injection, etc.
+  manufacturer      String?
+  category          String?  // antibiotic, statin, antihypertensive, etc.
+  
+  // Description
+  description       String?
+  sideEffects       String?  // JSON array
+  warnings          String?  // JSON array
+  instructions      String?
+  
+  // Prescription
+  requiresPrescription Boolean @default(true)
+  controlledSubstance  String? // Schedule I-V
+  
+  // Pricing
+  averagePrice      Float?
+  insuranceCovered  Boolean  @default(true)
+  
+  // Metadata
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  isActive          Boolean  @default(true)
+  
+  // Relations
+  prescriptions     Prescription[]
+  alternatives      MedicationAlternative[] @relation("MainMedication")
+  alternativeOf     MedicationAlternative[] @relation("AlternativeMedication")
+  interactions1     DrugInteraction[] @relation("Medication1")
+  interactions2     DrugInteraction[] @relation("Medication2")
+  stocks            MedicationStock[]
+  histories         MedicationHistory[]
+  
+  @@map("medications")
+  @@index([name])
+  @@index([genericName])
+  @@index([category])
+}
+
+model MedicationAlternative {
+  id                String   @id @default(uuid())
+  
+  medicationId      String
+  medication        Medication @relation("MainMedication", fields: [medicationId], references: [id], onDelete: Cascade)
+  
+  alternativeId     String
+  alternative       Medication @relation("AlternativeMedication", fields: [alternativeId], references: [id], onDelete: Cascade)
+  
+  type              String   // generic, brand, therapeutic
+  costDifference    Float?   // Positive = more expensive, Negative = cheaper
+  effectiveness     String?  // equivalent, similar, different
+  approvedBy        String?  // FDA, provider, clinical study
+  notes             String?
+  
+  createdAt         DateTime @default(now())
+  
+  @@map("medication_alternatives")
+  @@unique([medicationId, alternativeId])
+  @@index([medicationId])
+}
+
+model Prescription {
+  id                String   @id @default(uuid())
+  
+  // Who
+  patientId         String
+  providerId        String
+  medicationId      String
+  medication        Medication @relation(fields: [medicationId], references: [id])
+  
+  // What
+  dosage            String
+  frequency         String   // daily, twice daily, every 8 hours, etc.
+  duration          Int?     // days
+  quantity          Int      // number of pills/doses
+  
+  // When
+  startDate         DateTime
+  endDate           DateTime?
+  
+  // Refills
+  refillsAllowed    Int      @default(0)
+  refillsRemaining  Int      @default(0)
+  
+  // Status
+  status            String   // active, completed, cancelled, expired
+  
+  // Instructions
+  instructions      String?
+  notes             String?
+  
+  // Pharmacy
+  pharmacyName      String?
+  pharmacyPhone     String?
+  pharmacyAddress   String?
+  
+  // Metadata
+  prescribedAt      DateTime @default(now())
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  // Relations
+  stocks            MedicationStock[]
+  refillRequests    RefillRequest[]
+  
+  @@map("prescriptions")
+  @@index([patientId])
+  @@index([providerId])
+  @@index([medicationId])
+  @@index([status])
+}
+
+model MedicationStock {
+  id                String   @id @default(uuid())
+  
+  patientId         String
+  medicationId      String
+  medication        Medication @relation(fields: [medicationId], references: [id])
+  prescriptionId    String?
+  prescription      Prescription? @relation(fields: [prescriptionId], references: [id])
+  
+  // Stock
+  currentStock      Int      @default(0)
+  lowStockThreshold Int      @default(5)
+  
+  // Refill
+  lastRefillDate    DateTime?
+  nextRefillDue     DateTime?
+  autoRefill        Boolean  @default(false)
+  
+  // Pharmacy
+  pharmacyName      String?
+  pharmacyPhone     String?
+  pharmacyAddress   String?
+  
+  // Metadata
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  // Relations
+  histories         MedicationHistory[]
+  
+  @@map("medication_stocks")
+  @@unique([patientId, medicationId])
+  @@index([patientId])
+  @@index([currentStock])
+}
+
+model DrugInteraction {
+  id                String   @id @default(uuid())
+  
+  medication1Id     String
+  medication1       Medication @relation("Medication1", fields: [medication1Id], references: [id], onDelete: Cascade)
+  
+  medication2Id     String
+  medication2       Medication @relation("Medication2", fields: [medication2Id], references: [id], onDelete: Cascade)
+  
+  severity          String   // minor, moderate, severe, critical
+  description       String
+  recommendation    String?
+  source            String?  // FDA, clinical study, etc.
+  
+  createdAt         DateTime @default(now())
+  
+  @@map("drug_interactions")
+  @@unique([medication1Id, medication2Id])
+  @@index([medication1Id])
+  @@index([medication2Id])
+  @@index([severity])
+}
+
+model MedicationHistory {
+  id                String   @id @default(uuid())
+  
+  patientId         String
+  medicationId      String
+  medication        Medication @relation(fields: [medicationId], references: [id])
+  stockId           String?
+  stock             MedicationStock? @relation(fields: [stockId], references: [id])
+  
+  action            String   // taken, missed, refilled, discontinued, added
+  timestamp         DateTime @default(now())
+  
+  // Details
+  dosageTaken       String?
+  notes             String?
+  recordedBy        String?  // patient, caregiver, system
+  
+  @@map("medication_history")
+  @@index([patientId])
+  @@index([medicationId])
+  @@index([timestamp])
+  @@index([action])
+}
+
+model RefillRequest {
+  id                String   @id @default(uuid())
+  
+  prescriptionId    String
+  prescription      Prescription @relation(fields: [prescriptionId], references: [id])
+  
+  requestedBy       String   // patient or caregiver ID
+  requestedAt       DateTime @default(now())
+  
+  status            String   // pending, approved, denied, filled
+  
+  pharmacyName      String?
+  pharmacyPhone     String?
+  
+  approvedBy        String?  // provider ID
+  approvedAt        DateTime?
+  
+  filledAt          DateTime?
+  
+  notes             String?
+  
+  @@map("refill_requests")
+  @@index([prescriptionId])
+  @@index([status])
+}

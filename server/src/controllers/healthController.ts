@@ -139,8 +139,8 @@ export const generateInsights = async (req: AuthRequest, res: Response): Promise
       metricsByType.get(metric.metricType)!.push(metric);
     });
 
-    // Generate insights using AI
-    const generatedInsights = AIInsightsGenerator.generateInsights(metricsByType);
+    // Generate insights using AI (including medication adherence)
+    const generatedInsights = await AIInsightsGenerator.generateInsights(metricsByType, targetPatientId, prisma);
 
     // Delete old insights for this patient
     await prisma.healthInsight.deleteMany({

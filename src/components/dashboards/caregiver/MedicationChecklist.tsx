@@ -1,21 +1,88 @@
-import { Typography, Box, List, ListItem, ListItemIcon, ListItemText, Checkbox, Avatar, Divider } from '@mui/material';
-import { Medication as MedicationIcon } from '@mui/icons-material';
+import { useState, useEffect } from 'react';
+import { Typography, Box, List, ListItem, ListItemIcon, ListItemText, Checkbox, Avatar, Divider, CircularProgress, Chip } from '@mui/material';
+import { LocalPharmacy as MedicationIcon, Warning as WarningIcon } from '@mui/icons-material';
 import { roleColors } from '../../../styles/glassmorphism';
-
-export interface Medication {
-  id: number;
-  name: string;
-  dose: string;
-  time: string;
-  taken: boolean;
-}
+import { medicationService, type Prescription } from '../../../services/medicationService';
 
 interface MedicationChecklistProps {
-  medications: Medication[];
-  onToggle: (id: number) => void;
+  patientId: string;
 }
 
-const MedicationChecklist = ({ medications, onToggle }: MedicationChecklistProps) => {
+const MedicationChecklist = ({ patientId }: MedicationChecklistProps) => {
+  const [prescriptions, setPrescriptions] = useState<Prescription[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [takenToday, setTakenToday] = useState<Set<string>>(new Set());
+
+  useEffect(() => {
+    fetchPrescriptions();
+    loadTakenToday();
+  }, [patientId]);
+
+  const fetchPrescriptions = async () => {
+    try {
+      setLoading(true);
+      const data = await medicationService.getPatientPrescriptions(patientId, 'active');
+      setPrescriptions(data);
+    } catch (error) {
+      console.error('Failed to fetch prescriptions:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const loadTakenToday = () => {
+    const today = new Date().toDateString();
+    const saved = localStorage.getItem(`medications_taken_${today}`);
+    if (saved) {
+      setTakenToday(new Set(JSON.parse(saved)));
+    }
+  };
+
+  const handleToggle = async (prescriptionId: string) => {
+    const newTaken = new Set(takenToday);
+    const today = new Date().toDateString();
+
+    if (newTaken.has(prescriptionId)) {
+      newTaken.delete(prescriptionId);
+    } else {
+      newTaken.add(prescriptionId);
+      
+      // Log dose taken in backend
+      const prescription = prescriptions.find(p => p.id === prescriptionId);
+      if (prescription) {
+        try {
+          await medicationService.logDoseTaken(
+            patientId,
+            prescription.medicationId,
+            prescription.dosage,
+            'Taken via dashboard checklist'
+          );
+        } catch (error) {
+          console.error('Failed to log dose:', error);
+        }
+      }
+    }
+
+    setTakenToday(newTaken);
+    localStorage.setItem(`medications_taken_${today}`, JSON.stringify([...newTaken]));
+  };
+
+  const getScheduledTime = (frequency: string) => {
+    if (frequency.includes('morning')) return 'Morning';
+    if (frequency.includes('evening')) return 'Evening';
+    if (frequency.includes('bedtime')) return 'Bedtime';
+    if (frequency.includes('twice')) return 'Morning & Evening';
+    if (frequency.includes('8 hours')) return 'Every 8 hours';
+    return frequency;
+  };
+
+  if (loading) {
+    return (
+      <Box sx={{ display: 'flex', justifyContent: 'center', p: 4 }}>
+        <CircularProgress sx={{ color: roleColors.CAREGIVER.primary }} />
+      </Box>
+    );
+  }
   return (
     <Box sx={{ 
       background: 'rgba(255, 255, 255, 0.7)',
@@ -47,32 +114,59 @@ const MedicationChecklist = ({ medications, onToggle }: MedicationChecklistProps
         </Typography>
       </Box>
       <List sx={{ p: 0 }}>
-        {medications.map((med, index) => (
-          <div key={med.id}>
-            <ListItem sx={{ px: 1 }} button onClick={() => onToggle(med.id)}>
-              <ListItemIcon sx={{ minWidth: 'auto', mr: 1.5 }}>
-                <Checkbox 
-                  edge="start" 
-                  checked={med.taken} 
-                  sx={{ 
-                    color: roleColors.CAREGIVER.primary,
-                    '&.Mui-checked': { color: roleColors.CAREGIVER.primary },
-                  }} 
-                  tabIndex={-1} 
-                  disableRipple 
+        {prescriptions.map((prescription, index) => {
+          const isTaken = takenToday.has(prescription.id);
+          const needsRefill = prescription.refillsRemaining === 0;
+          
+          return (
+            <div key={prescription.id}>
+              <ListItem sx={{ px: 1 }} button onClick={() => handleToggle(prescription.id)}>
+                <ListItemIcon sx={{ minWidth: 'auto', mr: 1.5 }}>
+                  <Checkbox 
+                    edge="start" 
+                    checked={isTaken} 
+                    sx={{ 
+                      color: roleColors.CAREGIVER.primary,
+                      '&.Mui-checked': { color: roleColors.CAREGIVER.primary },
+                    }} 
+                    tabIndex={-1} 
+                    disableRipple 
+                  />
+                </ListItemIcon>
+                <ListItemText 
+                  primaryTypographyProps={{ fontWeight: 600, color: '#1b5e20' }}
+                  primary={
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                      <span>{prescription.medication.name} {prescription.dosage}</span>
+                      {needsRefill && (
+                        <Chip 
+                          icon={<WarningIcon sx={{ fontSize: 14 }} />}
+                          label="Refill Needed" 
+                          size="small" 
+                          sx={{ 
+                            bgcolor: 'rgba(255, 152, 0, 0.2)',
+                            color: '#f57c00',
+                            fontWeight: 700,
+                            height: 20,
+                          }}
+                        />
+                      )}
+                    </Box>
+                  }
+                  secondary={`${getScheduledTime(prescription.frequency)} • ${prescription.refillsRemaining} refills left`}
+                  secondaryTypographyProps={{ color: 'rgba(27, 94, 32, 0.7)' }}
                 />
-              </ListItemIcon>
-              <ListItemText 
-                primaryTypographyProps={{ fontWeight: 600, color: '#1b5e20' }}
-                primary={`${med.name} ${med.dose}`}
-                secondary={med.time}
-                secondaryTypographyProps={{ color: 'rgba(27, 94, 32, 0.7)' }}
-              />
-            </ListItem>
-            {index < medications.length - 1 && <Divider variant="inset" component="li" sx={{ ml: '56px', bgcolor: 'rgba(76, 175, 80, 0.1)' }} />}
-          </div>
-        ))}
+              </ListItem>
+              {index < prescriptions.length - 1 && <Divider variant="inset" component="li" sx={{ ml: '56px', bgcolor: 'rgba(76, 175, 80, 0.1)' }} />}
+            </div>
+          );
+        })}
       </List>
+      {prescriptions.length === 0 && (
+        <Typography variant="body2" sx={{ textAlign: 'center', color: 'rgba(27, 94, 32, 0.6)', py: 3 }}>
+          No active prescriptions
+        </Typography>
+      )}
     </Box>
   );
 };

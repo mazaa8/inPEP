@@ -11,8 +11,11 @@ const allFeatures = [
   { id: 'champion-corner', title: 'Champion Corner', description: 'Check out the latest caregiver stories.', path: '/champion-corner' },
   { id: 'patient-monitor', title: 'Patient Monitor', description: "View patient's daily progress.", path: '/dashboard/caregiver', roles: ['Caregiver'] },
   { id: 'heredibles', title: 'Heredibles™', description: 'Access personalized meal plans.', path: '/caregiver/heredibles', roles: ['Caregiver'] },
-  { id: 'reclaime-champion', title: 'ReclaiMe Champion™', description: 'Explore exclusive resources.', path: '/reclaime', roles: ['Caregiver'] },
+  { id: 'pharmacy', title: 'Pharmacy', description: 'Manage medications and prescriptions.', path: '/caregiver/pharmacy', roles: ['Caregiver'] },
+  { id: 'appointments-billing', title: 'Appointments & Billing', description: 'Schedule appointments and manage bills.', path: '/caregiver/appointments-billing', roles: ['Caregiver'] },
+  { id: 'payment-methods', title: 'Payment Methods', description: 'Manage payment cards and accounts.', path: '/caregiver/payment-methods', roles: ['Caregiver'] },
   { id: 'grocery-list', title: 'Grocery List', description: 'Manage your grocery shopping list.', path: '/caregiver/grocery-list', roles: ['Caregiver'] },
+  { id: 'reclaime-champion', title: 'ReclaiMe Champion™', description: 'Explore exclusive resources.', path: '/reclaime', roles: ['Caregiver'] },
   { id: 'caregiver-support', title: 'Caregiver Support', description: 'Find resources and support.', path: '/caregiver-support', roles: ['Caregiver'] },
 ];
 

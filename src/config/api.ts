@@ -56,3 +56,23 @@ export const apiRequest = async <T>(
     throw error;
   }
 };
+
+// Default export for axios-like usage
+const api = {
+  get: <T>(endpoint: string) => apiRequest<T>(endpoint, { method: 'GET' }),
+  post: <T>(endpoint: string, data?: any) => apiRequest<T>(endpoint, { 
+    method: 'POST',
+    body: data ? JSON.stringify(data) : undefined,
+  }),
+  patch: <T>(endpoint: string, data?: any) => apiRequest<T>(endpoint, { 
+    method: 'PATCH',
+    body: data ? JSON.stringify(data) : undefined,
+  }),
+  put: <T>(endpoint: string, data?: any) => apiRequest<T>(endpoint, { 
+    method: 'PUT',
+    body: data ? JSON.stringify(data) : undefined,
+  }),
+  delete: <T>(endpoint: string) => apiRequest<T>(endpoint, { method: 'DELETE' }),
+};
+
+export default api;

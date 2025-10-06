@@ -6,6 +6,9 @@ import providerRoutes from './providerRoutes.js';
 import healthRoutes from './healthRoutes.js';
 import insurerRoutes from './insurerRoutes.js';
 import herediblesRoutes from './herediblesRoutes.js';
+import medicationRoutes from './medications.js';
+import prescriptionRoutes from './prescriptions.js';
+import medicationStockRoutes from './medicationStock.js';
 
 const router = Router();
 
@@ -26,5 +29,8 @@ router.use('/providers', providerRoutes);
 router.use('/health', healthRoutes);
 router.use('/insurer', insurerRoutes);
 router.use('/heredibles', herediblesRoutes);
+router.use('/medications', medicationRoutes);
+router.use('/prescriptions', prescriptionRoutes);
+router.use('/medication-stock', medicationStockRoutes);
 
 export default router;

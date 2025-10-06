@@ -289,7 +289,7 @@ const LandingPage = () => {
                 textShadow: '0 1px 2px rgba(0,0,0,0.2)'
               }}
             >
-              © 2025 Indigo International • Patient Journey Management • All Rights Reserved
+              © 2025 Indigo International • Caregiver-Patient Journey Management • All Rights Reserved
             </Typography>
           </Box>
         </Fade>
