@@ -377,6 +377,7 @@ const AppointmentsBillingPage = () => {
                         <Button 
                           variant="contained"
                           size="small"
+                          onClick={() => navigate('/caregiver/payment-methods')}
                           sx={{
                             mt: 1,
                             background: roleColors.CAREGIVER.gradient,

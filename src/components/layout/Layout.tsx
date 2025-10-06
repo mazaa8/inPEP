@@ -314,7 +314,7 @@ const Layout = ({ children, title, darkMode = false, themeColor }: LayoutProps) 
                       },
                     }}
                   >
-                    <ListItemIcon sx={{ color: currentTheme.secondary }}>
+                    <ListItemIcon sx={{ color: 'white' }}>
                       <VolunteerActivism />
                     </ListItemIcon>
                     <ListItemText primary="ReclaiMe™" primaryTypographyProps={{ fontWeight: 600 }} />
@@ -331,7 +331,7 @@ const Layout = ({ children, title, darkMode = false, themeColor }: LayoutProps) 
                       }} 
                       onClick={() => navigate('/profile')}
                     >
-                      <ListItemIcon sx={{ color: currentTheme.secondary }}>
+                      <ListItemIcon sx={{ color: 'white' }}>
                         <Person />
                       </ListItemIcon>
                       <ListItemText primary="Profile" />
@@ -346,7 +346,7 @@ const Layout = ({ children, title, darkMode = false, themeColor }: LayoutProps) 
                           }} 
                           onClick={() => navigate('/reclaime')}
                         >
-                          <ListItemIcon sx={{ color: currentTheme.secondary }}>
+                          <ListItemIcon sx={{ color: 'white' }}>
                             <WorkspacePremium />
                           </ListItemIcon>
                           <ListItemText primary="ReclaiMe Champion™" />
@@ -359,7 +359,7 @@ const Layout = ({ children, title, darkMode = false, themeColor }: LayoutProps) 
                           }} 
                           onClick={() => navigate('/champion-corner')}
                         >
-                          <ListItemIcon sx={{ color: currentTheme.secondary }}>
+                          <ListItemIcon sx={{ color: 'white' }}>
                             <MeetingRoom />
                           </ListItemIcon>
                           <ListItemText primary="Champion Corner" />
@@ -370,22 +370,9 @@ const Layout = ({ children, title, darkMode = false, themeColor }: LayoutProps) 
                             color: 'white',
                             '&:hover': { bgcolor: 'rgba(76, 175, 80, 0.15)' },
                           }} 
-                          onClick={() => navigate('/caregiver/appointments-billing')}
-                        >
-                          <ListItemIcon sx={{ color: currentTheme.secondary }}>
-                            <EventNote />
-                          </ListItemIcon>
-                          <ListItemText primary="Appointments & Billing" />
-                        </ListItemButton>
-                        <ListItemButton 
-                          sx={{ 
-                            pl: 4,
-                            color: 'white',
-                            '&:hover': { bgcolor: 'rgba(76, 175, 80, 0.15)' },
-                          }} 
                           onClick={() => navigate('/caregiver-support')}
                         >
-                          <ListItemIcon sx={{ color: currentTheme.secondary }}>
+                          <ListItemIcon sx={{ color: 'white' }}>
                             <SupportAgent />
                           </ListItemIcon>
                           <ListItemText primary="Caregiver Support" />
@@ -422,11 +409,20 @@ const Layout = ({ children, title, darkMode = false, themeColor }: LayoutProps) 
             ) : (
               <>
                 <ListItem disablePadding>
-                  <ListItemButton onClick={handleDashboardClick} sx={{ ...(darkMode && { color: 'white', '&:hover': { bgcolor: 'rgba(33, 150, 243, 0.1)' } }) }}>
-                    <ListItemIcon sx={{ color: darkMode ? currentTheme.secondary : 'primary.main' }}>
+                  <ListItemButton 
+                    onClick={handleDashboardClick} 
+                    sx={{ 
+                      ...(darkMode && { color: 'white', '&:hover': { bgcolor: 'rgba(33, 150, 243, 0.1)' } }),
+                      ...(user?.role === 'CAREGIVER' && { '&:hover': { bgcolor: 'rgba(76, 175, 80, 0.2)' } })
+                    }}
+                  >
+                    <ListItemIcon sx={{ color: user?.role === 'CAREGIVER' ? 'white' : (darkMode ? currentTheme.secondary : 'primary.main') }}>
                       <Dashboard />
                     </ListItemIcon>
-                    <ListItemText primary="Patient Hub" />
+                    <ListItemText 
+                      primary={user?.role === 'CAREGIVER' ? "Patient Records" : "Patient Hub"} 
+                      primaryTypographyProps={user?.role === 'CAREGIVER' ? { fontWeight: 600 } : undefined}
+                    />
                     {dashboardOpen ? <ExpandLess sx={{ color: darkMode ? 'white' : 'inherit' }} /> : <ExpandMore sx={{ color: darkMode ? 'white' : 'inherit' }} />}
                   </ListItemButton>
                 </ListItem>
@@ -470,7 +466,7 @@ const Layout = ({ children, title, darkMode = false, themeColor }: LayoutProps) 
                           }} 
                           onClick={() => navigate('/dashboard/caregiver')}
                         >
-                          <ListItemIcon sx={{ color: currentTheme.secondary }}>
+                          <ListItemIcon sx={{ color: 'white' }}>
                             <MonitorHeart />
                           </ListItemIcon>
                           <ListItemText primary="Patient Monitor" />
@@ -481,9 +477,22 @@ const Layout = ({ children, title, darkMode = false, themeColor }: LayoutProps) 
                             color: 'white',
                             '&:hover': { bgcolor: 'rgba(76, 175, 80, 0.15)' },
                           }} 
+                          onClick={() => navigate('/caregiver/appointments-billing')}
+                        >
+                          <ListItemIcon sx={{ color: 'white' }}>
+                            <EventNote />
+                          </ListItemIcon>
+                          <ListItemText primary="Appointments & Billing" />
+                        </ListItemButton>
+                        <ListItemButton 
+                          sx={{ 
+                            pl: 4,
+                            color: 'white',
+                            '&:hover': { bgcolor: 'rgba(76, 175, 80, 0.15)' },
+                          }} 
                           onClick={() => navigate('/caregiver/payment-methods')}
                         >
-                          <ListItemIcon sx={{ color: currentTheme.secondary }}>
+                          <ListItemIcon sx={{ color: 'white' }}>
                             <CreditCard />
                           </ListItemIcon>
                           <ListItemText primary="Payment Methods" />
@@ -496,7 +505,7 @@ const Layout = ({ children, title, darkMode = false, themeColor }: LayoutProps) 
                           }} 
                           onClick={() => navigate('/patient-support')}
                         >
-                          <ListItemIcon sx={{ color: currentTheme.secondary }}>
+                          <ListItemIcon sx={{ color: 'white' }}>
                             <SupportAgent />
                           </ListItemIcon>
                           <ListItemText primary="Patient Support" />
@@ -509,36 +518,10 @@ const Layout = ({ children, title, darkMode = false, themeColor }: LayoutProps) 
                           }} 
                           onClick={() => navigate('/caregiver/pharmacy')}
                         >
-                          <ListItemIcon sx={{ color: currentTheme.secondary }}>
+                          <ListItemIcon sx={{ color: 'white' }}>
                             <LocalPharmacy />
                           </ListItemIcon>
                           <ListItemText primary="Pharmacy" />
-                        </ListItemButton>
-                        <ListItemButton 
-                          sx={{ 
-                            pl: 4,
-                            color: 'white',
-                            '&:hover': { bgcolor: 'rgba(76, 175, 80, 0.15)' },
-                          }} 
-                          onClick={() => navigate('/caregiver/heredibles')}
-                        >
-                          <ListItemIcon sx={{ color: currentTheme.secondary }}>
-                            <RestaurantMenu />
-                          </ListItemIcon>
-                          <ListItemText primary="Heredibles™" />
-                        </ListItemButton>
-                        <ListItemButton 
-                          sx={{ 
-                            pl: 4,
-                            color: 'white',
-                            '&:hover': { bgcolor: 'rgba(76, 175, 80, 0.15)' },
-                          }} 
-                          onClick={() => navigate('/caregiver/grocery-list')}
-                        >
-                          <ListItemIcon sx={{ color: currentTheme.secondary }}>
-                            <ShoppingCart />
-                          </ListItemIcon>
-                          <ListItemText primary="Grocery List" />
                         </ListItemButton>
                       </>
                     )}
@@ -559,7 +542,7 @@ const Layout = ({ children, title, darkMode = false, themeColor }: LayoutProps) 
                       },
                     }}
                   >
-                    <ListItemIcon sx={{ color: currentTheme.secondary }}>
+                    <ListItemIcon sx={{ color: 'white' }}>
                       <EventNote />
                     </ListItemIcon>
                     <ListItemText primary="Care Planning" primaryTypographyProps={{ fontWeight: 600 }} />
@@ -576,7 +559,7 @@ const Layout = ({ children, title, darkMode = false, themeColor }: LayoutProps) 
                       }} 
                       onClick={() => navigate('/care-planning')}
                     >
-                      <ListItemIcon sx={{ color: currentTheme.secondary }}>
+                      <ListItemIcon sx={{ color: 'white' }}>
                         <AllInclusive />
                       </ListItemIcon>
                       <ListItemText primary="Wellness Plan" />
@@ -589,7 +572,7 @@ const Layout = ({ children, title, darkMode = false, themeColor }: LayoutProps) 
                       }} 
                       onClick={() => navigate('/caregiver/heredibles')}
                     > 
-                      <ListItemIcon sx={{ color: currentTheme.secondary }}>
+                      <ListItemIcon sx={{ color: 'white' }}>
                         <RestaurantMenu />
                       </ListItemIcon>
                       <ListItemText primary="Heredibles™" />
@@ -602,7 +585,7 @@ const Layout = ({ children, title, darkMode = false, themeColor }: LayoutProps) 
                       }} 
                       onClick={() => navigate('/caregiver/grocery-list')}
                     >
-                      <ListItemIcon sx={{ color: currentTheme.secondary }}>
+                      <ListItemIcon sx={{ color: 'white' }}>
                         <ShoppingCart />
                       </ListItemIcon>
                       <ListItemText primary="Grocery List" />
@@ -615,23 +598,10 @@ const Layout = ({ children, title, darkMode = false, themeColor }: LayoutProps) 
                       }} 
                       onClick={() => navigate('/caregiver/medication-schedule')}
                     >
-                      <ListItemIcon sx={{ color: currentTheme.secondary }}>
+                      <ListItemIcon sx={{ color: 'white' }}>
                         <ScheduleIcon />
                       </ListItemIcon>
                       <ListItemText primary="Medication Scheduler" />
-                    </ListItemButton>
-                    <ListItemButton 
-                      sx={{ 
-                        pl: 4,
-                        color: 'white',
-                        '&:hover': { bgcolor: 'rgba(76, 175, 80, 0.15)' },
-                      }} 
-                      onClick={() => navigate('/caregiver/appointments-billing')}
-                    >
-                      <ListItemIcon sx={{ color: currentTheme.secondary }}>
-                        <EventNote />
-                      </ListItemIcon>
-                      <ListItemText primary="Appointments & Billing" />
                     </ListItemButton>
                   </List>
                 </Collapse>
