@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
-import { Typography, Box, Grid, Tabs, Tab, Chip, Button, Avatar, CircularProgress, Card, CardContent } from '@mui/material';
-import { CalendarMonth as CalendarIcon, Receipt as BillingIcon, Payment as PaymentIcon, CheckCircle as PaidIcon, Schedule as PendingIcon } from '@mui/icons-material';
+import { Typography, Box, Grid, Tabs, Tab, Chip, Button, Avatar, CircularProgress, Card, CardContent, Checkbox, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
+import { CalendarMonth as CalendarIcon, Receipt as BillingIcon, Payment as PaymentIcon, CheckCircle as PaidIcon, Schedule as PendingIcon, Download as DownloadIcon, Merge as MergeIcon } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import Layout from '../../../components/layout/Layout';
 import { appointmentService, type Appointment } from '../../../services/appointmentService';
 import { roleColors } from '../../../styles/glassmorphism';
+import jsPDF from 'jspdf';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -27,6 +28,8 @@ const AppointmentsBillingPage = () => {
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [loading, setLoading] = useState(true);
   const patientId = 'b805ec90-e553-4de7-9de0-45f2eb73d1ba'; // Abdeen White
+  const [selectedInvoices, setSelectedInvoices] = useState<number[]>([]);
+  const [consolidateDialogOpen, setConsolidateDialogOpen] = useState(false);
 
   useEffect(() => {
     fetchAppointments();
@@ -70,6 +73,121 @@ const AppointmentsBillingPage = () => {
 
   const totalPending = billingData.filter(b => b.status === 'pending').reduce((sum, b) => sum + b.amount, 0);
   const totalPaid = billingData.filter(b => b.status === 'paid').reduce((sum, b) => sum + b.amount, 0);
+
+  const handleSelectInvoice = (id: number) => {
+    setSelectedInvoices(prev => 
+      prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]
+    );
+  };
+
+  const handleDownloadPDF = (invoiceIds: number[]) => {
+    const invoices = billingData.filter(b => invoiceIds.includes(b.id));
+    const doc = new jsPDF();
+    
+    // Header
+    doc.setFontSize(20);
+    doc.setTextColor(27, 94, 32);
+    doc.text('inPEP Healthcare', 105, 20, { align: 'center' });
+    
+    doc.setFontSize(16);
+    doc.text(invoices.length > 1 ? 'Consolidated Invoice' : 'Invoice', 105, 30, { align: 'center' });
+    
+    // Date
+    doc.setFontSize(10);
+    doc.setTextColor(100);
+    doc.text(`Generated: ${new Date().toLocaleDateString()}`, 105, 38, { align: 'center' });
+    
+    let yPosition = 50;
+    
+    // Patient Info
+    doc.setFontSize(12);
+    doc.setTextColor(0);
+    doc.text('Bill To:', 20, yPosition);
+    yPosition += 7;
+    doc.setFontSize(10);
+    doc.text('Nora White (Caregiver)', 20, yPosition);
+    yPosition += 5;
+    doc.text('Patient: Abdeen White', 20, yPosition);
+    yPosition += 15;
+    
+    // Invoice Details
+    doc.setFontSize(12);
+    doc.setTextColor(27, 94, 32);
+    doc.text('Invoice Details', 20, yPosition);
+    yPosition += 10;
+    
+    // Table Header
+    doc.setFillColor(76, 175, 80);
+    doc.rect(20, yPosition - 5, 170, 8, 'F');
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(10);
+    doc.text('Date', 25, yPosition);
+    doc.text('Service', 55, yPosition);
+    doc.text('Provider', 110, yPosition);
+    doc.text('Amount', 165, yPosition);
+    yPosition += 10;
+    
+    // Invoice Items
+    doc.setTextColor(0);
+    let total = 0;
+    invoices.forEach((invoice, index) => {
+      if (yPosition > 270) {
+        doc.addPage();
+        yPosition = 20;
+      }
+      
+      // Alternate row colors
+      if (index % 2 === 0) {
+        doc.setFillColor(240, 248, 241);
+        doc.rect(20, yPosition - 5, 170, 8, 'F');
+      }
+      
+      doc.text(formatDate(invoice.date), 25, yPosition);
+      doc.text(invoice.service.substring(0, 25), 55, yPosition);
+      doc.text(invoice.provider.substring(0, 20), 110, yPosition);
+      doc.text(`$${invoice.amount.toFixed(2)}`, 165, yPosition);
+      total += invoice.amount;
+      yPosition += 10;
+    });
+    
+    // Total
+    yPosition += 5;
+    doc.setDrawColor(76, 175, 80);
+    doc.line(20, yPosition, 190, yPosition);
+    yPosition += 10;
+    doc.setFontSize(12);
+    doc.setTextColor(27, 94, 32);
+    doc.text('Total Amount:', 130, yPosition);
+    doc.text(`$${total.toFixed(2)}`, 165, yPosition);
+    
+    // Footer
+    yPosition += 20;
+    doc.setFontSize(9);
+    doc.setTextColor(100);
+    doc.text('Thank you for using inPEP Healthcare Services', 105, yPosition, { align: 'center' });
+    doc.text('For questions, contact: support@inpep.com', 105, yPosition + 5, { align: 'center' });
+    
+    // Save PDF
+    const fileName = invoices.length > 1 
+      ? `inPEP_Consolidated_Invoice_${new Date().toISOString().split('T')[0]}.pdf`
+      : `inPEP_Invoice_${invoices[0].id}_${new Date().toISOString().split('T')[0]}.pdf`;
+    
+    doc.save(fileName);
+  };
+
+  const handleConsolidateInvoices = () => {
+    if (selectedInvoices.length < 2) {
+      alert('Please select at least 2 invoices to consolidate');
+      return;
+    }
+    setConsolidateDialogOpen(true);
+  };
+
+  const confirmConsolidate = () => {
+    handleDownloadPDF(selectedInvoices);
+    setConsolidateDialogOpen(false);
+    setSelectedInvoices([]);
+  };
 
   return (
     <Box sx={{ 
@@ -288,10 +406,10 @@ const AppointmentsBillingPage = () => {
                 boxShadow: '0 4px 20px rgba(255, 152, 0, 0.1)',
               }}>
                 <CardContent>
-                  <Typography variant="caption" sx={{ color: '#e65100', fontWeight: 700 }}>
+                  <Typography variant="caption" sx={{ color: '#FF0000', fontWeight: 700 }}>
                     PENDING PAYMENT
                   </Typography>
-                  <Typography variant="h4" sx={{ fontWeight: 700, color: '#f57c00', mt: 1 }}>
+                  <Typography variant="h4" sx={{ fontWeight: 700, color: '#FF0000', mt: 1 }}>
                     ${totalPending.toFixed(2)}
                   </Typography>
                 </CardContent>
@@ -318,6 +436,49 @@ const AppointmentsBillingPage = () => {
             </Grid>
           </Grid>
 
+          {/* Action Buttons */}
+          {selectedInvoices.length > 0 && (
+            <Box sx={{ mb: 3, display: 'flex', gap: 2, flexWrap: 'wrap' }}>
+              <Button
+                variant="contained"
+                startIcon={<DownloadIcon />}
+                onClick={() => handleDownloadPDF(selectedInvoices)}
+                sx={{
+                  background: roleColors.CAREGIVER.gradient,
+                  color: 'white',
+                  fontWeight: 700,
+                }}
+              >
+                Download {selectedInvoices.length} Invoice{selectedInvoices.length > 1 ? 's' : ''}
+              </Button>
+              {selectedInvoices.length > 1 && (
+                <Button
+                  variant="outlined"
+                  startIcon={<MergeIcon />}
+                  onClick={handleConsolidateInvoices}
+                  sx={{
+                    borderColor: roleColors.CAREGIVER.primary,
+                    color: roleColors.CAREGIVER.primary,
+                    fontWeight: 700,
+                    '&:hover': {
+                      borderColor: roleColors.CAREGIVER.primary,
+                      bgcolor: 'rgba(76, 175, 80, 0.05)',
+                    },
+                  }}
+                >
+                  Consolidate Invoices
+                </Button>
+              )}
+              <Button
+                variant="text"
+                onClick={() => setSelectedInvoices([])}
+                sx={{ color: 'rgba(27, 94, 32, 0.7)' }}
+              >
+                Clear Selection
+              </Button>
+            </Box>
+          )}
+
           {/* Billing Items */}
           <Grid container spacing={3}>
             {billingData.map((bill) => (
@@ -337,7 +498,17 @@ const AppointmentsBillingPage = () => {
                   },
                 }}>
                   <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                    <Box sx={{ display: 'flex', gap: 2, flex: 1 }}>
+                    <Box sx={{ display: 'flex', gap: 2, flex: 1, alignItems: 'flex-start' }}>
+                      <Checkbox
+                        checked={selectedInvoices.includes(bill.id)}
+                        onChange={() => handleSelectInvoice(bill.id)}
+                        sx={{
+                          color: roleColors.CAREGIVER.primary,
+                          '&.Mui-checked': {
+                            color: roleColors.CAREGIVER.primary,
+                          },
+                        }}
+                      />
                       <Avatar sx={{ 
                         bgcolor: bill.status === 'paid' ? roleColors.CAREGIVER.primary : '#ff9800',
                         width: 56, 
@@ -369,25 +540,43 @@ const AppointmentsBillingPage = () => {
                         </Typography>
                       </Box>
                     </Box>
-                    <Box sx={{ textAlign: 'right' }}>
+                    <Box sx={{ textAlign: 'right', display: 'flex', flexDirection: 'column', gap: 1 }}>
                       <Typography variant="h5" sx={{ fontWeight: 700, color: '#1b5e20' }}>
                         ${bill.amount.toFixed(2)}
                       </Typography>
-                      {bill.status === 'pending' && (
+                      <Box sx={{ display: 'flex', gap: 1, justifyContent: 'flex-end' }}>
                         <Button 
-                          variant="contained"
+                          variant="outlined"
                           size="small"
-                          onClick={() => navigate('/caregiver/payment-methods')}
+                          startIcon={<DownloadIcon />}
+                          onClick={() => handleDownloadPDF([bill.id])}
                           sx={{
-                            mt: 1,
-                            background: roleColors.CAREGIVER.gradient,
-                            color: 'white',
-                            fontWeight: 700,
+                            borderColor: roleColors.CAREGIVER.primary,
+                            color: roleColors.CAREGIVER.primary,
+                            fontWeight: 600,
+                            '&:hover': {
+                              borderColor: roleColors.CAREGIVER.primary,
+                              bgcolor: 'rgba(76, 175, 80, 0.05)',
+                            },
                           }}
                         >
-                          Pay Now
+                          PDF
                         </Button>
-                      )}
+                        {bill.status === 'pending' && (
+                          <Button 
+                            variant="contained"
+                            size="small"
+                            onClick={() => navigate('/caregiver/payment-methods')}
+                            sx={{
+                              background: roleColors.CAREGIVER.gradient,
+                              color: 'white',
+                              fontWeight: 700,
+                            }}
+                          >
+                            Pay Now
+                          </Button>
+                        )}
+                      </Box>
                     </Box>
                   </Box>
                 </Box>
@@ -395,6 +584,48 @@ const AppointmentsBillingPage = () => {
             ))}
           </Grid>
         </TabPanel>
+
+        {/* Consolidate Dialog */}
+        <Dialog open={consolidateDialogOpen} onClose={() => setConsolidateDialogOpen(false)} maxWidth="sm" fullWidth>
+          <DialogTitle sx={{ fontWeight: 700, color: '#1b5e20' }}>
+            Consolidate Invoices
+          </DialogTitle>
+          <DialogContent>
+            <Typography variant="body1" sx={{ mb: 2 }}>
+              You are about to consolidate {selectedInvoices.length} invoices into a single PDF document.
+            </Typography>
+            <Box sx={{ bgcolor: 'rgba(76, 175, 80, 0.1)', p: 2, borderRadius: 2 }}>
+              <Typography variant="body2" sx={{ fontWeight: 600, mb: 1, color: '#1b5e20' }}>
+                Selected Invoices:
+              </Typography>
+              {billingData.filter(b => selectedInvoices.includes(b.id)).map(bill => (
+                <Typography key={bill.id} variant="body2" sx={{ color: 'rgba(27, 94, 32, 0.8)', ml: 2 }}>
+                  • {bill.service} - ${bill.amount.toFixed(2)} ({formatDate(bill.date)})
+                </Typography>
+              ))}
+              <Typography variant="h6" sx={{ fontWeight: 700, color: '#1b5e20', mt: 2 }}>
+                Total: ${billingData.filter(b => selectedInvoices.includes(b.id)).reduce((sum, b) => sum + b.amount, 0).toFixed(2)}
+              </Typography>
+            </Box>
+          </DialogContent>
+          <DialogActions sx={{ p: 3 }}>
+            <Button onClick={() => setConsolidateDialogOpen(false)}>
+              Cancel
+            </Button>
+            <Button 
+              variant="contained"
+              startIcon={<DownloadIcon />}
+              onClick={confirmConsolidate}
+              sx={{
+                background: roleColors.CAREGIVER.gradient,
+                color: 'white',
+                fontWeight: 700,
+              }}
+            >
+              Download Consolidated PDF
+            </Button>
+          </DialogActions>
+        </Dialog>
       </Layout>
     </Box>
   );
