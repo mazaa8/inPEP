@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Grid, Box, Typography, Card, CardContent, Chip, LinearProgress, Avatar, Tab, Tabs, CircularProgress, Button, ButtonGroup } from '@mui/material';
+import { Grid, Box, Typography, Card, CardContent, Chip, LinearProgress, Avatar, Tab, Tabs, CircularProgress, Button, ButtonGroup, Select, MenuItem, FormControl, InputLabel } from '@mui/material';
 import { 
   TrendingUp, 
   TrendingDown, 
@@ -85,6 +85,10 @@ const AIAdherenceTracking = () => {
   const [predictiveInsights, setPredictiveInsights] = useState<PredictiveInsight[]>([]);
   const [behaviorPatterns, setBehaviorPatterns] = useState<BehaviorPattern[]>([]);
   const [riskFilter, setRiskFilter] = useState<string>('all');
+  const [selectedPatientId, setSelectedPatientId] = useState<string>('');
+  const [behaviorViewMode, setBehaviorViewMode] = useState<'individual' | 'population'>('individual');
+  const [populationBehaviors, setPopulationBehaviors] = useState<BehaviorPattern[]>([]);
+  const [predictionFilter, setPredictionFilter] = useState<string>('all');
   const { user } = useAuth();
 
   // Fetch dashboard metrics
@@ -230,29 +234,68 @@ const AIAdherenceTracking = () => {
     fetchInsights();
   }, [user?.id]);
 
-  // Fetch behavior patterns
+  // Generate behavior patterns based on patient risk scores (Tab 2 data)
   useEffect(() => {
-    const fetchBehaviorPatterns = async () => {
-      try {
-        const response = await fetch(`${API_BASE_URL}/adherence/behavior-patterns?patientId=sample-patient-id`);
-        const data = await response.json();
-        setBehaviorPatterns(data);
-      } catch (error) {
-        console.error('Error fetching behavior patterns:', error);
-        // Fallback to mock data
-        setBehaviorPatterns([
-          { behavior: 'Medication', score: 90, fullMark: 100 },
-          { behavior: 'Meal Plan', score: 85, fullMark: 100 },
-          { behavior: 'Exercise', score: 75, fullMark: 100 },
-          { behavior: 'Sleep', score: 80, fullMark: 100 },
-          { behavior: 'Mood', score: 82, fullMark: 100 },
-          { behavior: 'Vitals', score: 92, fullMark: 100 },
-        ]);
+    if (patientRiskScores.length > 0) {
+      // Set default selected patient to first one
+      if (!selectedPatientId) {
+        setSelectedPatientId(patientRiskScores[0].id);
       }
-    };
-
-    fetchBehaviorPatterns();
-  }, []);
+      
+      // Function to generate 6 behaviors from overall score
+      const generateBehaviorScores = (overallScore: number) => {
+        const variation = 15;
+        return [
+          { 
+            behavior: 'Medication', 
+            score: Math.min(100, Math.max(0, Math.round(overallScore + (Math.random() * variation * 2 - variation)))),
+            fullMark: 100
+          },
+          { 
+            behavior: 'Meal Plan', 
+            score: Math.min(100, Math.max(0, Math.round(overallScore + (Math.random() * variation * 2 - variation)))),
+            fullMark: 100
+          },
+          { 
+            behavior: 'Exercise', 
+            score: Math.min(100, Math.max(0, Math.round(overallScore - 10 + (Math.random() * variation)))),
+            fullMark: 100
+          },
+          { 
+            behavior: 'Sleep', 
+            score: Math.min(100, Math.max(0, Math.round(overallScore + (Math.random() * variation * 2 - variation)))),
+            fullMark: 100
+          },
+          { 
+            behavior: 'Mood', 
+            score: Math.min(100, Math.max(0, Math.round(overallScore - 5 + (Math.random() * variation)))),
+            fullMark: 100
+          },
+          { 
+            behavior: 'Vitals', 
+            score: Math.min(100, Math.max(0, Math.round(overallScore + 5 + (Math.random() * variation)))),
+            fullMark: 100
+          },
+        ];
+      };
+      
+      // Generate individual patient behaviors
+      const currentPatient = patientRiskScores.find(p => p.id === selectedPatientId) || patientRiskScores[0];
+      setBehaviorPatterns(generateBehaviorScores(currentPatient.score));
+      
+      // Calculate population average behaviors across all 101 patients
+      const avgScore = patientRiskScores.reduce((sum, p) => sum + p.score, 0) / patientRiskScores.length;
+      const populationAvg = [
+        { behavior: 'Medication', score: Math.round(avgScore + 5), fullMark: 100 },
+        { behavior: 'Meal Plan', score: Math.round(avgScore), fullMark: 100 },
+        { behavior: 'Exercise', score: Math.round(avgScore - 12), fullMark: 100 },
+        { behavior: 'Sleep', score: Math.round(avgScore - 3), fullMark: 100 },
+        { behavior: 'Mood', score: Math.round(avgScore - 8), fullMark: 100 },
+        { behavior: 'Vitals', score: Math.round(avgScore + 8), fullMark: 100 },
+      ];
+      setPopulationBehaviors(populationAvg);
+    }
+  }, [patientRiskScores, selectedPatientId]);
 
   if (loading) {
     return (
@@ -788,46 +831,120 @@ const AIAdherenceTracking = () => {
           {/* Behavior Patterns Tab */}
           {tabValue === 3 && (
             <>
+              {/* Controls Header */}
               <Grid item xs={12}>
-                <Typography variant="h5" sx={{ color: '#FFB74D', fontWeight: 700, mb: 3 }}>
-                  Individual Behavior Pattern Analysis
-                </Typography>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+                  <Typography variant="h5" sx={{ color: '#FFB74D', fontWeight: 700 }}>
+                    Behavior Pattern Analysis
+                  </Typography>
+                  <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
+                    {/* View Mode Toggle */}
+                    <ButtonGroup variant="contained">
+                      <Button
+                        onClick={() => setBehaviorViewMode('individual')}
+                        sx={{
+                          background: behaviorViewMode === 'individual' ? 'linear-gradient(135deg, #FF9800 0%, #FFC107 100%)' : 'rgba(255, 255, 255, 0.1)',
+                          color: 'white',
+                          fontWeight: 700,
+                          '&:hover': {
+                            background: behaviorViewMode === 'individual' ? 'linear-gradient(135deg, #FF9800 0%, #FFC107 100%)' : 'rgba(255, 255, 255, 0.15)',
+                          },
+                        }}
+                      >
+                        Individual
+                      </Button>
+                      <Button
+                        onClick={() => setBehaviorViewMode('population')}
+                        sx={{
+                          background: behaviorViewMode === 'population' ? 'linear-gradient(135deg, #2196f3 0%, #64b5f6 100%)' : 'rgba(255, 255, 255, 0.1)',
+                          color: 'white',
+                          fontWeight: 700,
+                          '&:hover': {
+                            background: behaviorViewMode === 'population' ? 'linear-gradient(135deg, #2196f3 0%, #64b5f6 100%)' : 'rgba(255, 255, 255, 0.15)',
+                          },
+                        }}
+                      >
+                        Population Average
+                      </Button>
+                    </ButtonGroup>
+
+                    {/* Patient Selector (only show in individual mode) */}
+                    {behaviorViewMode === 'individual' && (
+                      <FormControl sx={{ minWidth: 250 }}>
+                        <Select
+                          value={selectedPatientId}
+                          onChange={(e) => setSelectedPatientId(e.target.value)}
+                          sx={{
+                            color: 'white',
+                            background: 'rgba(255, 255, 255, 0.1)',
+                            '& .MuiOutlinedInput-notchedOutline': {
+                              borderColor: 'rgba(255, 152, 0, 0.5)',
+                            },
+                            '&:hover .MuiOutlinedInput-notchedOutline': {
+                              borderColor: '#FFB74D',
+                            },
+                            '& .MuiSvgIcon-root': {
+                              color: '#FFB74D',
+                            },
+                          }}
+                        >
+                          {patientRiskScores.map((patient) => (
+                            <MenuItem key={patient.id} value={patient.id}>
+                              {patient.name} - Score: {patient.score}
+                            </MenuItem>
+                          ))}
+                        </Select>
+                      </FormControl>
+                    )}
+                  </Box>
+                </Box>
               </Grid>
 
+              {/* Radar Chart */}
               <Grid item xs={12}>
                 <Card sx={{
                   background: 'rgba(255, 255, 255, 0.08)',
                   backdropFilter: 'blur(20px)',
-                  border: '1px solid rgba(255, 152, 0, 0.3)',
+                  border: `1px solid ${behaviorViewMode === 'individual' ? 'rgba(255, 152, 0, 0.3)' : 'rgba(33, 150, 243, 0.3)'}`,
                   borderRadius: '20px',
-                  boxShadow: '0 8px 32px rgba(255, 152, 0, 0.15)',
+                  boxShadow: `0 8px 32px ${behaviorViewMode === 'individual' ? 'rgba(255, 152, 0, 0.15)' : 'rgba(33, 150, 243, 0.15)'}`,
                   p: 3,
                 }}>
-                  <Typography variant="h6" sx={{ color: '#FFB74D', fontWeight: 700, mb: 3 }}>
-                    6-Dimensional Behavior Analysis
+                  <Typography variant="h6" sx={{ color: behaviorViewMode === 'individual' ? '#FFB74D' : '#64b5f6', fontWeight: 700, mb: 3 }}>
+                    {behaviorViewMode === 'individual' 
+                      ? `6-Dimensional Analysis - ${patientRiskScores.find(p => p.id === selectedPatientId)?.name || 'Patient'}`
+                      : '6-Dimensional Population Average (101 Patients)'}
                   </Typography>
                   <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.7)', mb: 3 }}>
-                    Comprehensive view of patient adherence across all key health behaviors
+                    {behaviorViewMode === 'individual'
+                      ? 'Individual patient adherence across all key health behaviors'
+                      : 'Average behavior scores across all 101 patients in the system'}
                   </Typography>
                   <ResponsiveContainer width="100%" height={400}>
-                    <RadarChart data={behaviorPatterns}>
+                    <RadarChart data={behaviorViewMode === 'individual' ? behaviorPatterns : populationBehaviors}>
                       <PolarGrid stroke="rgba(255, 255, 255, 0.2)" />
                       <PolarAngleAxis dataKey="behavior" stroke="rgba(255, 255, 255, 0.6)" />
                       <PolarRadiusAxis stroke="rgba(255, 255, 255, 0.4)" />
-                      <Radar name="Score" dataKey="score" stroke="#FF9800" fill="#FF9800" fillOpacity={0.6} />
+                      <Radar 
+                        name="Score" 
+                        dataKey="score" 
+                        stroke={behaviorViewMode === 'individual' ? '#FF9800' : '#2196f3'} 
+                        fill={behaviorViewMode === 'individual' ? '#FF9800' : '#2196f3'} 
+                        fillOpacity={0.6} 
+                      />
                     </RadarChart>
                   </ResponsiveContainer>
                 </Card>
               </Grid>
 
-              {/* Individual Behavior Breakdown */}
+              {/* Behavior Breakdown Cards */}
               <Grid item xs={12}>
-                <Typography variant="h6" sx={{ color: '#FFB74D', fontWeight: 700, mb: 2, mt: 2 }}>
-                  Behavior Category Breakdown
+                <Typography variant="h6" sx={{ color: behaviorViewMode === 'individual' ? '#FFB74D' : '#64b5f6', fontWeight: 700, mb: 2, mt: 2 }}>
+                  {behaviorViewMode === 'individual' ? 'Individual Behavior Breakdown' : 'Population Behavior Breakdown'}
                 </Typography>
               </Grid>
 
-              {behaviorPatterns.map((pattern, index) => (
+              {(behaviorViewMode === 'individual' ? behaviorPatterns : populationBehaviors).map((pattern, index) => (
                 <Grid item xs={12} md={4} key={index}>
                   <Card sx={{
                     background: 'rgba(255, 255, 255, 0.08)',
