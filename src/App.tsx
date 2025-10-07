@@ -19,6 +19,7 @@ import ProviderAppointmentsPage from './pages/provider/ProviderAppointmentsPage'
 import ProviderDirectoryPage from './pages/provider/ProviderDirectoryPage';
 import AIAdherenceTracking from './pages/provider/AIAdherenceTracking';
 import EMRIntegrationPage from './pages/provider/EMRIntegrationPage';
+import CaregiverEngagementPage from './pages/provider/CaregiverEngagementPage';
 import AnalyticsPage from './pages/dashboards/AnalyticsPage';
 import InsurerDashboard from './pages/dashboards/InsurerDashboard';
 import InsurerMessagesPage from './pages/insurer/InsurerMessagesPage';
@@ -94,6 +95,7 @@ function App() {
               <Route path="/welcome-home/provider" element={<WelcomeHomeProvider />} />
               <Route path="/dashboard/provider" element={<ProviderDashboard />} />
               <Route path="/provider/ai-adherence" element={<AIAdherenceTracking />} />
+              <Route path="/provider/caregiver-engagement" element={<CaregiverEngagementPage />} />
               <Route path="/provider/emr-integration" element={<EMRIntegrationPage />} />
               <Route path="/dashboard/analytics" element={<AnalyticsPage />} />
               <Route path="/provider/messages" element={<ProviderMessagesPage />} />
