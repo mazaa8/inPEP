@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Grid, Box, Typography, Card, CardContent, Chip, LinearProgress, Avatar, Tab, Tabs, CircularProgress, Button, ButtonGroup, Select, MenuItem, FormControl, InputLabel } from '@mui/material';
+import ComprehensiveReport from '../../components/reports/ComprehensiveReport';
 import { 
   TrendingUp, 
   TrendingDown, 
@@ -93,6 +94,7 @@ const AIAdherenceTracking = () => {
   const [behaviorViewMode, setBehaviorViewMode] = useState<'individual' | 'population'>('individual');
   const [populationBehaviors, setPopulationBehaviors] = useState<BehaviorPattern[]>([]);
   const [predictionFilter, setPredictionFilter] = useState<string>('all');
+  const [reportOpen, setReportOpen] = useState(false);
   const { user } = useAuth();
 
   // Fetch dashboard metrics
@@ -1168,9 +1170,32 @@ const AIAdherenceTracking = () => {
           {tabValue === 4 && (
             <>
               <Grid item xs={12}>
-                <Typography variant="h5" sx={{ color: '#FFB74D', fontWeight: 700, mb: 3 }}>
-                  Population-Level Analytics & Outcomes
-                </Typography>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+                  <Typography variant="h5" sx={{ color: '#FFB74D', fontWeight: 700 }}>
+                    Population-Level Analytics & Outcomes
+                  </Typography>
+                  <Button
+                    variant="contained"
+                    onClick={() => setReportOpen(true)}
+                    sx={{
+                      background: 'linear-gradient(135deg, #2196f3 0%, #64b5f6 100%)',
+                      color: 'white',
+                      fontWeight: 700,
+                      fontSize: '1rem',
+                      px: 4,
+                      py: 1.5,
+                      boxShadow: '0 8px 24px rgba(33, 150, 243, 0.4)',
+                      '&:hover': {
+                        background: 'linear-gradient(135deg, #1976d2 0%, #42a5f5 100%)',
+                        boxShadow: '0 12px 32px rgba(33, 150, 243, 0.6)',
+                        transform: 'translateY(-2px)',
+                      },
+                      transition: 'all 0.3s ease',
+                    }}
+                  >
+                    📊 Generate Comprehensive Report
+                  </Button>
+                </Box>
               </Grid>
 
               {/* Post-Discharge Recovery Metrics */}
@@ -1362,6 +1387,9 @@ const AIAdherenceTracking = () => {
           )}
         </Grid>
       </Layout>
+
+      {/* Comprehensive Report Modal */}
+      <ComprehensiveReport open={reportOpen} onClose={() => setReportOpen(false)} />
     </Box>
   );
 };
