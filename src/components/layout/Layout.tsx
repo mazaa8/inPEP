@@ -301,14 +301,6 @@ const Layout = ({ children, title, darkMode = false, themeColor }: LayoutProps) 
                     <ListItemText primary="Provider Directory" />
                   </ListItemButton>
                 </ListItem>
-                <ListItem disablePadding>
-                  <ListItemButton onClick={() => navigate('/dashboard/analytics')}>
-                    <ListItemIcon>
-                      <AnalyticsIcon />
-                    </ListItemIcon>
-                    <ListItemText primary="Analytics" />
-                  </ListItemButton>
-                </ListItem>
               </>
             )}
             {user?.role === 'CAREGIVER' && (

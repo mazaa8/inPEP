@@ -13,6 +13,10 @@ import {
 import { 
   AreaChart,
   Area,
+  BarChart,
+  Bar,
+  LineChart,
+  Line,
   XAxis, 
   YAxis, 
   CartesianGrid, 
@@ -28,7 +32,7 @@ import {
 import Layout from '../../components/layout/Layout';
 import { useAuth } from '../../context/AuthContext';
 
-const API_BASE_URL = 'http://localhost:3001/api';
+const API_BASE_URL = 'http://localhost:3000/api';
 
 interface DashboardMetrics {
   overallScore: number;
@@ -331,6 +335,7 @@ const AIAdherenceTracking = () => {
             <Tab label="Predictive Analytics" />
             <Tab label="Patient Risk Scores" />
             <Tab label="Behavior Patterns" />
+            <Tab label="Population Analytics" />
           </Tabs>
         </Box>
 
@@ -674,6 +679,294 @@ const AIAdherenceTracking = () => {
                 </Card>
               ))}
             </Grid>
+          )}
+
+          {/* Behavior Patterns Tab */}
+          {tabValue === 3 && (
+            <>
+              <Grid item xs={12}>
+                <Typography variant="h5" sx={{ color: '#FFB74D', fontWeight: 700, mb: 3 }}>
+                  Individual Behavior Pattern Analysis
+                </Typography>
+              </Grid>
+
+              <Grid item xs={12}>
+                <Card sx={{
+                  background: 'rgba(255, 255, 255, 0.08)',
+                  backdropFilter: 'blur(20px)',
+                  border: '1px solid rgba(255, 152, 0, 0.3)',
+                  borderRadius: '20px',
+                  boxShadow: '0 8px 32px rgba(255, 152, 0, 0.15)',
+                  p: 3,
+                }}>
+                  <Typography variant="h6" sx={{ color: '#FFB74D', fontWeight: 700, mb: 3 }}>
+                    6-Dimensional Behavior Analysis
+                  </Typography>
+                  <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.7)', mb: 3 }}>
+                    Comprehensive view of patient adherence across all key health behaviors
+                  </Typography>
+                  <ResponsiveContainer width="100%" height={400}>
+                    <RadarChart data={behaviorPatterns}>
+                      <PolarGrid stroke="rgba(255, 255, 255, 0.2)" />
+                      <PolarAngleAxis dataKey="behavior" stroke="rgba(255, 255, 255, 0.6)" />
+                      <PolarRadiusAxis stroke="rgba(255, 255, 255, 0.4)" />
+                      <Radar name="Score" dataKey="score" stroke="#FF9800" fill="#FF9800" fillOpacity={0.6} />
+                    </RadarChart>
+                  </ResponsiveContainer>
+                </Card>
+              </Grid>
+
+              {/* Individual Behavior Breakdown */}
+              <Grid item xs={12}>
+                <Typography variant="h6" sx={{ color: '#FFB74D', fontWeight: 700, mb: 2, mt: 2 }}>
+                  Behavior Category Breakdown
+                </Typography>
+              </Grid>
+
+              {behaviorPatterns.map((pattern, index) => (
+                <Grid item xs={12} md={4} key={index}>
+                  <Card sx={{
+                    background: 'rgba(255, 255, 255, 0.08)',
+                    backdropFilter: 'blur(20px)',
+                    border: '1px solid rgba(255, 152, 0, 0.3)',
+                    borderRadius: '20px',
+                    boxShadow: '0 8px 32px rgba(255, 152, 0, 0.15)',
+                    p: 3,
+                    transition: 'all 0.3s ease',
+                    '&:hover': {
+                      transform: 'translateY(-4px)',
+                      boxShadow: '0 12px 40px rgba(255, 152, 0, 0.25)',
+                    },
+                  }}>
+                    <Typography variant="h6" sx={{ color: '#FFB74D', fontWeight: 700, mb: 2 }}>
+                      {pattern.behavior}
+                    </Typography>
+                    <Box sx={{ display: 'flex', alignItems: 'baseline', gap: 1, mb: 2 }}>
+                      <Typography variant="h3" sx={{ color: pattern.score >= 80 ? '#4caf50' : pattern.score >= 60 ? '#ff9800' : '#f44336', fontWeight: 700 }}>
+                        {pattern.score}
+                      </Typography>
+                      <Typography variant="h6" sx={{ color: 'rgba(255, 255, 255, 0.6)' }}>
+                        / 100
+                      </Typography>
+                    </Box>
+                    <LinearProgress 
+                      variant="determinate" 
+                      value={pattern.score} 
+                      sx={{
+                        height: 8,
+                        borderRadius: 4,
+                        backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                        '& .MuiLinearProgress-bar': {
+                          background: pattern.score >= 80 
+                            ? 'linear-gradient(90deg, #4caf50 0%, #8bc34a 100%)'
+                            : pattern.score >= 60
+                            ? 'linear-gradient(90deg, #ff9800 0%, #ffc107 100%)'
+                            : 'linear-gradient(90deg, #f44336 0%, #ff5252 100%)',
+                          borderRadius: 4,
+                        },
+                      }}
+                    />
+                  </Card>
+                </Grid>
+              ))}
+            </>
+          )}
+
+          {/* Population Analytics Tab */}
+          {tabValue === 4 && (
+            <>
+              <Grid item xs={12}>
+                <Typography variant="h5" sx={{ color: '#FFB74D', fontWeight: 700, mb: 3 }}>
+                  Population-Level Analytics & Outcomes
+                </Typography>
+              </Grid>
+
+              {/* Post-Discharge Recovery Metrics */}
+              <Grid item xs={12} md={6}>
+                <Card sx={{
+                  background: 'rgba(255, 255, 255, 0.08)',
+                  backdropFilter: 'blur(20px)',
+                  border: '1px solid rgba(255, 152, 0, 0.3)',
+                  borderRadius: '20px',
+                  boxShadow: '0 8px 32px rgba(255, 152, 0, 0.15)',
+                  p: 3,
+                }}>
+                  <Typography variant="h6" sx={{ color: '#FFB74D', fontWeight: 700, mb: 3 }}>
+                    Post-Discharge Recovery Metrics
+                  </Typography>
+                  <ResponsiveContainer width="100%" height={300}>
+                    <BarChart data={[
+                      { name: 'Week 1', progress: 65 },
+                      { name: 'Week 2', progress: 70 },
+                      { name: 'Week 3', progress: 78 },
+                      { name: 'Week 4', progress: 85 },
+                    ]}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="rgba(255, 255, 255, 0.1)" />
+                      <XAxis dataKey="name" stroke="rgba(255, 255, 255, 0.6)" />
+                      <YAxis stroke="rgba(255, 255, 255, 0.6)" />
+                      <Tooltip 
+                        contentStyle={{ 
+                          backgroundColor: 'rgba(0, 0, 0, 0.8)', 
+                          border: '1px solid rgba(255, 152, 0, 0.3)',
+                          borderRadius: '8px',
+                        }}
+                      />
+                      <Legend />
+                      <Bar dataKey="progress" fill="#FF9800" />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </Card>
+              </Grid>
+
+              {/* Readmission Trends */}
+              <Grid item xs={12} md={6}>
+                <Card sx={{
+                  background: 'rgba(255, 255, 255, 0.08)',
+                  backdropFilter: 'blur(20px)',
+                  border: '1px solid rgba(255, 152, 0, 0.3)',
+                  borderRadius: '20px',
+                  boxShadow: '0 8px 32px rgba(255, 152, 0, 0.15)',
+                  p: 3,
+                }}>
+                  <Typography variant="h6" sx={{ color: '#FFB74D', fontWeight: 700, mb: 3 }}>
+                    Readmission Trends
+                  </Typography>
+                  <ResponsiveContainer width="100%" height={300}>
+                    <LineChart data={[
+                      { month: 'Jan', rate: 5.2 },
+                      { month: 'Feb', rate: 4.8 },
+                      { month: 'Mar', rate: 4.9 },
+                      { month: 'Apr', rate: 4.5 },
+                      { month: 'May', rate: 4.2 },
+                      { month: 'Jun', rate: 3.9 },
+                    ]}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="rgba(255, 255, 255, 0.1)" />
+                      <XAxis dataKey="month" stroke="rgba(255, 255, 255, 0.6)" />
+                      <YAxis stroke="rgba(255, 255, 255, 0.6)" />
+                      <Tooltip 
+                        contentStyle={{ 
+                          backgroundColor: 'rgba(0, 0, 0, 0.8)', 
+                          border: '1px solid rgba(255, 152, 0, 0.3)',
+                          borderRadius: '8px',
+                        }}
+                      />
+                      <Legend />
+                      <Line type="monotone" dataKey="rate" stroke="#4caf50" strokeWidth={3} />
+                    </LineChart>
+                  </ResponsiveContainer>
+                </Card>
+              </Grid>
+
+              {/* Patient Satisfaction */}
+              <Grid item xs={12} md={6}>
+                <Card sx={{
+                  background: 'rgba(255, 255, 255, 0.08)',
+                  backdropFilter: 'blur(20px)',
+                  border: '1px solid rgba(255, 152, 0, 0.3)',
+                  borderRadius: '20px',
+                  boxShadow: '0 8px 32px rgba(255, 152, 0, 0.15)',
+                  p: 3,
+                }}>
+                  <Typography variant="h6" sx={{ color: '#FFB74D', fontWeight: 700, mb: 3 }}>
+                    Patient Satisfaction
+                  </Typography>
+                  <ResponsiveContainer width="100%" height={300}>
+                    <RadarChart data={[
+                      { subject: 'Communication', A: 85, fullMark: 100 },
+                      { subject: 'Care Quality', A: 90, fullMark: 100 },
+                      { subject: 'Education', A: 75, fullMark: 100 },
+                      { subject: 'Responsiveness', A: 80, fullMark: 100 },
+                      { subject: 'Overall', A: 88, fullMark: 100 },
+                    ]}>
+                      <PolarGrid stroke="rgba(255, 255, 255, 0.2)" />
+                      <PolarAngleAxis dataKey="subject" stroke="rgba(255, 255, 255, 0.6)" />
+                      <PolarRadiusAxis stroke="rgba(255, 255, 255, 0.4)" />
+                      <Radar name="Satisfaction" dataKey="A" stroke="#2196f3" fill="#2196f3" fillOpacity={0.6} />
+                    </RadarChart>
+                  </ResponsiveContainer>
+                </Card>
+              </Grid>
+
+              {/* Caregiver Effectiveness */}
+              <Grid item xs={12} md={6}>
+                <Card sx={{
+                  background: 'rgba(255, 255, 255, 0.08)',
+                  backdropFilter: 'blur(20px)',
+                  border: '1px solid rgba(255, 152, 0, 0.3)',
+                  borderRadius: '20px',
+                  boxShadow: '0 8px 32px rgba(255, 152, 0, 0.15)',
+                  p: 3,
+                }}>
+                  <Typography variant="h6" sx={{ color: '#FFB74D', fontWeight: 700, mb: 3 }}>
+                    Caregiver Effectiveness
+                  </Typography>
+                  <ResponsiveContainer width="100%" height={300}>
+                    <BarChart layout="vertical" data={[
+                      { name: 'Adherence', score: 92 },
+                      { name: 'Engagement', score: 88 },
+                      { name: 'Reported Stress', score: 75 },
+                      { name: 'Task Completion', score: 95 },
+                    ]}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="rgba(255, 255, 255, 0.1)" />
+                      <XAxis type="number" stroke="rgba(255, 255, 255, 0.6)" />
+                      <YAxis dataKey="name" type="category" width={120} stroke="rgba(255, 255, 255, 0.6)" />
+                      <Tooltip 
+                        contentStyle={{ 
+                          backgroundColor: 'rgba(0, 0, 0, 0.8)', 
+                          border: '1px solid rgba(255, 152, 0, 0.3)',
+                          borderRadius: '8px',
+                        }}
+                      />
+                      <Legend />
+                      <Bar dataKey="score" fill="#FFC107" />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </Card>
+              </Grid>
+
+              {/* Predictive Forecasts */}
+              <Grid item xs={12}>
+                <Typography variant="h6" sx={{ color: '#FFB74D', fontWeight: 700, mb: 2, mt: 2 }}>
+                  Predictive Forecasts
+                </Typography>
+              </Grid>
+
+              <Grid item xs={12} md={6}>
+                <Card sx={{
+                  background: 'linear-gradient(135deg, rgba(33, 150, 243, 0.15) 0%, rgba(33, 150, 243, 0.05) 100%)',
+                  backdropFilter: 'blur(20px)',
+                  border: '1px solid rgba(33, 150, 243, 0.4)',
+                  borderRadius: '20px',
+                  boxShadow: '0 8px 32px rgba(33, 150, 243, 0.2)',
+                  p: 3,
+                }}>
+                  <Typography variant="h6" sx={{ color: '#2196f3', fontWeight: 700, mb: 2 }}>
+                    Predictive Readmission Risk
+                  </Typography>
+                  <Typography variant="body1" sx={{ color: 'rgba(255, 255, 255, 0.9)', lineHeight: 1.8 }}>
+                    Based on current trends, the aggregate readmission risk for the patient cohort is projected to decrease by <strong style={{ color: '#4caf50' }}>5%</strong> over the next quarter.
+                  </Typography>
+                </Card>
+              </Grid>
+
+              <Grid item xs={12} md={6}>
+                <Card sx={{
+                  background: 'linear-gradient(135deg, rgba(76, 175, 80, 0.15) 0%, rgba(76, 175, 80, 0.05) 100%)',
+                  backdropFilter: 'blur(20px)',
+                  border: '1px solid rgba(76, 175, 80, 0.4)',
+                  borderRadius: '20px',
+                  boxShadow: '0 8px 32px rgba(76, 175, 80, 0.2)',
+                  p: 3,
+                }}>
+                  <Typography variant="h6" sx={{ color: '#4caf50', fontWeight: 700, mb: 2 }}>
+                    Health Outcomes Forecast
+                  </Typography>
+                  <Typography variant="body1" sx={{ color: 'rgba(255, 255, 255, 0.9)', lineHeight: 1.8 }}>
+                    Patients adhering to their care plans are <strong style={{ color: '#4caf50' }}>20%</strong> more likely to report improved health outcomes within 30 days post-discharge.
+                  </Typography>
+                </Card>
+              </Grid>
+            </>
           )}
         </Grid>
       </Layout>

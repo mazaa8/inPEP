@@ -6,6 +6,7 @@ import routes from './routes/index.js';
 import { errorHandler } from './middleware/errorHandler.js';
 import prisma from './config/database.js';
 import { initializeVideoCallService } from './services/videoCallService.js';
+import { scheduleAggregation } from './services/adherenceAggregationService.js';
 
 const app = express();
 const httpServer = createServer(app);
@@ -48,6 +49,10 @@ const startServer = async () => {
     // Initialize video call service
     initializeVideoCallService(httpServer);
     console.log('✅ Video call service initialized');
+
+    // Start AI adherence tracking aggregation service
+    scheduleAggregation();
+    console.log('✅ AI Adherence Tracking service started (runs every 24 hours)');
 
     httpServer.listen(config.port, () => {
       console.log(`🚀 Server running on http://localhost:${config.port}`);
