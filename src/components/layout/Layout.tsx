@@ -23,6 +23,7 @@ import {
   AccountCircle,
   MessageOutlined as MessageIcon,
   CreditCardOutlined as CreditCard,
+  PsychologyOutlined as Psychology,
 } from '@mui/icons-material';
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -282,6 +283,14 @@ const Layout = ({ children, title, darkMode = false, themeColor }: LayoutProps) 
                       <Dashboard />
                     </ListItemIcon>
                     <ListItemText primary="Dashboard" />
+                  </ListItemButton>
+                </ListItem>
+                <ListItem disablePadding>
+                  <ListItemButton onClick={() => navigate('/provider/ai-adherence')}>
+                    <ListItemIcon>
+                      <Psychology />
+                    </ListItemIcon>
+                    <ListItemText primary="AI Adherence Tracking" />
                   </ListItemButton>
                 </ListItem>
                 <ListItem disablePadding>

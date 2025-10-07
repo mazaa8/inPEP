@@ -1,4 +1,4 @@
-import { Grid, Alert, Typography, Button } from '@mui/material';
+import { Grid, Alert, Typography, Button, Box } from '@mui/material';
 import DashboardCard from '../../components/dashboards/provider/DashboardCard';
 import { useEmergencyAlert } from '../../context/EmergencyAlertContext';
 import Layout from '../../components/layout/Layout';
@@ -21,8 +21,13 @@ const ProviderDashboard = () => {
   };
 
   return (
-    <Layout title="Provider Dashboard">
-      <Grid container spacing={3}>
+    <Box sx={{ 
+      minHeight: '100vh', 
+      background: 'linear-gradient(135deg, #0f1419 0%, #1a1f2e 30%, #2d1f1a 70%, #3d2a1f 100%)',
+      position: 'relative',
+    }}>
+      <Layout title="" darkMode={true} themeColor="PROVIDER">
+        <Grid container spacing={3}>
         {isEscalated && (
           <Grid item xs={12}>
             <Alert
@@ -32,10 +37,17 @@ const ProviderDashboard = () => {
                   ACKNOWLEDGE & DISMISS
                 </Button>
               }
-              sx={{ '.MuiAlert-message': { width: '100%' } }}
+              sx={{ 
+                '.MuiAlert-message': { width: '100%' },
+                background: 'rgba(211, 47, 47, 0.2)',
+                backdropFilter: 'blur(20px)',
+                border: '1px solid rgba(244, 67, 54, 0.5)',
+                color: '#fff',
+                '& .MuiAlert-icon': { color: '#ff5252' },
+              }}
             >
-              <Typography variant="h6">{getAlertTitle(alertLevel)}</Typography>
-              <Typography>Patient: <strong>{patientName} (ID: {patientId})</strong> requires immediate attention. This alert has been escalated by the caregiver.</Typography>
+              <Typography variant="h6" sx={{ color: '#fff' }}>{getAlertTitle(alertLevel)}</Typography>
+              <Typography sx={{ color: 'rgba(255, 255, 255, 0.9)' }}>Patient: <strong>{patientName} (ID: {patientId})</strong> requires immediate attention. This alert has been escalated by the caregiver.</Typography>
             </Alert>
           </Grid>
         )}
@@ -87,8 +99,9 @@ const ProviderDashboard = () => {
             </Grid>
           </Grid>
         </Grid>
-      </Grid>
-    </Layout>
+        </Grid>
+      </Layout>
+    </Box>
   );
 };
 

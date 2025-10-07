@@ -30,8 +30,18 @@ const PatientOverview = () => {
       {/* Active Patients Widget */}
       <Grid item xs={12} sm={6} md={3}>
         <DashboardCard title="Active Patients">
-          <Typography variant="h4" component="div" sx={{ flexGrow: 1, textAlign: 'center', alignSelf: 'center' }}>
+          <Typography variant="h3" component="div" sx={{ 
+            flexGrow: 1, 
+            textAlign: 'center', 
+            alignSelf: 'center',
+            color: '#FFA726',
+            fontWeight: 700,
+            mt: 2,
+          }}>
             {activePatients}
+          </Typography>
+          <Typography variant="body2" sx={{ textAlign: 'center', color: 'rgba(255, 255, 255, 0.6)', mt: 1 }}>
+            Under Your Care
           </Typography>
         </DashboardCard>
       </Grid>
