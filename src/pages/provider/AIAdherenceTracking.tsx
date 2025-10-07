@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Grid, Box, Typography, Card, CardContent, Chip, LinearProgress, Avatar, Tab, Tabs, CircularProgress } from '@mui/material';
+import { Grid, Box, Typography, Card, CardContent, Chip, LinearProgress, Avatar, Tab, Tabs, CircularProgress, Button, ButtonGroup } from '@mui/material';
 import { 
   TrendingUp, 
   TrendingDown, 
@@ -84,6 +84,7 @@ const AIAdherenceTracking = () => {
   const [patientRiskScores, setPatientRiskScores] = useState<PatientRisk[]>([]);
   const [predictiveInsights, setPredictiveInsights] = useState<PredictiveInsight[]>([]);
   const [behaviorPatterns, setBehaviorPatterns] = useState<BehaviorPattern[]>([]);
+  const [riskFilter, setRiskFilter] = useState<string>('all');
   const { user } = useAuth();
 
   // Fetch dashboard metrics
@@ -136,30 +137,59 @@ const AIAdherenceTracking = () => {
     fetchAdherenceTrends();
   }, []);
 
-  // Fetch patient risk scores
+  // For demo: Generate all 101 patients with realistic risk scores
   useEffect(() => {
-    const fetchRiskScores = async () => {
-      try {
-        const response = await fetch(`${API_BASE_URL}/adherence/risk-scores?providerId=${user?.id}`);
-        const data = await response.json();
-        setPatientRiskScores(data);
-      } catch (error) {
-        console.error('Error fetching risk scores:', error);
-        // Fallback to mock data
-        setPatientRiskScores([
-          { id: 'P001', name: 'Abdeen White', score: 85, risk: 'low', trend: 'up', adherence: 92 },
-          { id: 'P002', name: 'Sarah Johnson', score: 65, risk: 'medium', trend: 'down', adherence: 78 },
-          { id: 'P003', name: 'Michael Chen', score: 45, risk: 'high', trend: 'down', adherence: 62 },
-          { id: 'P004', name: 'Emma Davis', score: 90, risk: 'low', trend: 'stable', adherence: 95 },
-          { id: 'P005', name: 'James Wilson', score: 55, risk: 'high', trend: 'down', adherence: 68 },
-        ]);
-      } finally {
-        setLoading(false);
-      }
-    };
+    const patientNames = [
+      'Abdeen White', 'Jan Graham', 'Steven Cameron', 'Michelle Coleman', 'Victoria Black',
+      'Liam Randall', 'Joan Gibson', 'Jan Kerr', 'Anne Johnston', 'Stewart Ferguson',
+      'Dominic Campbell', 'Victoria Blake', 'Rebecca Gibson', 'Paul Davidson', 'Fiona Springer',
+      'Dorothy Lyman', 'Una Morgan', 'Max Grant', 'Virginia Skinner', 'Oliver Nash',
+      'Gavin Lawrence', 'Benjamin Wright', 'Madeleine Howard', 'Christian Miller', 'Angela Clarkson',
+      'Gavin Bell', 'Paul Langdon', 'Owen James', 'Samantha Russell', 'Robert Murray',
+      'Blake Alsop', 'Julia Burgess', 'Olivia Vance', 'James Dyer', 'Sophie Burgess',
+      'Piers Abraham', 'Kimberly Murray', 'Kimberly Henderson', 'Molly Parsons', 'Jan Cornish',
+      'Sonia Parsons', 'Michael Avery', 'Dorothy Grant', 'Felicity James', 'Kevin Bower',
+      'Virginia Rutherford', 'Sue Hill', 'Joseph Bond', 'Vanessa Russell', 'Jonathan Simpson',
+      'Evan Hunter', 'Zoe Morgan', 'Connor Nash', 'Claire Jackson', 'Christian Payne',
+      'Elizabeth Skinner', 'Irene Morgan', 'Natalie Marshall', 'Charles Cornish', 'William Abraham',
+      'Jennifer Hughes', 'Julian Vaughan', 'Richard Lyman', 'Liam North', 'Christian Young',
+      'Rose Campbell', 'Emma Hemmings', 'Neil Wilkins', 'Jack Sharp', 'Mary Wilkins',
+      'Tracey Clarkson', 'Connor James', 'Blake Slater', 'Joshua Dickens', 'Amelia Wallace',
+      'Carl Henderson', 'Alexandra Campbell', 'Donna Lambert', 'Dylan Grant', 'Evan Forsyth',
+      'James McDonald', 'Jonathan Hunter', 'Alison Underwood', 'Kimberly Turner', 'Emma Rutherford',
+      'Lisa Campbell', 'Robert Bower', 'Tim Young', 'Jennifer May', 'Karen Vaughan',
+      'Natalie Nash', 'Luke Taylor', 'Brandon Baker', 'Yvonne Blake', 'Tim Tucker',
+      'Julia Ogden', 'Sophie Rees', 'Brandon Butler', 'Tracey Graham', 'Harry King', 'Jacob Ince'
+    ];
 
-    fetchRiskScores();
-  }, [user?.id]);
+    const riskLevels = ['critical', 'high', 'high', 'medium', 'medium', 'medium', 'low', 'low', 'low', 'low'];
+    const trends = ['up', 'down', 'stable'];
+    
+    const all101Patients = patientNames.map((name, index) => {
+      const riskLevel = riskLevels[index % riskLevels.length];
+      let score = 50;
+      
+      // Assign scores based on risk level
+      if (riskLevel === 'critical') score = 35 + Math.floor(Math.random() * 15);
+      else if (riskLevel === 'high') score = 50 + Math.floor(Math.random() * 15);
+      else if (riskLevel === 'medium') score = 65 + Math.floor(Math.random() * 15);
+      else score = 80 + Math.floor(Math.random() * 20);
+      
+      const adherence = score + Math.floor(Math.random() * 10);
+      
+      return {
+        id: `P${String(index + 1).padStart(3, '0')}`,
+        name,
+        score,
+        risk: riskLevel,
+        trend: trends[index % trends.length],
+        adherence: Math.min(adherence, 100),
+      };
+    });
+    
+    setPatientRiskScores(all101Patients);
+    setLoading(false);
+  }, []);
 
   // Fetch predictive insights
   useEffect(() => {
@@ -591,11 +621,85 @@ const AIAdherenceTracking = () => {
 
           {/* Patient Risk Scores Tab */}
           {tabValue === 2 && (
-            <Grid item xs={12}>
-              <Typography variant="h5" sx={{ color: '#FFB74D', fontWeight: 700, mb: 3 }}>
-                Patient Risk Assessment
-              </Typography>
-              {patientRiskScores.map((patient) => (
+            <>
+              <Grid item xs={12}>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+                  <Typography variant="h5" sx={{ color: '#FFB74D', fontWeight: 700 }}>
+                    Patient Risk Assessment - Triage Dashboard
+                  </Typography>
+                  <ButtonGroup variant="contained" sx={{ boxShadow: '0 4px 16px rgba(255, 152, 0, 0.3)' }}>
+                    <Button
+                      onClick={() => setRiskFilter('all')}
+                      sx={{
+                        background: riskFilter === 'all' ? 'linear-gradient(135deg, #FF9800 0%, #FFC107 100%)' : 'rgba(255, 255, 255, 0.1)',
+                        color: 'white',
+                        fontWeight: 700,
+                        '&:hover': {
+                          background: riskFilter === 'all' ? 'linear-gradient(135deg, #FF9800 0%, #FFC107 100%)' : 'rgba(255, 255, 255, 0.15)',
+                        },
+                      }}
+                    >
+                      All ({patientRiskScores.length})
+                    </Button>
+                    <Button
+                      onClick={() => setRiskFilter('critical')}
+                      sx={{
+                        background: riskFilter === 'critical' ? '#f44336' : 'rgba(255, 255, 255, 0.1)',
+                        color: 'white',
+                        fontWeight: 700,
+                        '&:hover': {
+                          background: riskFilter === 'critical' ? '#f44336' : 'rgba(244, 67, 54, 0.3)',
+                        },
+                      }}
+                    >
+                      Critical ({patientRiskScores.filter(p => p.risk === 'critical').length})
+                    </Button>
+                    <Button
+                      onClick={() => setRiskFilter('high')}
+                      sx={{
+                        background: riskFilter === 'high' ? '#ff9800' : 'rgba(255, 255, 255, 0.1)',
+                        color: 'white',
+                        fontWeight: 700,
+                        '&:hover': {
+                          background: riskFilter === 'high' ? '#ff9800' : 'rgba(255, 152, 0, 0.3)',
+                        },
+                      }}
+                    >
+                      High ({patientRiskScores.filter(p => p.risk === 'high').length})
+                    </Button>
+                    <Button
+                      onClick={() => setRiskFilter('medium')}
+                      sx={{
+                        background: riskFilter === 'medium' ? '#ffc107' : 'rgba(255, 255, 255, 0.1)',
+                        color: 'white',
+                        fontWeight: 700,
+                        '&:hover': {
+                          background: riskFilter === 'medium' ? '#ffc107' : 'rgba(255, 193, 7, 0.3)',
+                        },
+                      }}
+                    >
+                      Medium ({patientRiskScores.filter(p => p.risk === 'medium').length})
+                    </Button>
+                    <Button
+                      onClick={() => setRiskFilter('low')}
+                      sx={{
+                        background: riskFilter === 'low' ? '#4caf50' : 'rgba(255, 255, 255, 0.1)',
+                        color: 'white',
+                        fontWeight: 700,
+                        '&:hover': {
+                          background: riskFilter === 'low' ? '#4caf50' : 'rgba(76, 175, 80, 0.3)',
+                        },
+                      }}
+                    >
+                      Low ({patientRiskScores.filter(p => p.risk === 'low').length})
+                    </Button>
+                  </ButtonGroup>
+                </Box>
+              </Grid>
+              
+              {patientRiskScores
+                .filter(patient => riskFilter === 'all' || patient.risk === riskFilter)
+                .map((patient) => (
                 <Card key={patient.id} sx={{
                   background: 'rgba(255, 255, 255, 0.08)',
                   backdropFilter: 'blur(20px)',
@@ -678,7 +782,7 @@ const AIAdherenceTracking = () => {
                   </Box>
                 </Card>
               ))}
-            </Grid>
+            </>
           )}
 
           {/* Behavior Patterns Tab */}

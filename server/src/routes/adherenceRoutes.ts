@@ -121,11 +121,16 @@ router.get('/risk-scores', async (req, res) => {
   try {
     const providerId = req.query.providerId as string;
     
-    // Get all patients for this provider
-    const patients = await prisma.patientProfile.findMany({
-      where: { primaryProviderId: providerId },
-      include: { user: true },
-    });
+    // Get all patients (for demo purposes, show all if no valid provider ID)
+    const patients = providerId && providerId !== 'provider-id' && providerId !== 'test'
+      ? await prisma.patientProfile.findMany({
+          where: { primaryProviderId: providerId },
+          include: { user: true },
+        })
+      : await prisma.patientProfile.findMany({
+          include: { user: true },
+          take: 101, // Get all 101 patients
+        });
     
     const patientIds = patients.map(p => p.id);
     

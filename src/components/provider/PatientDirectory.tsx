@@ -141,11 +141,12 @@ const PatientDirectory = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const navigate = useNavigate();
 
-  // Activate all 101 patients with realistic data
-  const patients: Patient[] = mockPatients.map(p => ({
+  // For demo: Activate all 101 patients with realistic risk levels
+  const riskLevels = ['critical', 'high', 'high', 'medium', 'medium', 'medium', 'low', 'low', 'low', 'low'];
+  const patients: Patient[] = mockPatients.map((p, index) => ({
     ...p,
     active: true,
-    riskLevel: Math.random() > 0.7 ? 'high' : Math.random() > 0.4 ? 'medium' : 'low',
+    riskLevel: riskLevels[index % riskLevels.length],
   }));
 
   const filteredPatients = patients.filter((patient) =>
