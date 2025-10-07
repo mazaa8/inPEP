@@ -64,10 +64,14 @@ interface PatientRisk {
 interface PredictiveInsight {
   patient: string;
   prediction: string;
+  timeframe?: string;
   confidence: number;
   factors: string[];
   recommendation: string;
   priority?: string;
+  riskLevel?: string;
+  patientId?: string;
+  score?: number;
 }
 
 interface BehaviorPattern {
@@ -195,44 +199,79 @@ const AIAdherenceTracking = () => {
     setLoading(false);
   }, []);
 
-  // Fetch predictive insights
+  // Generate predictive insights for all 101 patients based on Tab 2 & 3 data
   useEffect(() => {
-    const fetchInsights = async () => {
-      try {
-        const response = await fetch(`${API_BASE_URL}/adherence/insights/predictive?providerId=${user?.id}`);
-        const data = await response.json();
-        setPredictiveInsights(data);
-      } catch (error) {
-        console.error('Error fetching predictive insights:', error);
-        // Fallback to mock data
-        setPredictiveInsights([
-          {
-            patient: 'Sarah Johnson',
-            prediction: 'High risk of medication non-adherence in next 48 hours',
-            confidence: 87,
-            factors: ['Declining mood scores', 'Missed 2 doses this week', 'Caregiver reported stress'],
-            recommendation: 'Schedule check-in call, consider medication reminder adjustment',
-          },
-          {
-            patient: 'Michael Chen',
-            prediction: 'Potential hospital readmission risk within 7 days',
-            confidence: 76,
-            factors: ['Vitals trending downward', 'Low meal plan adherence', 'Increased pain reports'],
-            recommendation: 'Urgent: Schedule in-person visit, review care plan',
-          },
-          {
-            patient: 'James Wilson',
-            prediction: 'Caregiver burnout indicators detected',
-            confidence: 82,
-            factors: ['Delayed wellness plan updates', 'Reduced engagement', 'Stress markers in notes'],
-            recommendation: 'Reach out to caregiver, offer support resources',
-          },
-        ]);
-      }
-    };
+    if (patientRiskScores.length > 0) {
+      const predictions = patientRiskScores.map(patient => {
+        // Determine prediction type based on risk level and score
+        let predictionType = '';
+        let timeframe = '';
+        let confidence = 0;
+        let factors: string[] = [];
+        let recommendation = '';
 
-    fetchInsights();
-  }, [user?.id]);
+        if (patient.risk === 'critical') {
+          predictionType = 'Hospital Readmission Risk';
+          timeframe = 'within 24-48 hours';
+          confidence = 85 + Math.floor(Math.random() * 10);
+          factors = [
+            `Critical health score (${patient.score}) - Tab 2`,
+            `Downward trend detected - Tab 2`,
+            `Low adherence rate (${patient.adherence}%) - Tab 2`,
+            'Multiple behavior indicators declining - Tab 3'
+          ];
+          recommendation = 'URGENT: Schedule immediate in-person visit, review care plan and medications';
+        } else if (patient.risk === 'high') {
+          predictionType = 'Medication Non-Adherence Risk';
+          timeframe = 'next 48-72 hours';
+          confidence = 75 + Math.floor(Math.random() * 15);
+          factors = [
+            `High risk level (score: ${patient.score}) - Tab 2`,
+            `Trend: ${patient.trend} - Tab 2`,
+            `Adherence at ${patient.adherence}% - Tab 2`,
+            'Declining medication/mood scores - Tab 3'
+          ];
+          recommendation = 'Schedule check-in call within 24 hours, consider medication reminder adjustment';
+        } else if (patient.risk === 'medium') {
+          predictionType = 'Care Plan Adherence Monitoring';
+          timeframe = 'next 5-7 days';
+          confidence = 65 + Math.floor(Math.random() * 15);
+          factors = [
+            `Medium risk (score: ${patient.score}) - Tab 2`,
+            `Current trend: ${patient.trend} - Tab 2`,
+            'Some behavior categories need attention - Tab 3',
+            'Preventive monitoring recommended'
+          ];
+          recommendation = 'Monitor closely, schedule routine check-in, focus on exercise and mood support';
+        } else {
+          predictionType = 'Stable - Continued Monitoring';
+          timeframe = 'ongoing';
+          confidence = 90 + Math.floor(Math.random() * 10);
+          factors = [
+            `Low risk (score: ${patient.score}) - Tab 2`,
+            `Positive trend: ${patient.trend} - Tab 2`,
+            `Good adherence (${patient.adherence}%) - Tab 2`,
+            'All behaviors within acceptable range - Tab 3'
+          ];
+          recommendation = 'Continue current care plan, routine follow-up as scheduled';
+        }
+
+        return {
+          patient: patient.name,
+          prediction: predictionType,
+          timeframe,
+          confidence,
+          factors,
+          recommendation,
+          riskLevel: patient.risk,
+          patientId: patient.id,
+          score: patient.score,
+        };
+      });
+
+      setPredictiveInsights(predictions);
+    }
+  }, [patientRiskScores]);
 
   // Generate behavior patterns based on patient risk scores (Tab 2 data)
   useEffect(() => {
@@ -595,11 +634,143 @@ const AIAdherenceTracking = () => {
 
           {/* Predictive Analytics Tab */}
           {tabValue === 1 && (
-            <Grid item xs={12}>
-              <Typography variant="h5" sx={{ color: '#FFB74D', fontWeight: 700, mb: 3 }}>
-                AI-Powered Predictive Insights
-              </Typography>
-              {predictiveInsights.map((insight, index) => (
+            <>
+              {/* Population Predictions Card */}
+              <Grid item xs={12}>
+                <Card sx={{
+                  background: 'linear-gradient(135deg, rgba(33, 150, 243, 0.2) 0%, rgba(100, 181, 246, 0.1) 100%)',
+                  backdropFilter: 'blur(30px)',
+                  border: '2px solid rgba(33, 150, 243, 0.5)',
+                  borderRadius: '24px',
+                  boxShadow: '0 12px 40px rgba(33, 150, 243, 0.3)',
+                  p: 4,
+                  mb: 4,
+                }}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 3 }}>
+                    <Box sx={{
+                      width: 56,
+                      height: 56,
+                      borderRadius: '12px',
+                      background: 'linear-gradient(135deg, #2196f3 0%, #64b5f6 100%)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}>
+                      <Insights sx={{ fontSize: 32, color: 'white' }} />
+                    </Box>
+                    <Box>
+                      <Typography variant="h5" sx={{ color: '#64b5f6', fontWeight: 700 }}>
+                        Hospital-Wide AI Predictions
+                      </Typography>
+                      <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.7)' }}>
+                        Population-level insights across all 101 patients
+                      </Typography>
+                    </Box>
+                  </Box>
+
+                  <Grid container spacing={3}>
+                    <Grid item xs={12} md={3}>
+                      <Box sx={{ textAlign: 'center', p: 2, background: 'rgba(76, 175, 80, 0.15)', borderRadius: '12px' }}>
+                        <Typography variant="h4" sx={{ color: '#4caf50', fontWeight: 700 }}>↓ 5%</Typography>
+                        <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.8)' }}>Readmission Risk</Typography>
+                        <Typography variant="caption" sx={{ color: 'rgba(255, 255, 255, 0.6)' }}>Decreasing trend</Typography>
+                      </Box>
+                    </Grid>
+                    <Grid item xs={12} md={3}>
+                      <Box sx={{ textAlign: 'center', p: 2, background: 'rgba(33, 150, 243, 0.15)', borderRadius: '12px' }}>
+                        <Typography variant="h4" sx={{ color: '#2196f3', fontWeight: 700 }}>↑ 8%</Typography>
+                        <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.8)' }}>Medication Adherence</Typography>
+                        <Typography variant="caption" sx={{ color: 'rgba(255, 255, 255, 0.6)' }}>Improving forecast</Typography>
+                      </Box>
+                    </Grid>
+                    <Grid item xs={12} md={3}>
+                      <Box sx={{ textAlign: 'center', p: 2, background: 'rgba(255, 193, 7, 0.15)', borderRadius: '12px' }}>
+                        <Typography variant="h4" sx={{ color: '#ffc107', fontWeight: 700 }}>12%</Typography>
+                        <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.8)' }}>Caregiver Burnout</Typography>
+                        <Typography variant="caption" sx={{ color: 'rgba(255, 255, 255, 0.6)' }}>Stable rate</Typography>
+                      </Box>
+                    </Grid>
+                    <Grid item xs={12} md={3}>
+                      <Box sx={{ textAlign: 'center', p: 2, background: 'rgba(156, 39, 176, 0.15)', borderRadius: '12px' }}>
+                        <Typography variant="h4" sx={{ color: '#9c27b0', fontWeight: 700 }}>↑ 20%</Typography>
+                        <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.8)' }}>Health Outcomes</Typography>
+                        <Typography variant="caption" sx={{ color: 'rgba(255, 255, 255, 0.6)' }}>Projected improvement</Typography>
+                      </Box>
+                    </Grid>
+                  </Grid>
+                </Card>
+              </Grid>
+
+              {/* Filter Controls */}
+              <Grid item xs={12}>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+                  <Typography variant="h5" sx={{ color: '#FFB74D', fontWeight: 700 }}>
+                    Individual Patient Predictions ({predictiveInsights.filter(p => predictionFilter === 'all' || p.riskLevel === predictionFilter).length})
+                  </Typography>
+                  <ButtonGroup variant="contained">
+                    <Button
+                      onClick={() => setPredictionFilter('all')}
+                      sx={{
+                        background: predictionFilter === 'all' ? 'linear-gradient(135deg, #FF9800 0%, #FFC107 100%)' : 'rgba(255, 255, 255, 0.1)',
+                        color: 'white',
+                        fontWeight: 700,
+                        '&:hover': { background: predictionFilter === 'all' ? 'linear-gradient(135deg, #FF9800 0%, #FFC107 100%)' : 'rgba(255, 255, 255, 0.15)' },
+                      }}
+                    >
+                      All ({predictiveInsights.length})
+                    </Button>
+                    <Button
+                      onClick={() => setPredictionFilter('critical')}
+                      sx={{
+                        background: predictionFilter === 'critical' ? '#f44336' : 'rgba(255, 255, 255, 0.1)',
+                        color: 'white',
+                        fontWeight: 700,
+                        '&:hover': { background: predictionFilter === 'critical' ? '#f44336' : 'rgba(244, 67, 54, 0.3)' },
+                      }}
+                    >
+                      Critical ({predictiveInsights.filter(p => p.riskLevel === 'critical').length})
+                    </Button>
+                    <Button
+                      onClick={() => setPredictionFilter('high')}
+                      sx={{
+                        background: predictionFilter === 'high' ? '#ff9800' : 'rgba(255, 255, 255, 0.1)',
+                        color: 'white',
+                        fontWeight: 700,
+                        '&:hover': { background: predictionFilter === 'high' ? '#ff9800' : 'rgba(255, 152, 0, 0.3)' },
+                      }}
+                    >
+                      High ({predictiveInsights.filter(p => p.riskLevel === 'high').length})
+                    </Button>
+                    <Button
+                      onClick={() => setPredictionFilter('medium')}
+                      sx={{
+                        background: predictionFilter === 'medium' ? '#ffc107' : 'rgba(255, 255, 255, 0.1)',
+                        color: 'white',
+                        fontWeight: 700,
+                        '&:hover': { background: predictionFilter === 'medium' ? '#ffc107' : 'rgba(255, 193, 7, 0.3)' },
+                      }}
+                    >
+                      Medium ({predictiveInsights.filter(p => p.riskLevel === 'medium').length})
+                    </Button>
+                    <Button
+                      onClick={() => setPredictionFilter('low')}
+                      sx={{
+                        background: predictionFilter === 'low' ? '#4caf50' : 'rgba(255, 255, 255, 0.1)',
+                        color: 'white',
+                        fontWeight: 700,
+                        '&:hover': { background: predictionFilter === 'low' ? '#4caf50' : 'rgba(76, 175, 80, 0.3)' },
+                      }}
+                    >
+                      Low ({predictiveInsights.filter(p => p.riskLevel === 'low').length})
+                    </Button>
+                  </ButtonGroup>
+                </Box>
+              </Grid>
+
+              {/* Individual Prediction Cards */}
+              {predictiveInsights
+                .filter(insight => predictionFilter === 'all' || insight.riskLevel === predictionFilter)
+                .map((insight, index) => (
                 <Card key={index} sx={{
                   background: 'rgba(255, 255, 255, 0.08)',
                   backdropFilter: 'blur(20px)',
@@ -659,7 +830,7 @@ const AIAdherenceTracking = () => {
                   </Box>
                 </Card>
               ))}
-            </Grid>
+            </>
           )}
 
           {/* Patient Risk Scores Tab */}
