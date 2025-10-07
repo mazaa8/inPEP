@@ -3,6 +3,7 @@ import authRoutes from './authRoutes.js';
 import appointmentRoutes from './appointmentRoutes.js';
 import messageRoutes from './messageRoutes.js';
 import providerRoutes from './providerRoutes.js';
+import providerOverviewRoutes from './providerOverviewRoutes.js';
 import healthRoutes from './healthRoutes.js';
 import insurerRoutes from './insurerRoutes.js';
 import herediblesRoutes from './herediblesRoutes.js';
@@ -11,6 +12,7 @@ import prescriptionRoutes from './prescriptions.js';
 import medicationStockRoutes from './medicationStock.js';
 import adherenceRoutes from './adherenceRoutes.js';
 import emrRoutes from './emrRoutes.js';
+import admissionRoutes from './admissionRoutes.js';
 
 const router = Router();
 
@@ -28,6 +30,7 @@ router.use('/auth', authRoutes);
 router.use('/appointments', appointmentRoutes);
 router.use('/messages', messageRoutes);
 router.use('/providers', providerRoutes);
+router.use('/providers', providerOverviewRoutes);
 router.use('/health', healthRoutes);
 router.use('/insurer', insurerRoutes);
 router.use('/heredibles', herediblesRoutes);
@@ -36,5 +39,6 @@ router.use('/prescriptions', prescriptionRoutes);
 router.use('/medication-stock', medicationStockRoutes);
 router.use('/adherence', adherenceRoutes);
 router.use('/emr', emrRoutes);
+router.use('/admissions', admissionRoutes);
 
 export default router;

@@ -32,6 +32,20 @@ const CreateAppointmentModal = ({
 }: CreateAppointmentModalProps) => {
   const [providers, setProviders] = useState<Provider[]>([]);
   const [selectedProvider, setSelectedProvider] = useState<Provider | null>(null);
+  
+  // Common TextField styling
+  const textFieldSx = {
+    '& .MuiOutlinedInput-root': {
+      color: 'white',
+      bgcolor: 'rgba(255,255,255,0.05)',
+      '& fieldset': { borderColor: 'rgba(255, 152, 0, 0.3)' },
+      '&:hover fieldset': { borderColor: 'rgba(255, 152, 0, 0.5)' },
+      '&.Mui-focused fieldset': { borderColor: '#FFA726' },
+    },
+    '& .MuiInputLabel-root': { color: 'rgba(255, 255, 255, 0.7)' },
+    '& .MuiFormHelperText-root': { color: 'rgba(255, 255, 255, 0.5)' },
+  };
+  
   const [formData, setFormData] = useState({
     patientId: '',
     patientName: '',
@@ -146,9 +160,30 @@ const CreateAppointmentModal = ({
   };
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
-      <DialogTitle>Create New Appointment</DialogTitle>
-      <DialogContent>
+    <Dialog 
+      open={open} 
+      onClose={onClose} 
+      maxWidth="md" 
+      fullWidth
+      PaperProps={{
+        sx: {
+          background: 'linear-gradient(135deg, rgba(26, 26, 26, 0.98) 0%, rgba(45, 36, 22, 0.98) 100%)',
+          backdropFilter: 'blur(20px)',
+          border: '1px solid rgba(255, 152, 0, 0.3)',
+          borderRadius: '20px',
+        },
+      }}
+    >
+      <DialogTitle sx={{ 
+        color: '#FFB74D', 
+        fontWeight: 700, 
+        fontSize: '1.5rem',
+        borderBottom: '1px solid rgba(255, 152, 0, 0.2)',
+        pb: 2,
+      }}>
+        Create New Appointment
+      </DialogTitle>
+      <DialogContent sx={{ pt: 3 }}>
         <Grid container spacing={2} sx={{ mt: 1 }}>
           {error && (
             <Grid item xs={12}>
@@ -159,6 +194,13 @@ const CreateAppointmentModal = ({
                 InputProps={{ readOnly: true }}
                 variant="outlined"
                 size="small"
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    color: '#f44336',
+                    bgcolor: 'rgba(244, 67, 54, 0.1)',
+                    '& fieldset': { borderColor: '#f44336' },
+                  },
+                }}
               />
             </Grid>
           )}
@@ -180,6 +222,7 @@ const CreateAppointmentModal = ({
                   {...params}
                   label="Select Provider *"
                   placeholder="Search by name or specialty..."
+                  sx={textFieldSx}
                   InputProps={{
                     ...params.InputProps,
                     endAdornment: (
@@ -203,6 +246,7 @@ const CreateAppointmentModal = ({
               onChange={(e) => handleChange('patientId', e.target.value)}
               helperText="Use: b805ec90-e553-4de7-9de0-45f2eb73d1ba"
               size="small"
+              sx={textFieldSx}
             />
           </Grid>
 
@@ -214,6 +258,7 @@ const CreateAppointmentModal = ({
               onChange={(e) => handleChange('patientName', e.target.value)}
               helperText="Optional (auto-filled if empty)"
               size="small"
+              sx={textFieldSx}
             />
           </Grid>
 
@@ -226,6 +271,7 @@ const CreateAppointmentModal = ({
               onChange={(e) => handleChange('title', e.target.value)}
               placeholder="e.g., Annual Checkup"
               size="small"
+              sx={textFieldSx}
             />
           </Grid>
 
@@ -238,6 +284,7 @@ const CreateAppointmentModal = ({
               value={formData.description}
               onChange={(e) => handleChange('description', e.target.value)}
               size="small"
+              sx={textFieldSx}
             />
           </Grid>
 
@@ -249,6 +296,7 @@ const CreateAppointmentModal = ({
               onChange={(e) => handleChange('specialty', e.target.value)}
               placeholder="Auto-filled from provider"
               size="small"
+              sx={textFieldSx}
             />
           </Grid>
 
@@ -260,6 +308,7 @@ const CreateAppointmentModal = ({
               value={formData.appointmentType}
               onChange={(e) => handleChange('appointmentType', e.target.value)}
               size="small"
+              sx={textFieldSx}
             >
               <MenuItem value="Consultation">Consultation</MenuItem>
               <MenuItem value="Follow-up">Follow-up</MenuItem>
@@ -278,6 +327,7 @@ const CreateAppointmentModal = ({
               onChange={(e) => handleChange('startTime', e.target.value)}
               InputLabelProps={{ shrink: true }}
               size="small"
+              sx={textFieldSx}
             />
           </Grid>
 
@@ -291,6 +341,7 @@ const CreateAppointmentModal = ({
               onChange={(e) => handleChange('endTime', e.target.value)}
               InputLabelProps={{ shrink: true }}
               size="small"
+              sx={textFieldSx}
             />
           </Grid>
 
@@ -302,6 +353,7 @@ const CreateAppointmentModal = ({
               value={formData.duration}
               onChange={(e) => handleChange('duration', parseInt(e.target.value))}
               size="small"
+              sx={textFieldSx}
             />
           </Grid>
 
@@ -311,9 +363,14 @@ const CreateAppointmentModal = ({
                 <Checkbox
                   checked={formData.isVirtual}
                   onChange={(e) => handleChange('isVirtual', e.target.checked)}
+                  sx={{
+                    color: 'rgba(255, 152, 0, 0.5)',
+                    '&.Mui-checked': { color: '#FFA726' },
+                  }}
                 />
               }
               label="Virtual Appointment"
+              sx={{ '& .MuiFormControlLabel-label': { color: 'rgba(255,255,255,0.8)' } }}
             />
           </Grid>
 
@@ -326,6 +383,7 @@ const CreateAppointmentModal = ({
                 onChange={(e) => handleChange('location', e.target.value)}
                 placeholder="e.g., Main Hospital, Room 301"
                 size="small"
+                sx={textFieldSx}
               />
             </Grid>
           ) : (
@@ -337,6 +395,7 @@ const CreateAppointmentModal = ({
                 onChange={(e) => handleChange('meetingLink', e.target.value)}
                 placeholder="e.g., https://zoom.us/j/..."
                 size="small"
+                sx={textFieldSx}
               />
             </Grid>
           )}
@@ -350,20 +409,37 @@ const CreateAppointmentModal = ({
               value={formData.notes}
               onChange={(e) => handleChange('notes', e.target.value)}
               size="small"
+              sx={textFieldSx}
             />
           </Grid>
         </Grid>
       </DialogContent>
-      <DialogActions>
-        <Button onClick={onClose} disabled={loading}>
+      <DialogActions sx={{ p: 3, borderTop: '1px solid rgba(255, 152, 0, 0.2)' }}>
+        <Button 
+          onClick={onClose} 
+          disabled={loading}
+          sx={{ color: 'rgba(255,255,255,0.7)' }}
+        >
           Cancel
         </Button>
         <Button
           onClick={handleSubmit}
           variant="contained"
           disabled={loading || !selectedProvider}
+          sx={{
+            background: 'linear-gradient(135deg, #FF9800 0%, #FFC107 100%)',
+            color: 'white',
+            fontWeight: 600,
+            '&:hover': {
+              background: 'linear-gradient(135deg, #F57C00 0%, #FFA000 100%)',
+            },
+            '&:disabled': {
+              background: 'rgba(255,255,255,0.1)',
+              color: 'rgba(255,255,255,0.3)',
+            },
+          }}
         >
-          {loading ? <CircularProgress size={24} /> : 'Create Appointment'}
+          {loading ? <CircularProgress size={24} sx={{ color: 'white' }} /> : 'Create Appointment'}
         </Button>
       </DialogActions>
     </Dialog>

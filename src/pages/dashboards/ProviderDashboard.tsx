@@ -56,14 +56,14 @@ const ProviderDashboard = () => {
           <WelcomeMessage />
         </Grid>
 
-        {/* AI Intelligence Widget - NEW! */}
-        <Grid item xs={12}>
-          <AIIntelligenceWidget />
-        </Grid>
-
         {/* Quick Actions */}
         <Grid item xs={12}>
           <QuickActions />
+        </Grid>
+
+        {/* AI Intelligence Widget */}
+        <Grid item xs={12}>
+          <AIIntelligenceWidget />
         </Grid>
 
         {/* Patient Overview Widgets */}

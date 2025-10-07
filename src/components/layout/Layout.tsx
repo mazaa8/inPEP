@@ -86,6 +86,7 @@ const Layout = ({ children, title, darkMode = false, themeColor }: LayoutProps) 
   const [carePlanningOpen, setCarePlanningOpen] = useState(false);
   const [reclaiMeOpen, setReclaiMeOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const currentPath = window.location.pathname;
 
   // Determine theme colors
   const roleColors = {
@@ -164,7 +165,15 @@ const Layout = ({ children, title, darkMode = false, themeColor }: LayoutProps) 
     <Box sx={{ display: 'flex' }}>
       <AppBar position="fixed" sx={{ 
         zIndex: (theme) => theme.zIndex.drawer + 1,
-        ...(darkMode && {
+        ...(themeColor === 'PROVIDER' && {
+          background: 'linear-gradient(135deg, #FF9800 0%, #FFC107 100%)',
+          backdropFilter: 'blur(20px)',
+          WebkitBackdropFilter: 'blur(20px)',
+          borderBottom: '1px solid rgba(255, 193, 7, 0.3)',
+          boxShadow: '0 4px 20px rgba(255, 152, 0, 0.4)',
+          color: 'white',
+        }),
+        ...(darkMode && themeColor !== 'PROVIDER' && {
           background: 'rgba(15, 32, 39, 0.8)',
           backdropFilter: 'blur(20px)',
           WebkitBackdropFilter: 'blur(20px)',
@@ -215,27 +224,52 @@ const Layout = ({ children, title, darkMode = false, themeColor }: LayoutProps) 
           </Search>
           <Box sx={{ flexGrow: 1 }} />
           {user && (
-            <Box sx={{ display: 'flex', alignItems: 'center' }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
               <IconButton 
                 size="large" 
                 aria-label="show 17 new notifications" 
                 onClick={handleNotificationClick}
-                sx={{ color: 'white' }}
+                sx={{ 
+                  color: 'white',
+                  '&:hover': { 
+                    background: 'rgba(255, 255, 255, 0.1)',
+                    transform: 'scale(1.05)',
+                  },
+                  transition: 'all 0.2s ease',
+                }}
               >
                 <Badge badgeContent={17} color="error">
                   <NotificationsIcon sx={{ color: 'white' }} />
                 </Badge>
               </IconButton>
-              <IconButton
-                size="large"
-                edge="end"
-                aria-label="account of current user"
-                aria-haspopup="true"
-                onClick={handleProfileMenuOpen}
-                sx={{ color: 'white' }}
+              
+              <Box sx={{ 
+                display: 'flex', 
+                alignItems: 'center', 
+                gap: 1,
+                px: 2,
+                py: 0.5,
+                borderRadius: '12px',
+                background: 'rgba(255, 255, 255, 0.1)',
+                backdropFilter: 'blur(10px)',
+                cursor: 'pointer',
+                '&:hover': {
+                  background: 'rgba(255, 255, 255, 0.15)',
+                },
+                transition: 'all 0.2s ease',
+              }}
+              onClick={handleProfileMenuOpen}
               >
-                <AccountCircle sx={{ color: 'white' }} />
-              </IconButton>
+                <AccountCircle sx={{ color: 'white', fontSize: 32 }} />
+                <Box sx={{ display: { xs: 'none', md: 'block' } }}>
+                  <Typography variant="body2" sx={{ color: 'white', fontWeight: 600, lineHeight: 1.2 }}>
+                    {user.name || 'User'}
+                  </Typography>
+                  <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.8)', textTransform: 'capitalize' }}>
+                    {user.role?.toLowerCase() || 'User'}
+                  </Typography>
+                </Box>
+              </Box>
             </Box>
           )}
         </Toolbar>
@@ -249,7 +283,14 @@ const Layout = ({ children, title, darkMode = false, themeColor }: LayoutProps) 
           [`& .MuiDrawer-paper`]: { 
             width: drawerWidth, 
             boxSizing: 'border-box',
-            ...(darkMode && {
+            ...(themeColor === 'PROVIDER' && {
+              background: 'linear-gradient(180deg, rgba(26, 26, 26, 0.98) 0%, rgba(45, 36, 22, 0.98) 100%)',
+              backdropFilter: 'blur(20px)',
+              WebkitBackdropFilter: 'blur(20px)',
+              borderRight: '1px solid rgba(255, 152, 0, 0.3)',
+              color: 'white',
+            }),
+            ...(darkMode && themeColor !== 'PROVIDER' && {
               background: 'rgba(15, 32, 39, 0.95)',
               backdropFilter: 'blur(20px)',
               WebkitBackdropFilter: 'blur(20px)',
@@ -279,32 +320,104 @@ const Layout = ({ children, title, darkMode = false, themeColor }: LayoutProps) 
             {user?.role === 'PROVIDER' && (
               <>
                 <ListItem disablePadding>
-                  <ListItemButton onClick={() => navigate('/dashboard/provider')}>
-                    <ListItemIcon>
+                  <ListItemButton 
+                    onClick={() => navigate('/dashboard/provider')}
+                    selected={currentPath === '/dashboard/provider'}
+                    sx={{
+                      color: 'white',
+                      '&:hover': {
+                        bgcolor: 'rgba(255, 152, 0, 0.1)',
+                        borderLeft: '4px solid rgba(255, 152, 0, 0.5)',
+                      },
+                      '&.Mui-selected': {
+                        bgcolor: 'rgba(255, 152, 0, 0.2)',
+                        borderLeft: '4px solid #FFA726',
+                        '&:hover': {
+                          bgcolor: 'rgba(255, 152, 0, 0.25)',
+                        },
+                      },
+                      transition: 'all 0.2s ease',
+                    }}
+                  >
+                    <ListItemIcon sx={{ color: '#FFA726' }}>
                       <Dashboard />
                     </ListItemIcon>
                     <ListItemText primary="Dashboard" />
                   </ListItemButton>
                 </ListItem>
                 <ListItem disablePadding>
-                  <ListItemButton onClick={() => navigate('/provider/ai-adherence')}>
-                    <ListItemIcon>
+                  <ListItemButton 
+                    onClick={() => navigate('/provider/ai-adherence')}
+                    selected={currentPath === '/provider/ai-adherence'}
+                    sx={{
+                      color: 'white',
+                      '&:hover': {
+                        bgcolor: 'rgba(255, 152, 0, 0.1)',
+                        borderLeft: '4px solid rgba(255, 152, 0, 0.5)',
+                      },
+                      '&.Mui-selected': {
+                        bgcolor: 'rgba(255, 152, 0, 0.2)',
+                        borderLeft: '4px solid #FFA726',
+                        '&:hover': {
+                          bgcolor: 'rgba(255, 152, 0, 0.25)',
+                        },
+                      },
+                      transition: 'all 0.2s ease',
+                    }}
+                  >
+                    <ListItemIcon sx={{ color: '#FFA726' }}>
                       <Psychology />
                     </ListItemIcon>
                     <ListItemText primary="AI Adherence Tracking" />
                   </ListItemButton>
                 </ListItem>
                 <ListItem disablePadding>
-                  <ListItemButton onClick={() => navigate('/provider/emr-integration')}>
-                    <ListItemIcon>
+                  <ListItemButton 
+                    onClick={() => navigate('/provider/emr-integration')}
+                    selected={currentPath === '/provider/emr-integration'}
+                    sx={{
+                      color: 'white',
+                      '&:hover': {
+                        bgcolor: 'rgba(255, 152, 0, 0.1)',
+                        borderLeft: '4px solid rgba(255, 152, 0, 0.5)',
+                      },
+                      '&.Mui-selected': {
+                        bgcolor: 'rgba(255, 152, 0, 0.2)',
+                        borderLeft: '4px solid #FFA726',
+                        '&:hover': {
+                          bgcolor: 'rgba(255, 152, 0, 0.25)',
+                        },
+                      },
+                      transition: 'all 0.2s ease',
+                    }}
+                  >
+                    <ListItemIcon sx={{ color: '#FFA726' }}>
                       <LocalHospital />
                     </ListItemIcon>
                     <ListItemText primary="EMR Integration" />
                   </ListItemButton>
                 </ListItem>
                 <ListItem disablePadding>
-                  <ListItemButton onClick={() => navigate('/provider/directory')}>
-                    <ListItemIcon>
+                  <ListItemButton 
+                    onClick={() => navigate('/provider/directory')}
+                    selected={currentPath === '/provider/directory'}
+                    sx={{
+                      color: 'white',
+                      '&:hover': {
+                        bgcolor: 'rgba(255, 152, 0, 0.1)',
+                        borderLeft: '4px solid rgba(255, 152, 0, 0.5)',
+                      },
+                      '&.Mui-selected': {
+                        bgcolor: 'rgba(255, 152, 0, 0.2)',
+                        borderLeft: '4px solid #FFA726',
+                        '&:hover': {
+                          bgcolor: 'rgba(255, 152, 0, 0.25)',
+                        },
+                      },
+                      transition: 'all 0.2s ease',
+                    }}
+                  >
+                    <ListItemIcon sx={{ color: '#FFA726' }}>
                       <Person />
                     </ListItemIcon>
                     <ListItemText primary="Provider Directory" />
