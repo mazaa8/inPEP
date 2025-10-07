@@ -3,7 +3,7 @@ import prisma from '../config/database.js';
 import { hashPassword, comparePassword } from '../utils/password.js';
 import { generateToken } from '../utils/jwt.js';
 import { AppError } from '../middleware/errorHandler.js';
-import { RegisterDto, LoginDto, AuthResponse, AuthRequest } from '../types/index.js';
+import { RegisterDto, LoginDto, AuthResponse, AuthRequest, UserRole } from '../types/index.js';
 
 export const register = async (req: Request, res: Response): Promise<void> => {
   try {
@@ -59,11 +59,21 @@ export const register = async (req: Request, res: Response): Promise<void> => {
     });
 
     // Generate JWT token
-    const token = generateToken(user);
+    const token = generateToken({
+      id: user.id,
+      email: user.email,
+      name: user.name,
+      role: user.role as UserRole,
+    });
 
     const response: AuthResponse = {
       token,
-      user,
+      user: {
+        id: user.id,
+        email: user.email,
+        name: user.name,
+        role: user.role as UserRole,
+      },
     };
 
     res.status(201).json(response);
@@ -124,7 +134,7 @@ export const login = async (req: Request, res: Response): Promise<void> => {
       id: user.id,
       email: user.email,
       name: user.name,
-      role: user.role,
+      role: user.role as UserRole,
     });
 
     const response: AuthResponse = {
@@ -133,7 +143,7 @@ export const login = async (req: Request, res: Response): Promise<void> => {
         id: user.id,
         email: user.email,
         name: user.name,
-        role: user.role,
+        role: user.role as UserRole,
       },
     };
 

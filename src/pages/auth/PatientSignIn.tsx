@@ -30,7 +30,7 @@ const PatientSignIn = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await login(nationalId, 'Patient', hospital);
+      await login({ email: nationalId, password });
       navigate('/welcome-home/patient');
     } catch (err) {
       setError('Invalid credentials. Please try again.');

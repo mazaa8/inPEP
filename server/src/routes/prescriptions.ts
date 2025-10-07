@@ -50,10 +50,10 @@ router.get('/:id', authenticate, async (req, res) => {
       return res.status(404).json({ error: 'Prescription not found' });
     }
 
-    res.json(prescription);
+    return res.json(prescription);
   } catch (error) {
     console.error('Error fetching prescription:', error);
-    res.status(500).json({ error: 'Failed to fetch prescription' });
+    return res.status(500).json({ error: 'Failed to fetch prescription' });
   }
 });
 
@@ -122,10 +122,10 @@ router.post('/', authenticate, async (req, res) => {
       },
     });
 
-    res.status(201).json(prescription);
+    return res.status(201).json(prescription);
   } catch (error) {
     console.error('Error creating prescription:', error);
-    res.status(500).json({ error: 'Failed to create prescription' });
+    return res.status(500).json({ error: 'Failed to create prescription' });
   }
 });
 
@@ -159,10 +159,10 @@ router.post('/:id/refill', authenticate, async (req, res) => {
       },
     });
 
-    res.status(201).json(refillRequest);
+    return res.status(201).json(refillRequest);
   } catch (error) {
     console.error('Error requesting refill:', error);
-    res.status(500).json({ error: 'Failed to request refill' });
+    return res.status(500).json({ error: 'Failed to request refill' });
   }
 });
 
@@ -198,10 +198,10 @@ router.patch('/refill/:refillId/approve', authenticate, async (req, res) => {
       },
     });
 
-    res.json(refillRequest);
+    return res.json(refillRequest);
   } catch (error) {
     console.error('Error approving refill:', error);
-    res.status(500).json({ error: 'Failed to approve refill' });
+    return res.status(500).json({ error: 'Failed to approve refill' });
   }
 });
 
@@ -254,10 +254,10 @@ router.patch('/refill/:refillId/filled', authenticate, async (req, res) => {
       });
     }
 
-    res.json(refillRequest);
+    return res.json(refillRequest);
   } catch (error) {
     console.error('Error marking refill as filled:', error);
-    res.status(500).json({ error: 'Failed to mark refill as filled' });
+    return res.status(500).json({ error: 'Failed to mark refill as filled' });
   }
 });
 

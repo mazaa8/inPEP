@@ -90,10 +90,10 @@ router.post('/update', authenticate, async (req, res) => {
       },
     });
 
-    res.json(updatedStock);
+    return res.json(updatedStock);
   } catch (error) {
     console.error('Error updating stock:', error);
-    res.status(500).json({ error: 'Failed to update stock' });
+    return res.status(500).json({ error: 'Failed to update stock' });
   }
 });
 

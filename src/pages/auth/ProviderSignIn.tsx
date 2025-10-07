@@ -30,7 +30,7 @@ const ProviderSignIn = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await login(providerId, 'Provider');
+      await login({ email: providerId, password });
       navigate('/welcome-home/provider');
     } catch (err) {
       setError('Invalid credentials. Please try again.');

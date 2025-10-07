@@ -14,7 +14,7 @@ import adherenceRoutes from './adherenceRoutes.js';
 const router = Router();
 
 // Health check endpoint (before health routes to avoid conflict)
-router.get('/healthcheck', (req, res) => {
+router.get('/healthcheck', (_req, res) => {
   res.status(200).json({
     status: 'ok',
     timestamp: new Date().toISOString(),

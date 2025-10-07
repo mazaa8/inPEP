@@ -30,7 +30,7 @@ const InsurerSignIn = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await login(insurerId, 'Insurer');
+      await login({ email: insurerId, password });
       navigate('/welcome-home/insurer');
     } catch (err) {
       setError('Invalid credentials. Please try again.');

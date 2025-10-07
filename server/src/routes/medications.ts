@@ -77,10 +77,10 @@ router.get('/:id', authenticate, async (req, res) => {
       return res.status(404).json({ error: 'Medication not found' });
     }
 
-    res.json(medication);
+    return res.json(medication);
   } catch (error) {
     console.error('Error fetching medication:', error);
-    res.status(500).json({ error: 'Failed to fetch medication' });
+    return res.status(500).json({ error: 'Failed to fetch medication' });
   }
 });
 
@@ -134,10 +134,10 @@ router.post('/check-interactions', authenticate, async (req, res) => {
       },
     });
 
-    res.json(interactions);
+    return res.json(interactions);
   } catch (error) {
     console.error('Error checking interactions:', error);
-    res.status(500).json({ error: 'Failed to check interactions' });
+    return res.status(500).json({ error: 'Failed to check interactions' });
   }
 });
 
@@ -161,10 +161,10 @@ router.get('/barcode/:ndc', authenticate, async (req, res) => {
       return res.status(404).json({ error: 'Medication not found for this barcode' });
     }
 
-    res.json(medication);
+    return res.json(medication);
   } catch (error) {
     console.error('Error searching by barcode:', error);
-    res.status(500).json({ error: 'Failed to search by barcode' });
+    return res.status(500).json({ error: 'Failed to search by barcode' });
   }
 });
 
@@ -181,10 +181,10 @@ router.post('/', authenticate, async (req, res) => {
       data: req.body,
     });
 
-    res.status(201).json(medication);
+    return res.status(201).json(medication);
   } catch (error) {
     console.error('Error creating medication:', error);
-    res.status(500).json({ error: 'Failed to create medication' });
+    return res.status(500).json({ error: 'Failed to create medication' });
   }
 });
 

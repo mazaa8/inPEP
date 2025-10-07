@@ -31,7 +31,7 @@ const CaregiverSignIn = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await login(nationalId, 'Caregiver', hospital);
+      await login({ email: nationalId, password });
       navigate('/dashboard');
     } catch (err) {
       setError('Invalid credentials. Please try again.');
