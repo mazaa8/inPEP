@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Grid, Box, Typography, Card, CardContent, Chip, LinearProgress, Avatar, Tab, Tabs, CircularProgress, Button, ButtonGroup, Select, MenuItem, FormControl, InputLabel } from '@mui/material';
+import { Grid, Box, Typography, Card, CardContent, Chip, LinearProgress, Avatar, Tab, Tabs, CircularProgress, Button, ButtonGroup, Select, MenuItem, FormControl } from '@mui/material';
 import ComprehensiveReport from '../../components/reports/ComprehensiveReport';
 import { 
   TrendingUp, 
@@ -31,9 +31,6 @@ import {
   Radar,
 } from 'recharts';
 import Layout from '../../components/layout/Layout';
-import { useAuth } from '../../context/AuthContext';
-
-const API_BASE_URL = 'http://localhost:3000/api';
 
 interface DashboardMetrics {
   overallScore: number;
@@ -95,57 +92,77 @@ const AIAdherenceTracking = () => {
   const [populationBehaviors, setPopulationBehaviors] = useState<BehaviorPattern[]>([]);
   const [predictionFilter, setPredictionFilter] = useState<string>('all');
   const [reportOpen, setReportOpen] = useState(false);
-  const { user } = useAuth();
 
-  // Fetch dashboard metrics
+  // Calculate dashboard metrics from patient population
   useEffect(() => {
-    const fetchDashboardMetrics = async () => {
-      try {
-        const response = await fetch(`${API_BASE_URL}/adherence/dashboard?providerId=${user?.id}`);
-        const data = await response.json();
-        setDashboardMetrics(data);
-      } catch (error) {
-        console.error('Error fetching dashboard metrics:', error);
-        // Fallback to mock data
-        setDashboardMetrics({
-          overallScore: 89,
-          highRiskCount: 3,
-          activePredictionsCount: 12,
-          dataPointsCount: 2400,
-          trend: 'up',
-          weeklyChange: 5,
-        });
-      }
-    };
+    if (patientRiskScores.length > 0) {
+      // Calculate overall adherence score (average of all patients)
+      const avgAdherence = Math.round(
+        patientRiskScores.reduce((sum, p) => sum + p.adherence, 0) / patientRiskScores.length
+      );
+      
+      // Count high-risk patients (critical + high)
+      const highRiskCount = patientRiskScores.filter(
+        p => p.risk === 'critical' || p.risk === 'high'
+      ).length;
+      
+      // Active predictions = total number of patients (one prediction per patient)
+      const activePredictionsCount = patientRiskScores.length;
+      
+      // Simulate data points: ~24 data points per patient per week (medication, meals, vitals, mood)
+      const dataPointsCount = patientRiskScores.length * 24;
+      
+      // Calculate trend based on patient trends
+      const trendingUp = patientRiskScores.filter(p => p.trend === 'up').length;
+      const trendingDown = patientRiskScores.filter(p => p.trend === 'down').length;
+      const trend = trendingUp > trendingDown ? 'up' : 'down';
+      
+      // Weekly change: simulate 3-7% improvement
+      const weeklyChange = trend === 'up' ? Math.floor(Math.random() * 5) + 3 : -(Math.floor(Math.random() * 3) + 2);
+      
+      setDashboardMetrics({
+        overallScore: avgAdherence,
+        highRiskCount,
+        activePredictionsCount,
+        dataPointsCount,
+        trend,
+        weeklyChange,
+      });
+    }
+  }, [patientRiskScores]);
 
-    fetchDashboardMetrics();
-  }, [user?.id]);
-
-  // Fetch adherence trends
+  // Generate adherence trends from patient population
   useEffect(() => {
-    const fetchAdherenceTrends = async () => {
-      try {
-        // For now, fetch for first patient (would iterate through all patients)
-        const response = await fetch(`${API_BASE_URL}/adherence/trends/weekly?patientId=sample-patient-id`);
-        const data = await response.json();
-        setAdherenceTrends(data);
-      } catch (error) {
-        console.error('Error fetching adherence trends:', error);
-        // Fallback to mock data
-        setAdherenceTrends([
-          { date: 'Mon', medication: 95, mealPlan: 88, vitals: 92, mood: 85, overall: 90 },
-          { date: 'Tue', medication: 92, mealPlan: 90, vitals: 95, mood: 82, overall: 89 },
-          { date: 'Wed', medication: 88, mealPlan: 85, vitals: 90, mood: 78, overall: 85 },
-          { date: 'Thu', medication: 90, mealPlan: 92, vitals: 88, mood: 88, overall: 89 },
-          { date: 'Fri', medication: 85, mealPlan: 80, vitals: 85, mood: 75, overall: 81 },
-          { date: 'Sat', medication: 95, mealPlan: 95, vitals: 98, mood: 92, overall: 95 },
-          { date: 'Sun', medication: 93, mealPlan: 90, vitals: 95, mood: 90, overall: 92 },
-        ]);
-      }
-    };
-
-    fetchAdherenceTrends();
-  }, []);
+    if (patientRiskScores.length > 0) {
+      const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+      const avgScore = patientRiskScores.reduce((sum, p) => sum + p.score, 0) / patientRiskScores.length;
+      
+      // Generate realistic weekly trends with some variation
+      const trends = days.map((day, index) => {
+        // Weekend scores tend to be higher
+        const isWeekend = index >= 5;
+        const baseVariation = isWeekend ? 5 : -3;
+        const randomVariation = Math.floor(Math.random() * 10) - 5;
+        
+        const overall = Math.round(avgScore + baseVariation + randomVariation);
+        const medication = Math.round(overall + Math.random() * 6 - 3);
+        const mealPlan = Math.round(overall + Math.random() * 6 - 3);
+        const vitals = Math.round(overall + Math.random() * 6 - 3);
+        const mood = Math.round(overall + Math.random() * 8 - 4);
+        
+        return {
+          date: day,
+          medication: Math.min(100, Math.max(0, medication)),
+          mealPlan: Math.min(100, Math.max(0, mealPlan)),
+          vitals: Math.min(100, Math.max(0, vitals)),
+          mood: Math.min(100, Math.max(0, mood)),
+          overall: Math.min(100, Math.max(0, overall)),
+        };
+      });
+      
+      setAdherenceTrends(trends);
+    }
+  }, [patientRiskScores]);
 
   // For demo: Generate all 101 patients with realistic risk scores
   useEffect(() => {
@@ -483,7 +500,7 @@ const AIAdherenceTracking = () => {
                         <TrendingDown sx={{ color: '#f44336', fontSize: 20 }} />
                       )}
                       <Typography variant="body2" sx={{ color: dashboardMetrics?.trend === 'up' ? '#4caf50' : '#f44336' }}>
-                        {dashboardMetrics?.weeklyChange > 0 ? '+' : ''}{dashboardMetrics?.weeklyChange || 0}% from last week
+                        {(dashboardMetrics?.weeklyChange ?? 0) > 0 ? '+' : ''}{dashboardMetrics?.weeklyChange ?? 0}% from last week
                       </Typography>
                     </Box>
                   </CardContent>
@@ -618,11 +635,14 @@ const AIAdherenceTracking = () => {
                   boxShadow: '0 8px 32px rgba(255, 152, 0, 0.15)',
                   p: 3,
                 }}>
-                  <Typography variant="h6" sx={{ color: '#FFB74D', fontWeight: 700, mb: 3 }}>
-                    Behavior Analysis
+                  <Typography variant="h6" sx={{ color: '#FFB74D', fontWeight: 700, mb: 1 }}>
+                    Population Behavior Analysis
+                  </Typography>
+                  <Typography variant="caption" sx={{ color: 'rgba(255, 255, 255, 0.6)', display: 'block', mb: 2 }}>
+                    Average across all 101 patients
                   </Typography>
                   <ResponsiveContainer width="100%" height={300}>
-                    <RadarChart data={behaviorPatterns}>
+                    <RadarChart data={populationBehaviors}>
                       <PolarGrid stroke="rgba(255, 255, 255, 0.2)" />
                       <PolarAngleAxis dataKey="behavior" stroke="rgba(255, 255, 255, 0.6)" />
                       <PolarRadiusAxis stroke="rgba(255, 255, 255, 0.4)" />
