@@ -759,3 +759,229 @@ model RefillRequest {
   @@index([prescriptionId])
   @@index([status])
 }
+
+// ==================== AI ADHERENCE TRACKING SYSTEM ====================
+
+model AdherenceScore {
+  id                String   @id @default(uuid())
+  
+  // Patient
+  patientId         String
+  patientName       String
+  
+  // Overall Score
+  overallScore      Float    // 0-100
+  
+  // Category Scores
+  medicationScore   Float    @default(0) // 0-100
+  mealPlanScore     Float    @default(0) // 0-100
+  vitalsScore       Float    @default(0) // 0-100
+  moodScore         Float    @default(0) // 0-100
+  exerciseScore     Float    @default(0) // 0-100
+  sleepScore        Float    @default(0) // 0-100
+  
+  // Trend
+  trend             String   // up, down, stable
+  weeklyChange      Float    @default(0) // percentage change
+  
+  // Date
+  date              DateTime @default(now())
+  weekStart         DateTime // Start of the week this score represents
+  
+  // Metadata
+  dataPointsCount   Int      @default(0) // Number of data points used
+  confidence        Float    @default(0.8) // 0-1
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  @@map("adherence_scores")
+  @@index([patientId])
+  @@index([date])
+  @@index([overallScore])
+}
+
+model PatientRiskScore {
+  id                String   @id @default(uuid())
+  
+  // Patient
+  patientId         String
+  patientName       String
+  
+  // Risk Scoring
+  healthScore       Int      // 0-100 (higher is better)
+  riskLevel         String   // low, medium, high, critical
+  adherenceRate     Float    // 0-100
+  
+  // Trend
+  trend             String   // up, down, stable
+  
+  // Risk Factors (JSON arrays)
+  riskFactors       String?  // ["Declining mood", "Missed medications"]
+  protectiveFactors String?  // ["High caregiver engagement", "Regular vitals"]
+  
+  // Predictions
+  readmissionRisk   Float    @default(0) // 0-100
+  medicationRisk    Float    @default(0) // 0-100
+  caregiverBurnout  Float    @default(0) // 0-100
+  
+  // Metadata
+  assessmentDate    DateTime @default(now())
+  nextAssessment    DateTime?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  @@map("patient_risk_scores")
+  @@index([patientId])
+  @@index([riskLevel])
+  @@index([healthScore])
+  @@index([assessmentDate])
+}
+
+model PredictiveInsight {
+  id                String   @id @default(uuid())
+  
+  // Patient
+  patientId         String
+  patientName       String
+  
+  // Prediction
+  predictionType    String   // medication_nonadherence, readmission, caregiver_burnout
+  prediction        String   // The actual prediction text
+  confidence        Float    // 0-100 percentage
+  
+  // Contributing Factors
+  factors           String   // JSON array of factors
+  
+  // Recommendation
+  recommendation    String
+  priority          String   @default("medium") // low, medium, high, urgent
+  
+  // Status
+  status            String   @default("active") // active, acknowledged, resolved, dismissed
+  acknowledgedBy    String?  // Provider ID
+  acknowledgedAt    DateTime?
+  
+  // Outcome Tracking
+  actionTaken       String?
+  outcome           String?  // improved, no_change, worsened
+  outcomeDate       DateTime?
+  
+  // Metadata
+  generatedAt       DateTime @default(now())
+  expiresAt         DateTime?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  @@map("predictive_insights")
+  @@index([patientId])
+  @@index([predictionType])
+  @@index([priority])
+  @@index([status])
+  @@index([generatedAt])
+}
+
+model BehaviorPattern {
+  id                String   @id @default(uuid())
+  
+  // Patient
+  patientId         String
+  
+  // Behavior Scores (0-100)
+  medicationScore   Float    @default(0)
+  mealPlanScore     Float    @default(0)
+  exerciseScore     Float    @default(0)
+  sleepScore        Float    @default(0)
+  moodScore         Float    @default(0)
+  vitalsScore       Float    @default(0)
+  
+  // Time Period
+  date              DateTime @default(now())
+  periodType        String   @default("daily") // daily, weekly, monthly
+  
+  // Analysis
+  patterns          String?  // JSON: detected patterns
+  anomalies         String?  // JSON: unusual behaviors
+  
+  // Metadata
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  @@map("behavior_patterns")
+  @@index([patientId])
+  @@index([date])
+  @@index([periodType])
+}
+
+model AdherenceDataPoint {
+  id                String   @id @default(uuid())
+  
+  // Patient
+  patientId         String
+  
+  // Data Source
+  sourceType        String   // medication, meal_plan, vitals, mood, exercise, sleep
+  sourceId          String?  // ID of the source record
+  
+  // Data
+  value             Float    // Normalized 0-100 score
+  rawValue          String?  // Original value as JSON
+  
+  // Context
+  timestamp         DateTime @default(now())
+  recordedBy        String?  // patient, caregiver, system
+  
+  // Quality
+  isVerified        Boolean  @default(false)
+  confidence        Float    @default(1.0) // 0-1
+  
+  // Metadata
+  createdAt         DateTime @default(now())
+  
+  @@map("adherence_data_points")
+  @@index([patientId])
+  @@index([sourceType])
+  @@index([timestamp])
+}
+
+model CaregiverEngagement {
+  id                String   @id @default(uuid())
+  
+  // Caregiver and Patient
+  caregiverId       String
+  caregiverName     String
+  patientId         String
+  patientName       String
+  
+  // Engagement Metrics
+  engagementScore   Float    // 0-100
+  engagementLevel   String   // high, moderate, low
+  
+  // Activity Counts (last 7 days)
+  wellnessPlanUpdates Int    @default(0)
+  medicationLogs    Int      @default(0)
+  mealPlanUpdates   Int      @default(0)
+  vitalsRecorded    Int      @default(0)
+  messagesExchanged Int      @default(0)
+  
+  // Stress Indicators
+  stressLevel       String?  // low, moderate, high
+  burnoutRisk       Float    @default(0) // 0-100
+  stressFactors     String?  // JSON array
+  
+  // Last Activity
+  lastActivityAt    DateTime?
+  lastActivityType  String?
+  
+  // Date
+  weekStart         DateTime // Start of the week
+  
+  // Metadata
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  @@map("caregiver_engagement")
+  @@index([caregiverId])
+  @@index([patientId])
+  @@index([engagementLevel])
+  @@index([weekStart])
+}

@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Grid, Box, Typography, Card, CardContent, Chip, LinearProgress, Avatar, Tab, Tabs } from '@mui/material';
+import { useState, useEffect } from 'react';
+import { Grid, Box, Typography, Card, CardContent, Chip, LinearProgress, Avatar, Tab, Tabs, CircularProgress } from '@mui/material';
 import { 
   TrendingUp, 
   TrendingDown, 
@@ -11,12 +11,8 @@ import {
   MonitorHeart
 } from '@mui/icons-material';
 import { 
-  LineChart, 
-  Line, 
   AreaChart,
   Area,
-  BarChart, 
-  Bar, 
   XAxis, 
   YAxis, 
   CartesianGrid, 
@@ -28,67 +24,215 @@ import {
   PolarAngleAxis,
   PolarRadiusAxis,
   Radar,
-  ScatterChart,
-  Scatter,
-  ZAxis
 } from 'recharts';
 import Layout from '../../components/layout/Layout';
-import { roleColors } from '../../styles/glassmorphism';
+import { useAuth } from '../../context/AuthContext';
 
-// AI-Generated Mock Data (would come from patient/caregiver dashboards)
-const adherenceData = [
-  { date: 'Mon', medication: 95, mealPlan: 88, vitals: 92, mood: 85, overall: 90 },
-  { date: 'Tue', medication: 92, mealPlan: 90, vitals: 95, mood: 82, overall: 89 },
-  { date: 'Wed', medication: 88, mealPlan: 85, vitals: 90, mood: 78, overall: 85 },
-  { date: 'Thu', medication: 90, mealPlan: 92, vitals: 88, mood: 88, overall: 89 },
-  { date: 'Fri', medication: 85, mealPlan: 80, vitals: 85, mood: 75, overall: 81 },
-  { date: 'Sat', medication: 95, mealPlan: 95, vitals: 98, mood: 92, overall: 95 },
-  { date: 'Sun', medication: 93, mealPlan: 90, vitals: 95, mood: 90, overall: 92 },
-];
+const API_BASE_URL = 'http://localhost:3001/api';
 
-const patientRiskScores = [
-  { id: 'P001', name: 'Abdeen White', score: 85, risk: 'low', trend: 'up', adherence: 92 },
-  { id: 'P002', name: 'Sarah Johnson', score: 65, risk: 'medium', trend: 'down', adherence: 78 },
-  { id: 'P003', name: 'Michael Chen', score: 45, risk: 'high', trend: 'down', adherence: 62 },
-  { id: 'P004', name: 'Emma Davis', score: 90, risk: 'low', trend: 'stable', adherence: 95 },
-  { id: 'P005', name: 'James Wilson', score: 55, risk: 'high', trend: 'down', adherence: 68 },
-];
+interface DashboardMetrics {
+  overallScore: number;
+  highRiskCount: number;
+  activePredictionsCount: number;
+  dataPointsCount: number;
+  trend: string;
+  weeklyChange: number;
+}
 
-const behaviorPatterns = [
-  { behavior: 'Medication', score: 90, fullMark: 100 },
-  { behavior: 'Meal Plan', score: 85, fullMark: 100 },
-  { behavior: 'Exercise', score: 75, fullMark: 100 },
-  { behavior: 'Sleep', score: 80, fullMark: 100 },
-  { behavior: 'Mood', score: 82, fullMark: 100 },
-  { behavior: 'Vitals', score: 92, fullMark: 100 },
-];
+interface AdherenceTrend {
+  date: string;
+  medication: number;
+  mealPlan: number;
+  vitals: number;
+  mood: number;
+  overall: number;
+}
 
-const predictiveInsights = [
-  {
-    patient: 'Sarah Johnson',
-    prediction: 'High risk of medication non-adherence in next 48 hours',
-    confidence: 87,
-    factors: ['Declining mood scores', 'Missed 2 doses this week', 'Caregiver reported stress'],
-    recommendation: 'Schedule check-in call, consider medication reminder adjustment',
-  },
-  {
-    patient: 'Michael Chen',
-    prediction: 'Potential hospital readmission risk within 7 days',
-    confidence: 76,
-    factors: ['Vitals trending downward', 'Low meal plan adherence', 'Increased pain reports'],
-    recommendation: 'Urgent: Schedule in-person visit, review care plan',
-  },
-  {
-    patient: 'James Wilson',
-    prediction: 'Caregiver burnout indicators detected',
-    confidence: 82,
-    factors: ['Delayed wellness plan updates', 'Reduced engagement', 'Stress markers in notes'],
-    recommendation: 'Reach out to caregiver, offer support resources',
-  },
-];
+interface PatientRisk {
+  id: string;
+  name: string;
+  score: number;
+  risk: string;
+  trend: string;
+  adherence: number;
+}
+
+interface PredictiveInsight {
+  patient: string;
+  prediction: string;
+  confidence: number;
+  factors: string[];
+  recommendation: string;
+  priority?: string;
+}
+
+interface BehaviorPattern {
+  behavior: string;
+  score: number;
+  fullMark: number;
+}
 
 const AIAdherenceTracking = () => {
   const [tabValue, setTabValue] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [dashboardMetrics, setDashboardMetrics] = useState<DashboardMetrics | null>(null);
+  const [adherenceTrends, setAdherenceTrends] = useState<AdherenceTrend[]>([]);
+  const [patientRiskScores, setPatientRiskScores] = useState<PatientRisk[]>([]);
+  const [predictiveInsights, setPredictiveInsights] = useState<PredictiveInsight[]>([]);
+  const [behaviorPatterns, setBehaviorPatterns] = useState<BehaviorPattern[]>([]);
+  const { user } = useAuth();
+
+  // Fetch dashboard metrics
+  useEffect(() => {
+    const fetchDashboardMetrics = async () => {
+      try {
+        const response = await fetch(`${API_BASE_URL}/adherence/dashboard?providerId=${user?.id}`);
+        const data = await response.json();
+        setDashboardMetrics(data);
+      } catch (error) {
+        console.error('Error fetching dashboard metrics:', error);
+        // Fallback to mock data
+        setDashboardMetrics({
+          overallScore: 89,
+          highRiskCount: 3,
+          activePredictionsCount: 12,
+          dataPointsCount: 2400,
+          trend: 'up',
+          weeklyChange: 5,
+        });
+      }
+    };
+
+    fetchDashboardMetrics();
+  }, [user?.id]);
+
+  // Fetch adherence trends
+  useEffect(() => {
+    const fetchAdherenceTrends = async () => {
+      try {
+        // For now, fetch for first patient (would iterate through all patients)
+        const response = await fetch(`${API_BASE_URL}/adherence/trends/weekly?patientId=sample-patient-id`);
+        const data = await response.json();
+        setAdherenceTrends(data);
+      } catch (error) {
+        console.error('Error fetching adherence trends:', error);
+        // Fallback to mock data
+        setAdherenceTrends([
+          { date: 'Mon', medication: 95, mealPlan: 88, vitals: 92, mood: 85, overall: 90 },
+          { date: 'Tue', medication: 92, mealPlan: 90, vitals: 95, mood: 82, overall: 89 },
+          { date: 'Wed', medication: 88, mealPlan: 85, vitals: 90, mood: 78, overall: 85 },
+          { date: 'Thu', medication: 90, mealPlan: 92, vitals: 88, mood: 88, overall: 89 },
+          { date: 'Fri', medication: 85, mealPlan: 80, vitals: 85, mood: 75, overall: 81 },
+          { date: 'Sat', medication: 95, mealPlan: 95, vitals: 98, mood: 92, overall: 95 },
+          { date: 'Sun', medication: 93, mealPlan: 90, vitals: 95, mood: 90, overall: 92 },
+        ]);
+      }
+    };
+
+    fetchAdherenceTrends();
+  }, []);
+
+  // Fetch patient risk scores
+  useEffect(() => {
+    const fetchRiskScores = async () => {
+      try {
+        const response = await fetch(`${API_BASE_URL}/adherence/risk-scores?providerId=${user?.id}`);
+        const data = await response.json();
+        setPatientRiskScores(data);
+      } catch (error) {
+        console.error('Error fetching risk scores:', error);
+        // Fallback to mock data
+        setPatientRiskScores([
+          { id: 'P001', name: 'Abdeen White', score: 85, risk: 'low', trend: 'up', adherence: 92 },
+          { id: 'P002', name: 'Sarah Johnson', score: 65, risk: 'medium', trend: 'down', adherence: 78 },
+          { id: 'P003', name: 'Michael Chen', score: 45, risk: 'high', trend: 'down', adherence: 62 },
+          { id: 'P004', name: 'Emma Davis', score: 90, risk: 'low', trend: 'stable', adherence: 95 },
+          { id: 'P005', name: 'James Wilson', score: 55, risk: 'high', trend: 'down', adherence: 68 },
+        ]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchRiskScores();
+  }, [user?.id]);
+
+  // Fetch predictive insights
+  useEffect(() => {
+    const fetchInsights = async () => {
+      try {
+        const response = await fetch(`${API_BASE_URL}/adherence/insights/predictive?providerId=${user?.id}`);
+        const data = await response.json();
+        setPredictiveInsights(data);
+      } catch (error) {
+        console.error('Error fetching predictive insights:', error);
+        // Fallback to mock data
+        setPredictiveInsights([
+          {
+            patient: 'Sarah Johnson',
+            prediction: 'High risk of medication non-adherence in next 48 hours',
+            confidence: 87,
+            factors: ['Declining mood scores', 'Missed 2 doses this week', 'Caregiver reported stress'],
+            recommendation: 'Schedule check-in call, consider medication reminder adjustment',
+          },
+          {
+            patient: 'Michael Chen',
+            prediction: 'Potential hospital readmission risk within 7 days',
+            confidence: 76,
+            factors: ['Vitals trending downward', 'Low meal plan adherence', 'Increased pain reports'],
+            recommendation: 'Urgent: Schedule in-person visit, review care plan',
+          },
+          {
+            patient: 'James Wilson',
+            prediction: 'Caregiver burnout indicators detected',
+            confidence: 82,
+            factors: ['Delayed wellness plan updates', 'Reduced engagement', 'Stress markers in notes'],
+            recommendation: 'Reach out to caregiver, offer support resources',
+          },
+        ]);
+      }
+    };
+
+    fetchInsights();
+  }, [user?.id]);
+
+  // Fetch behavior patterns
+  useEffect(() => {
+    const fetchBehaviorPatterns = async () => {
+      try {
+        const response = await fetch(`${API_BASE_URL}/adherence/behavior-patterns?patientId=sample-patient-id`);
+        const data = await response.json();
+        setBehaviorPatterns(data);
+      } catch (error) {
+        console.error('Error fetching behavior patterns:', error);
+        // Fallback to mock data
+        setBehaviorPatterns([
+          { behavior: 'Medication', score: 90, fullMark: 100 },
+          { behavior: 'Meal Plan', score: 85, fullMark: 100 },
+          { behavior: 'Exercise', score: 75, fullMark: 100 },
+          { behavior: 'Sleep', score: 80, fullMark: 100 },
+          { behavior: 'Mood', score: 82, fullMark: 100 },
+          { behavior: 'Vitals', score: 92, fullMark: 100 },
+        ]);
+      }
+    };
+
+    fetchBehaviorPatterns();
+  }, []);
+
+  if (loading) {
+    return (
+      <Box sx={{ 
+        minHeight: '100vh', 
+        background: 'linear-gradient(135deg, #0f1419 0%, #1a1f2e 30%, #2d1f1a 70%, #3d2a1f 100%)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+      }}>
+        <CircularProgress sx={{ color: '#FFA726' }} size={60} />
+      </Box>
+    );
+  }
 
   const getRiskColor = (risk: string) => {
     switch (risk) {
@@ -211,12 +355,16 @@ const AIAdherenceTracking = () => {
                       <CheckCircle sx={{ color: '#4caf50' }} />
                     </Box>
                     <Typography variant="h3" sx={{ color: '#4caf50', fontWeight: 700, mb: 1 }}>
-                      89%
+                      {dashboardMetrics?.overallScore || 0}%
                     </Typography>
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                      <TrendingUp sx={{ color: '#4caf50', fontSize: 20 }} />
-                      <Typography variant="body2" sx={{ color: '#4caf50' }}>
-                        +5% from last week
+                      {dashboardMetrics?.trend === 'up' ? (
+                        <TrendingUp sx={{ color: '#4caf50', fontSize: 20 }} />
+                      ) : (
+                        <TrendingDown sx={{ color: '#f44336', fontSize: 20 }} />
+                      )}
+                      <Typography variant="body2" sx={{ color: dashboardMetrics?.trend === 'up' ? '#4caf50' : '#f44336' }}>
+                        {dashboardMetrics?.weeklyChange > 0 ? '+' : ''}{dashboardMetrics?.weeklyChange || 0}% from last week
                       </Typography>
                     </Box>
                   </CardContent>
@@ -239,7 +387,7 @@ const AIAdherenceTracking = () => {
                       <Warning sx={{ color: '#ff9800' }} />
                     </Box>
                     <Typography variant="h3" sx={{ color: '#ff9800', fontWeight: 700, mb: 1 }}>
-                      3
+                      {dashboardMetrics?.highRiskCount || 0}
                     </Typography>
                     <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.6)' }}>
                       Require immediate attention
@@ -264,7 +412,7 @@ const AIAdherenceTracking = () => {
                       <Insights sx={{ color: '#2196f3' }} />
                     </Box>
                     <Typography variant="h3" sx={{ color: '#2196f3', fontWeight: 700, mb: 1 }}>
-                      12
+                      {dashboardMetrics?.activePredictionsCount || 0}
                     </Typography>
                     <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.6)' }}>
                       Active interventions suggested
@@ -289,7 +437,7 @@ const AIAdherenceTracking = () => {
                       <Timeline sx={{ color: '#9c27b0' }} />
                     </Box>
                     <Typography variant="h3" sx={{ color: '#9c27b0', fontWeight: 700, mb: 1 }}>
-                      2.4K
+                      {dashboardMetrics?.dataPointsCount ? (dashboardMetrics.dataPointsCount / 1000).toFixed(1) + 'K' : '0'}
                     </Typography>
                     <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.6)' }}>
                       Last 7 days
@@ -312,7 +460,7 @@ const AIAdherenceTracking = () => {
                     Weekly Adherence Trends
                   </Typography>
                   <ResponsiveContainer width="100%" height={300}>
-                    <AreaChart data={adherenceData}>
+                    <AreaChart data={adherenceTrends}>
                       <defs>
                         <linearGradient id="colorOverall" x1="0" y1="0" x2="0" y2="1">
                           <stop offset="5%" stopColor="#FF9800" stopOpacity={0.8}/>

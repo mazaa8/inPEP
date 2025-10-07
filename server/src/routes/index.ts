@@ -9,6 +9,7 @@ import herediblesRoutes from './herediblesRoutes.js';
 import medicationRoutes from './medications.js';
 import prescriptionRoutes from './prescriptions.js';
 import medicationStockRoutes from './medicationStock.js';
+import adherenceRoutes from './adherenceRoutes.js';
 
 const router = Router();
 
@@ -32,5 +33,6 @@ router.use('/heredibles', herediblesRoutes);
 router.use('/medications', medicationRoutes);
 router.use('/prescriptions', prescriptionRoutes);
 router.use('/medication-stock', medicationStockRoutes);
+router.use('/adherence', adherenceRoutes);
 
 export default router;
