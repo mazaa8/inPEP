@@ -10,6 +10,7 @@ import medicationRoutes from './medications.js';
 import prescriptionRoutes from './prescriptions.js';
 import medicationStockRoutes from './medicationStock.js';
 import adherenceRoutes from './adherenceRoutes.js';
+import emrRoutes from './emrRoutes.js';
 
 const router = Router();
 
@@ -34,5 +35,6 @@ router.use('/medications', medicationRoutes);
 router.use('/prescriptions', prescriptionRoutes);
 router.use('/medication-stock', medicationStockRoutes);
 router.use('/adherence', adherenceRoutes);
+router.use('/emr', emrRoutes);
 
 export default router;

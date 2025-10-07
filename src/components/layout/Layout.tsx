@@ -24,6 +24,7 @@ import {
   MessageOutlined as MessageIcon,
   CreditCardOutlined as CreditCard,
   PsychologyOutlined as Psychology,
+  LocalHospitalOutlined as LocalHospital,
 } from '@mui/icons-material';
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -291,6 +292,14 @@ const Layout = ({ children, title, darkMode = false, themeColor }: LayoutProps) 
                       <Psychology />
                     </ListItemIcon>
                     <ListItemText primary="AI Adherence Tracking" />
+                  </ListItemButton>
+                </ListItem>
+                <ListItem disablePadding>
+                  <ListItemButton onClick={() => navigate('/provider/emr-integration')}>
+                    <ListItemIcon>
+                      <LocalHospital />
+                    </ListItemIcon>
+                    <ListItemText primary="EMR Integration" />
                   </ListItemButton>
                 </ListItem>
                 <ListItem disablePadding>

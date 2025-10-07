@@ -8,7 +8,6 @@ import CommunicationHub from '../../components/dashboards/provider/Communication
 import PatientJourneys from '../../components/dashboards/provider/PatientJourneys';
 import WelcomeMessage from '../../components/dashboards/provider/WelcomeMessage';
 import QuickActions from '../../components/dashboards/provider/QuickActions';
-import EMRIntegration from '../../components/dashboards/provider/EMRIntegration';
 import PatientDirectory from '../../components/provider/PatientDirectory';
 import AIIntelligenceWidget from '../../components/dashboards/provider/AIIntelligenceWidget';
 
@@ -96,12 +95,6 @@ const ProviderDashboard = () => {
             {/* Patient Directory */}
             <Grid item xs={12}>
               <PatientDirectory />
-            </Grid>
-            {/* EMR Integration */}
-            <Grid item xs={12}>
-              <DashboardCard title="Seamless EMR Integration">
-                <EMRIntegration />
-              </DashboardCard>
             </Grid>
           </Grid>
         </Grid>
