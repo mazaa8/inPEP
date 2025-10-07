@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Paper,
   Typography,
@@ -13,12 +13,25 @@ import {
   Chip,
   Box,
   Divider,
+  CircularProgress,
 } from '@mui/material';
 import {
   Search as SearchIcon,
   Person as PersonIcon,
-  Lock as LockIcon,
+  CheckCircle as CheckCircleIcon,
 } from '@mui/icons-material';
+import { useNavigate } from 'react-router-dom';
+
+const API_BASE_URL = 'http://localhost:3000/api';
+
+interface Patient {
+  id: string;
+  name: string;
+  age: number;
+  condition: string;
+  active: boolean;
+  riskLevel?: string;
+}
 
 const mockPatients = [
   { id: 'b805ec90-e553-4de7-9de0-45f2eb73d1ba', name: 'Abdeen White', age: 79, condition: 'Heart Disease, Chronic Pancreatitis', active: true },
@@ -126,8 +139,16 @@ const mockPatients = [
 
 const PatientDirectory = () => {
   const [searchQuery, setSearchQuery] = useState('');
+  const navigate = useNavigate();
 
-  const filteredPatients = mockPatients.filter((patient) =>
+  // Activate all 101 patients with realistic data
+  const patients: Patient[] = mockPatients.map(p => ({
+    ...p,
+    active: true,
+    riskLevel: Math.random() > 0.7 ? 'high' : Math.random() > 0.4 ? 'medium' : 'low',
+  }));
+
+  const filteredPatients = patients.filter((patient) =>
     patient.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
@@ -139,13 +160,23 @@ const PatientDirectory = () => {
       .toUpperCase();
   };
 
+  const getRiskColor = (risk?: string) => {
+    switch (risk) {
+      case 'critical': return '#f44336';
+      case 'high': return '#ff9800';
+      case 'medium': return '#ffc107';
+      case 'low': return '#4caf50';
+      default: return 'primary.main';
+    }
+  };
+
   return (
     <Paper sx={{ p: 3 }}>
       <Typography variant="h5" gutterBottom>
         Patient Directory
       </Typography>
       <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-        {mockPatients.length} patients registered
+        {patients.length} patients registered • All Active
       </Typography>
 
       <TextField
@@ -168,28 +199,38 @@ const PatientDirectory = () => {
           <React.Fragment key={patient.id}>
             <ListItem disablePadding>
               <ListItemButton
-                disabled={!patient.active}
+                onClick={() => navigate('/provider/ai-adherence')}
                 sx={{
-                  opacity: patient.active ? 1 : 0.5,
-                  '&.Mui-disabled': {
-                    opacity: 0.5,
+                  '&:hover': {
+                    backgroundColor: 'action.hover',
                   },
                 }}
               >
                 <ListItemAvatar>
-                  <Avatar sx={{ bgcolor: patient.active ? 'primary.main' : 'grey.400' }}>
-                    {patient.active ? getInitials(patient.name) : <LockIcon />}
+                  <Avatar sx={{ bgcolor: getRiskColor(patient.riskLevel) }}>
+                    {getInitials(patient.name)}
                   </Avatar>
                 </ListItemAvatar>
                 <ListItemText
                   primary={
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                       <Typography variant="body1">{patient.name}</Typography>
-                      {patient.active && (
-                        <Chip label="Active" size="small" color="success" />
-                      )}
-                      {!patient.active && (
-                        <Chip label="Coming Soon" size="small" variant="outlined" />
+                      <Chip 
+                        label="Active" 
+                        size="small" 
+                        icon={<CheckCircleIcon />}
+                        color="success" 
+                      />
+                      {patient.riskLevel && (
+                        <Chip 
+                          label={patient.riskLevel.toUpperCase()} 
+                          size="small"
+                          sx={{
+                            bgcolor: getRiskColor(patient.riskLevel),
+                            color: 'white',
+                            fontWeight: 700,
+                          }}
+                        />
                       )}
                     </Box>
                   }

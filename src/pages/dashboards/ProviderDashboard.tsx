@@ -10,6 +10,7 @@ import WelcomeMessage from '../../components/dashboards/provider/WelcomeMessage'
 import QuickActions from '../../components/dashboards/provider/QuickActions';
 import EMRIntegration from '../../components/dashboards/provider/EMRIntegration';
 import PatientDirectory from '../../components/provider/PatientDirectory';
+import AIIntelligenceWidget from '../../components/dashboards/provider/AIIntelligenceWidget';
 
 const ProviderDashboard = () => {
   const { isEscalated, patientName, patientId, alertLevel, resetAlert } = useEmergencyAlert();
@@ -54,6 +55,11 @@ const ProviderDashboard = () => {
         {/* Welcome Message */}
         <Grid item xs={12}>
           <WelcomeMessage />
+        </Grid>
+
+        {/* AI Intelligence Widget - NEW! */}
+        <Grid item xs={12}>
+          <AIIntelligenceWidget />
         </Grid>
 
         {/* Quick Actions */}
