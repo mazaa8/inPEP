@@ -17,6 +17,7 @@ import {
   TextField,
   InputAdornment,
 } from '@mui/material';
+import CaregiverDetailModal from '../../components/provider/CaregiverDetailModal';
 import {
   TrendingUp as TrendingUpIcon,
   TrendingDown as TrendingDownIcon,
@@ -121,6 +122,8 @@ const CaregiverEngagementPage = () => {
     atRiskCount: 0,
     activeThisWeek: 0,
   });
+  const [selectedCaregiver, setSelectedCaregiver] = useState<any>(null);
+  const [detailModalOpen, setDetailModalOpen] = useState(false);
 
   useEffect(() => {
     const fetchCaregiverEngagement = async () => {
@@ -339,8 +342,12 @@ const CaregiverEngagementPage = () => {
               {filteredCaregivers.map((caregiver) => (
                 <TableRow 
                   key={caregiver.id}
+                  onClick={() => {
+                    setSelectedCaregiver(caregiver);
+                    setDetailModalOpen(true);
+                  }}
                   sx={{
-                    '&:hover': { bgcolor: 'rgba(255, 152, 0, 0.1)' },
+                    '&:hover': { bgcolor: 'rgba(255, 152, 0, 0.1)', cursor: 'pointer' },
                     transition: 'all 0.2s ease',
                   }}
                 >
@@ -410,6 +417,13 @@ const CaregiverEngagementPage = () => {
             </TableBody>
           </Table>
         </TableContainer>
+
+        {/* Caregiver Detail Modal */}
+        <CaregiverDetailModal
+          open={detailModalOpen}
+          onClose={() => setDetailModalOpen(false)}
+          caregiver={selectedCaregiver}
+        />
       </Layout>
     </Box>
   );
