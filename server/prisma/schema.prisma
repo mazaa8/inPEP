@@ -31,8 +31,33 @@ model User {
   caregiverProfile  CaregiverProfile?
   providerProfile   ProviderProfile?
   insurerProfile    InsurerProfile?
+
+  patientJournalEntries PatientJournalEntry[]     @relation("PatientJournalEntries")
+  caregiverJournalEntries PatientJournalEntry[]   @relation("CaregiverJournalEntries")
   
   @@map("users")
+}
+
+model PatientJournalEntry {
+  id                   String    @id @default(uuid())
+  patientId            String
+  patient              User      @relation("PatientJournalEntries", fields: [patientId], references: [id])
+  caregiverId          String
+  caregiver            User      @relation("CaregiverJournalEntries", fields: [caregiverId], references: [id])
+  entryDate            DateTime  @default(now())
+  title                String
+  eventType            String    // e.g., 'SEIZURE', 'FALL', 'GENERAL_NOTE'
+  mood                 String?   // e.g., 'HAPPY', 'SAD', 'ANXIOUS'
+  content              String
+  structuredDetails    String?   // Stored as a JSON string
+  tags                 String?   // Stored as a comma-separated string
+  isVisibleToPatient   Boolean   @default(true)
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt
+
+  @@map("patient_journal_entries")
+  @@index([patientId])
+  @@index([caregiverId])
 }
 
 model PatientProfile {

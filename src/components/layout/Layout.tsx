@@ -2,6 +2,7 @@ import { Box, AppBar, Toolbar, Typography, Drawer, List, ListItem, ListItemButto
 import { styled, alpha } from '@mui/material/styles';
 import {
   DashboardOutlined as Dashboard,
+  BookOutlined as BookIcon,
   AnalyticsOutlined as AnalyticsIcon,
   PersonOutlined as Person,
   MonitorHeartOutlined as MonitorHeart,
@@ -700,6 +701,19 @@ const Layout = ({ children, title, darkMode = false, themeColor }: LayoutProps) 
                         <AllInclusive />
                       </ListItemIcon>
                       <ListItemText primary="Wellness Plan" />
+                    </ListItemButton>
+                    <ListItemButton 
+                      sx={{ 
+                        pl: 4,
+                        color: 'white',
+                        '&:hover': { bgcolor: 'rgba(76, 175, 80, 0.15)' },
+                      }} 
+                      onClick={() => navigate('/caregiver/patient-journal')}
+                    >
+                      <ListItemIcon sx={{ color: 'white' }}>
+                        <BookIcon />
+                      </ListItemIcon>
+                      <ListItemText primary="Patient Journal" />
                     </ListItemButton>
                     <ListItemButton 
                       sx={{ 
