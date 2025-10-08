@@ -1,9 +1,11 @@
 import { seedCaregiverEngagement } from './seeds/caregiverEngagement';
+import { seedConversations } from './seeds/conversations';
 
 async function main() {
   console.log('🌱 Starting database seeding...\n');
 
   await seedCaregiverEngagement();
+  await seedConversations();
 
   console.log('\n✅ Database seeding completed!');
 }

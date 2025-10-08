@@ -26,11 +26,18 @@ export async function seedCaregiverEngagement() {
   const weekStart = new Date();
   weekStart.setDate(weekStart.getDate() - weekStart.getDay()); // Start of current week
 
+  // Get all users to map caregiver IDs properly
+  const allUsers = await prisma.user.findMany({
+    where: { role: 'CAREGIVER' },
+  });
+
   // First entry: Nora White caring for Abdeen White
   const abdeen = patientProfiles.find(p => p.user.name?.includes('Abdeen'));
+  const noraUser = allUsers.find(u => u.name?.includes('Nora'));
+  
   if (abdeen) {
     caregiverEngagementData.push({
-      caregiverId: abdeen.caregiverId || `caregiver-${abdeen.id}`,
+      caregiverId: noraUser?.id || abdeen.caregiverId || `caregiver-${abdeen.id}`,
       caregiverName: 'Nora White',
       patientId: abdeen.userId,
       patientName: abdeen.user.name || 'Abdeen White',

@@ -1,72 +1,115 @@
 import { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import {
   Box,
-  Grid,
+  Typography,
+  Paper,
   List,
   ListItem,
-  ListItemButton,
   ListItemText,
-  ListItemAvatar,
   Avatar,
-  Typography,
   TextField,
-  IconButton,
-  Divider,
-  Badge,
-  CircularProgress,
-  Alert,
+  Button,
 } from '@mui/material';
-import {
-  Send as SendIcon,
-  Message as MessageIcon,
-} from '@mui/icons-material';
-import Layout from '../../components/layout/Layout';
-import { messageService, type Conversation, type Message } from '../../services/messageService';
+import { Message as MessageIcon, Send } from '@mui/icons-material';
+import ProviderPageWrapper from '../../components/layout/ProviderPageWrapper';
+import { messageService } from '../../services/messageService';
 import { useAuth } from '../../context/AuthContext';
-import { roleColors } from '../../styles/glassmorphism';
+
+interface Message {
+  id: string;
+  senderId: string;
+  senderName: string;
+  content: string;
+  createdAt: string;
+}
+
+interface Conversation {
+  id: string;
+  name: string;
+  lastMessage: string;
+}
 
 const ProviderMessagesPage = () => {
   const { user } = useAuth();
+  const location = useLocation();
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [selectedConversation, setSelectedConversation] = useState<Conversation | null>(null);
-  const [messages, setMessages] = useState<Message[]>([]);
+  const [messages, setMessages] = useState<{ [key: string]: Message[] }>({});
   const [newMessage, setNewMessage] = useState('');
-  const [loading, setLoading] = useState(true);
-  const [sending, setSending] = useState(false);
-  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    fetchConversations();
+    loadConversations();
   }, []);
 
-  useEffect(() => {
-    if (selectedConversation) {
-      fetchMessages(selectedConversation.id);
-    }
-  }, [selectedConversation]);
-
-  const fetchConversations = async () => {
+  const loadConversations = async () => {
     try {
-      setLoading(true);
+      console.log('📥 Loading conversations...');
       const data = await messageService.getConversations();
-      setConversations(data);
-      if (data.length > 0 && !selectedConversation) {
-        setSelectedConversation(data[0]);
+      console.log('✅ Received conversations:', data);
+      
+      const formatted = data.map(conv => {
+        // Get the other participant's name (not the current user)
+        const otherParticipantName = conv.participantNames?.find((name: string) => name !== user?.name) || 'Unknown';
+        
+        return {
+          id: conv.id,
+          name: otherParticipantName,
+          lastMessage: conv.lastMessageText || 'No messages yet',
+        };
+      });
+      
+      console.log('📋 Formatted conversations:', formatted);
+      setConversations(formatted);
+      
+      // Select first conversation by default
+      if (formatted.length > 0 && !selectedConversation) {
+        setSelectedConversation(formatted[0]);
+        loadMessages(formatted[0].id);
       }
-    } catch (err) {
-      console.error('Failed to load conversations:', err);
-      setError('Failed to load conversations');
-    } finally {
-      setLoading(false);
+      
+      // Handle pre-selected recipient from navigation
+      if (location.state) {
+        const { recipientId, recipientName } = location.state as any;
+        console.log('🎯 Pre-selected recipient:', recipientName, recipientId);
+        
+        if (recipientId && recipientName) {
+          // Check if conversation exists
+          const existing = formatted.find(c => c.name === recipientName);
+          if (existing) {
+            console.log('✅ Found existing conversation');
+            setSelectedConversation(existing);
+            loadMessages(existing.id);
+          } else {
+            console.log('🆕 Creating new conversation placeholder');
+            // Create new conversation placeholder
+            const newConv = {
+              id: 'new-' + recipientId,
+              name: recipientName,
+              lastMessage: 'Start a new conversation',
+            };
+            setConversations([newConv, ...formatted]);
+            setSelectedConversation(newConv);
+            setMessages({ [newConv.id]: [] });
+          }
+        }
+      }
+    } catch (error) {
+      console.error('❌ Failed to load conversations:', error);
     }
   };
 
-  const fetchMessages = async (conversationId: string) => {
+  const loadMessages = async (conversationId: string) => {
+    if (conversationId.startsWith('new-')) {
+      setMessages({ ...messages, [conversationId]: [] });
+      return;
+    }
+    
     try {
       const data = await messageService.getMessages(conversationId);
-      setMessages(data);
-    } catch (err) {
-      console.error('Failed to load messages:', err);
+      setMessages({ ...messages, [conversationId]: data });
+    } catch (error) {
+      console.error('Failed to load messages:', error);
     }
   };
 
@@ -74,303 +117,275 @@ const ProviderMessagesPage = () => {
     if (!newMessage.trim() || !selectedConversation) return;
 
     try {
-      setSending(true);
-      const message = await messageService.sendMessage({
-        conversationId: selectedConversation.id,
-        content: newMessage,
-        messageType: 'TEXT',
-      });
+      console.log('📤 Sending message...');
       
-      setMessages([...messages, message]);
+      // If it's a new conversation
+      if (selectedConversation.id.startsWith('new-')) {
+        const recipientId = selectedConversation.id.replace('new-', '');
+        console.log('🆕 Creating new conversation with recipient:', recipientId);
+        console.log('👤 Current user ID:', user?.id);
+        
+        const newConv = await messageService.createConversation({
+          participantIds: [user?.id || '', recipientId], // Include BOTH provider and recipient
+          subject: `Conversation with ${selectedConversation.name}`,
+          initialMessage: newMessage,
+        });
+        
+        console.log('✅ Conversation created:', newConv);
+        
+        // Reload conversations
+        await loadConversations();
+        setSelectedConversation({
+          id: newConv.id,
+          name: selectedConversation.name,
+          lastMessage: newMessage,
+        });
+      } else {
+        console.log('📨 Sending to existing conversation:', selectedConversation.id);
+        
+        // Send to existing conversation
+        const message = await messageService.sendMessage({
+          conversationId: selectedConversation.id,
+          content: newMessage,
+          messageType: 'TEXT',
+        });
+        
+        console.log('✅ Message sent:', message);
+        
+        // Update messages
+        const currentMessages = messages[selectedConversation.id] || [];
+        setMessages({
+          ...messages,
+          [selectedConversation.id]: [...currentMessages, message],
+        });
+      }
+      
       setNewMessage('');
-      
-      // Update conversation list
-      fetchConversations();
-    } catch (err) {
-      console.error('Failed to send message:', err);
-      alert('Failed to send message');
-    } finally {
-      setSending(false);
+    } catch (error: any) {
+      console.error('❌ Failed to send message:', error);
+      console.error('Error details:', error.message, error.response);
+      alert(`Failed to send message: ${error.message || 'Unknown error'}`);
     }
-  };
-
-  const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      handleSendMessage();
-    }
-  };
-
-  const getOtherParticipantName = (conversation: Conversation) => {
-    const otherParticipant = conversation.otherParticipants?.[0];
-    return otherParticipant?.name || 'Unknown';
   };
 
   const getInitials = (name: string) => {
-    return name
-      .split(' ')
-      .map((n) => n[0])
-      .join('')
-      .toUpperCase()
-      .substring(0, 2);
+    return name.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2);
   };
 
-  if (loading) {
-    return (
-      <Box sx={{ minHeight: '100vh', background: 'linear-gradient(135deg, #0f1419 0%, #1a1f2e 30%, #2d1f1a 70%, #3d2a1f 100%)', p: 0 }}>
-        <Layout title="" darkMode={true} themeColor="PROVIDER">
-          <Box sx={{ display: 'flex', justifyContent: 'center', p: 4 }}>
-            <CircularProgress sx={{ color: '#FFA726' }} />
-          </Box>
-        </Layout>
-      </Box>
-    );
-  }
-
-  if (error) {
-    return (
-      <Box sx={{ minHeight: '100vh', background: 'linear-gradient(135deg, #0f1419 0%, #1a1f2e 30%, #2d1f1a 70%, #3d2a1f 100%)', p: 0 }}>
-        <Layout title="" darkMode={true} themeColor="PROVIDER">
-          <Alert severity="error">{error}</Alert>
-        </Layout>
-      </Box>
-    );
-  }
-
-  if (conversations.length === 0) {
-    return (
-      <Box sx={{ minHeight: '100vh', background: 'linear-gradient(135deg, #0f1419 0%, #1a1f2e 30%, #2d1f1a 70%, #3d2a1f 100%)', p: 0 }}>
-        <Layout title="" darkMode={true} themeColor="PROVIDER">
-          <Box sx={{ 
-            p: 6, 
-            textAlign: 'center',
-            background: 'rgba(255,255,255,0.05)',
-            borderRadius: '20px',
-            border: '1px dashed rgba(255,255,255,0.2)',
-          }}>
-            <MessageIcon sx={{ fontSize: 80, color: 'rgba(255, 152, 0, 0.5)', mb: 2 }} />
-            <Typography variant="h5" sx={{ color: 'white', fontWeight: 700, mb: 1 }}>
-              No Conversations Yet
-            </Typography>
-            <Typography variant="body1" sx={{ color: 'rgba(255,255,255,0.7)' }}>
-              Start a conversation with your patients or caregivers
-            </Typography>
-          </Box>
-        </Layout>
-      </Box>
-    );
-  }
-
   return (
-    <Box sx={{ minHeight: '100vh', background: 'linear-gradient(135deg, #0f1419 0%, #1a1f2e 30%, #2d1f1a 70%, #3d2a1f 100%)', p: 0 }}>
-      <Layout title="" darkMode={true} themeColor="PROVIDER">
-        {/* Hero Header */}
+    <ProviderPageWrapper 
+      title="Message Center" 
+      subtitle="Communicate with caregivers and care team"
+      icon={<MessageIcon />}
+    >
+      <Box sx={{ 
+        display: 'flex', 
+        height: 'calc(100vh - 280px)', 
+        background: 'rgba(0, 0, 0, 0.3)',
+        backdropFilter: 'blur(20px)',
+        WebkitBackdropFilter: 'blur(20px)',
+        border: '1px solid rgba(255, 152, 0, 0.2)',
+        borderRadius: '20px',
+        overflow: 'hidden',
+        boxShadow: '0 8px 32px 0 rgba(255, 152, 0, 0.1)',
+      }}>
+        {/* LEFT SIDE - Conversations List */}
         <Box sx={{ 
-          background: 'rgba(255, 255, 255, 0.05)',
-          backdropFilter: 'blur(30px)',
-          WebkitBackdropFilter: 'blur(30px)',
-          border: '1px solid rgba(255, 152, 0, 0.3)',
-          borderRadius: '24px',
-          p: 4,
-          mb: 4,
-          boxShadow: '0 8px 32px 0 rgba(255, 152, 0, 0.2)',
+          width: '35%', 
+          borderRight: '1px solid rgba(255, 152, 0, 0.2)',
+          display: 'flex',
+          flexDirection: 'column',
         }}>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-            <Box sx={{
-              width: 64,
-              height: 64,
-              borderRadius: '16px',
-              background: roleColors.PROVIDER.gradient,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              boxShadow: `0 8px 24px ${roleColors.PROVIDER.primary}40`,
-            }}>
-              <MessageIcon sx={{ fontSize: 36, color: 'white' }} />
-            </Box>
-            <Box>
-              <Typography variant="h3" sx={{ fontWeight: 700, color: 'white', mb: 0.5 }}>
-                Messages
-              </Typography>
-              <Typography variant="body1" sx={{ color: 'rgba(255,255,255,0.7)' }}>
-                Communicate with your patients and care team
-              </Typography>
-            </Box>
+          <Box sx={{ 
+            p: 3, 
+            borderBottom: '1px solid rgba(255, 152, 0, 0.2)',
+            background: 'rgba(0, 0, 0, 0.4)',
+          }}>
+            <Typography variant="h6" sx={{ color: '#FFA726', fontWeight: 600 }}>
+              Conversations
+            </Typography>
+            <Typography variant="caption" sx={{ color: 'rgba(255, 255, 255, 0.6)' }}>
+              {conversations.length} active
+            </Typography>
           </Box>
+          <List sx={{ overflowY: 'auto', flexGrow: 1 }}>
+            {conversations.map((convo) => (
+              <ListItem
+                button
+                key={convo.id}
+                onClick={() => {
+                  setSelectedConversation(convo);
+                  loadMessages(convo.id);
+                }}
+                sx={{
+                  py: 2,
+                  px: 3,
+                  borderBottom: '1px solid rgba(255, 152, 0, 0.1)',
+                  backgroundColor: selectedConversation?.id === convo.id 
+                    ? 'rgba(255, 152, 0, 0.15)' 
+                    : 'transparent',
+                  '&:hover': {
+                    backgroundColor: 'rgba(255, 152, 0, 0.1)',
+                  },
+                  transition: 'all 0.3s ease',
+                }}
+              >
+                <Avatar sx={{ 
+                  mr: 2, 
+                  bgcolor: '#FFA726',
+                  width: 48,
+                  height: 48,
+                  fontWeight: 600,
+                }}>
+                  {getInitials(convo.name)}
+                </Avatar>
+                <ListItemText 
+                  primary={
+                    <Typography sx={{ 
+                      color: 'rgba(255, 255, 255, 0.95)', 
+                      fontWeight: selectedConversation?.id === convo.id ? 600 : 400,
+                    }}>
+                      {convo.name}
+                    </Typography>
+                  }
+                  secondary={
+                    <Typography sx={{ 
+                      color: 'rgba(255, 255, 255, 0.6)',
+                      fontSize: '0.875rem',
+                      mt: 0.5,
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      whiteSpace: 'nowrap',
+                    }}>
+                      {convo.lastMessage}
+                    </Typography>
+                  }
+                />
+              </ListItem>
+            ))}
+          </List>
         </Box>
 
+        {/* RIGHT SIDE - Message View */}
         <Box sx={{ 
-          height: '70vh', 
-          display: 'flex',
-          background: 'rgba(255, 255, 255, 0.05)',
-          backdropFilter: 'blur(20px)',
-          WebkitBackdropFilter: 'blur(20px)',
-          border: '1px solid rgba(255, 152, 0, 0.2)',
-          borderRadius: '20px',
-          overflow: 'hidden',
-          boxShadow: '0 4px 20px rgba(255, 152, 0, 0.1)',
+          width: '65%', 
+          display: 'flex', 
+          flexDirection: 'column',
         }}>
-          <Grid container sx={{ height: '100%' }}>
-            {/* Conversations List */}
-            <Grid item xs={12} md={4} sx={{ borderRight: '1px solid rgba(255, 152, 0, 0.2)', height: '100%', overflow: 'auto' }}>
-            <List sx={{ p: 0 }}>
-              {conversations.map((conversation) => (
-                <ListItem key={conversation.id} disablePadding>
-                  <ListItemButton
-                    selected={selectedConversation?.id === conversation.id}
-                    onClick={() => setSelectedConversation(conversation)}
-                    sx={{
-                      py: 2,
-                      px: 2,
-                      '&.Mui-selected': {
-                        bgcolor: 'rgba(255, 152, 0, 0.15)',
-                        borderLeft: '4px solid #FFA726',
-                      },
-                      '&:hover': {
-                        bgcolor: 'rgba(255, 152, 0, 0.08)',
-                      },
-                    }}
-                  >
-                    <ListItemAvatar>
-                      <Badge 
-                        badgeContent={conversation.unreadCount} 
-                        sx={{
-                          '& .MuiBadge-badge': {
-                            bgcolor: roleColors.PROVIDER.primary,
-                            color: 'white',
-                          },
-                        }}
-                      >
-                        <Avatar sx={{ background: roleColors.PROVIDER.gradient, fontWeight: 700 }}>
-                          {getInitials(getOtherParticipantName(conversation))}
-                        </Avatar>
-                      </Badge>
-                    </ListItemAvatar>
-                    <ListItemText
-                      primary={
-                        <Typography sx={{ fontWeight: 600, color: 'white' }}>
-                          {getOtherParticipantName(conversation)}
-                        </Typography>
-                      }
-                      secondary={
-                        <>
-                          <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.6)' }} noWrap>
-                            {conversation.lastMessageText || 'No messages yet'}
-                          </Typography>
-                          <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.5)' }}>
-                            {new Date(conversation.lastMessageAt).toLocaleDateString()}
-                          </Typography>
-                        </>
-                      }
-                    />
-                  </ListItemButton>
-                </ListItem>
-              ))}
-            </List>
-          </Grid>
-
-          {/* Messages Area */}
-          <Grid item xs={12} md={8} sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-            {selectedConversation ? (
-              <>
-                {/* Header */}
-                <Box sx={{ p: 3, borderBottom: '1px solid rgba(255, 152, 0, 0.2)' }}>
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                    <Avatar sx={{ background: roleColors.PROVIDER.gradient, fontWeight: 700, width: 48, height: 48 }}>
-                      {getInitials(getOtherParticipantName(selectedConversation))}
-                    </Avatar>
-                    <Box>
-                      <Typography variant="h6" sx={{ color: 'white', fontWeight: 700 }}>
-                        {getOtherParticipantName(selectedConversation)}
-                      </Typography>
-                      {selectedConversation.subject && (
-                        <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.6)' }}>
-                          {selectedConversation.subject}
-                        </Typography>
-                      )}
-                    </Box>
-                  </Box>
+          {selectedConversation ? (
+            <>
+              {/* Chat Header */}
+              <Box sx={{ 
+                p: 3, 
+                borderBottom: '1px solid rgba(255, 152, 0, 0.2)',
+                background: 'rgba(0, 0, 0, 0.4)',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 2,
+              }}>
+                <Avatar sx={{ bgcolor: '#FFA726', width: 48, height: 48 }}>
+                  {getInitials(selectedConversation.name)}
+                </Avatar>
+                <Box>
+                  <Typography variant="h6" sx={{ color: '#FFA726', fontWeight: 600 }}>
+                    {selectedConversation.name}
+                  </Typography>
+                  <Typography variant="caption" sx={{ color: 'rgba(255, 255, 255, 0.6)' }}>
+                    Caregiver
+                  </Typography>
                 </Box>
+              </Box>
 
-                {/* Messages */}
-                <Box sx={{ flex: 1, overflow: 'auto', p: 3 }}>
-                  {messages.map((message) => {
-                    const isOwnMessage = message.senderId === user?.id;
+              {/* Messages */}
+              <Box sx={{ 
+                flexGrow: 1, 
+                p: 3, 
+                overflowY: 'auto',
+                background: 'rgba(0, 0, 0, 0.2)',
+              }}>
+                {(messages[selectedConversation.id] || []).length === 0 ? (
+                  <Box sx={{ 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    justifyContent: 'center', 
+                    height: '100%',
+                    flexDirection: 'column',
+                    gap: 2,
+                  }}>
+                    <MessageIcon sx={{ fontSize: 64, color: 'rgba(255, 152, 0, 0.3)' }} />
+                    <Typography variant="body1" sx={{ color: 'rgba(255, 255, 255, 0.5)' }}>
+                      No messages yet. Start the conversation!
+                    </Typography>
+                  </Box>
+                ) : (
+                  (messages[selectedConversation.id] || []).map((msg) => {
+                    const isOwnMessage = msg.senderId === user?.id;
                     return (
                       <Box
-                        key={message.id}
+                        key={msg.id}
                         sx={{
+                          mb: 2,
                           display: 'flex',
                           justifyContent: isOwnMessage ? 'flex-end' : 'flex-start',
-                          mb: 2,
                         }}
                       >
-                        {!isOwnMessage && (
-                          <Avatar sx={{ 
-                            mr: 1.5,
-                            background: 'rgba(255,255,255,0.1)',
-                            color: '#FFA726',
-                            fontWeight: 700,
-                          }}>
-                            {getInitials(message.senderName)}
-                          </Avatar>
-                        )}
-                        <Box
+                        <Paper
+                          elevation={0}
                           sx={{
-                            maxWidth: '70%',
-                            background: isOwnMessage 
-                              ? 'linear-gradient(135deg, #FF9800 0%, #FFC107 100%)' 
-                              : 'rgba(255,255,255,0.08)',
-                            backdropFilter: 'blur(10px)',
-                            WebkitBackdropFilter: 'blur(10px)',
-                            border: isOwnMessage ? 'none' : '1px solid rgba(255,255,255,0.15)',
-                            color: 'white',
-                            borderRadius: '16px',
                             p: 2,
-                            boxShadow: isOwnMessage ? '0 4px 16px rgba(255, 152, 0, 0.3)' : 'none',
+                            maxWidth: '70%',
+                            backgroundColor: isOwnMessage 
+                              ? 'rgba(255, 152, 0, 0.9)' 
+                              : 'rgba(255, 255, 255, 0.1)',
+                            backdropFilter: 'blur(10px)',
+                            border: isOwnMessage 
+                              ? 'none' 
+                              : '1px solid rgba(255, 152, 0, 0.2)',
+                            borderRadius: isOwnMessage 
+                              ? '20px 20px 4px 20px' 
+                              : '20px 20px 20px 4px',
                           }}
                         >
-                          {!isOwnMessage && (
-                            <Typography variant="caption" sx={{ fontWeight: 700, display: 'block', mb: 0.5, color: '#FFA726' }}>
-                              {message.senderName}
-                            </Typography>
-                          )}
-                          <Typography variant="body2" sx={{ color: 'white' }}>{message.content}</Typography>
-                          <Typography variant="caption" sx={{ opacity: 0.7, display: 'block', mt: 0.5 }}>
-                            {new Date(message.createdAt).toLocaleTimeString()}
-                          </Typography>
-                        </Box>
-                        {isOwnMessage && (
-                          <Avatar sx={{ 
-                            ml: 1.5, 
-                            background: roleColors.PROVIDER.gradient,
-                            fontWeight: 700,
+                          <Typography variant="body1" sx={{ 
+                            color: isOwnMessage ? 'white' : 'rgba(255, 255, 255, 0.9)',
+                            wordWrap: 'break-word',
                           }}>
-                            {getInitials(user?.name || '')}
-                          </Avatar>
-                        )}
+                            {msg.content}
+                          </Typography>
+                          <Typography variant="caption" sx={{ 
+                            display: 'block', 
+                            mt: 0.5,
+                            color: isOwnMessage 
+                              ? 'rgba(255, 255, 255, 0.8)' 
+                              : 'rgba(255, 255, 255, 0.5)',
+                          }}>
+                            {new Date(msg.createdAt).toLocaleTimeString()}
+                          </Typography>
+                        </Paper>
                       </Box>
                     );
-                  })}
-                </Box>
+                  })
+                )}
+              </Box>
 
-                <Divider sx={{ bgcolor: 'rgba(255, 152, 0, 0.2)' }} />
-
-                {/* Input */}
-                <Box sx={{ p: 2, display: 'flex', gap: 1.5 }}>
+              {/* Message Input */}
+              <Box sx={{ 
+                p: 3, 
+                borderTop: '1px solid rgba(255, 152, 0, 0.2)',
+                background: 'rgba(0, 0, 0, 0.4)',
+              }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                   <TextField
                     fullWidth
+                    variant="outlined"
                     placeholder="Type a message..."
                     value={newMessage}
                     onChange={(e) => setNewMessage(e.target.value)}
-                    onKeyPress={handleKeyPress}
-                    disabled={sending}
-                    multiline
-                    maxRows={3}
+                    onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
                     sx={{
                       '& .MuiOutlinedInput-root': {
-                        color: 'white',
-                        bgcolor: 'rgba(255,255,255,0.05)',
+                        color: 'rgba(255, 255, 255, 0.9)',
+                        backgroundColor: 'rgba(0, 0, 0, 0.3)',
                         borderRadius: '12px',
                         '& fieldset': {
                           borderColor: 'rgba(255, 152, 0, 0.3)',
@@ -383,47 +398,59 @@ const ProviderMessagesPage = () => {
                         },
                       },
                       '& .MuiInputBase-input::placeholder': {
-                        color: 'rgba(255,255,255,0.5)',
+                        color: 'rgba(255, 255, 255, 0.5)',
+                        opacity: 1,
                       },
                     }}
                   />
-                  <IconButton
+                  <Button 
+                    variant="contained" 
                     onClick={handleSendMessage}
-                    disabled={!newMessage.trim() || sending}
-                    sx={{
-                      background: roleColors.PROVIDER.gradient,
+                    disabled={!newMessage.trim()}
+                    startIcon={<Send />}
+                    sx={{ 
+                      bgcolor: '#FFA726',
                       color: 'white',
-                      width: 48,
-                      height: 48,
-                      boxShadow: '0 4px 16px rgba(255, 152, 0, 0.4)',
-                      '&:hover': {
-                        transform: 'scale(1.05)',
-                        boxShadow: '0 8px 24px rgba(255, 152, 0, 0.5)',
+                      px: 3,
+                      py: 1.5,
+                      borderRadius: '12px',
+                      fontWeight: 600,
+                      textTransform: 'none',
+                      '&:hover': { 
+                        bgcolor: '#FF9800',
+                        transform: 'translateY(-2px)',
+                        boxShadow: '0 8px 24px rgba(255, 152, 0, 0.4)',
                       },
                       '&:disabled': {
-                        background: 'rgba(255,255,255,0.1)',
-                        color: 'rgba(255,255,255,0.3)',
+                        bgcolor: 'rgba(255, 152, 0, 0.3)',
+                        color: 'rgba(255, 255, 255, 0.5)',
                       },
-                      transition: 'all 0.2s ease',
+                      transition: 'all 0.3s ease',
                     }}
                   >
-                    {sending ? <CircularProgress size={24} sx={{ color: 'white' }} /> : <SendIcon />}
-                  </IconButton>
+                    Send
+                  </Button>
                 </Box>
-              </>
-            ) : (
-              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', flexDirection: 'column', gap: 2 }}>
-                <MessageIcon sx={{ fontSize: 64, color: 'rgba(255, 152, 0, 0.3)' }} />
-                <Typography variant="body1" sx={{ color: 'rgba(255,255,255,0.6)' }}>
-                  Select a conversation to start messaging
-                </Typography>
               </Box>
-            )}
-          </Grid>
-        </Grid>
+            </>
+          ) : (
+            <Box sx={{ 
+              display: 'flex', 
+              alignItems: 'center', 
+              justifyContent: 'center', 
+              height: '100%',
+              flexDirection: 'column',
+              gap: 2,
+            }}>
+              <MessageIcon sx={{ fontSize: 80, color: 'rgba(255, 152, 0, 0.3)' }} />
+              <Typography variant="h6" sx={{ color: 'rgba(255, 255, 255, 0.5)' }}>
+                Select a conversation to start messaging
+              </Typography>
+            </Box>
+          )}
         </Box>
-      </Layout>
-    </Box>
+      </Box>
+    </ProviderPageWrapper>
   );
 };
 

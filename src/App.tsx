@@ -32,6 +32,7 @@ import CaregiverSupportPage from './pages/caregiver/CaregiverSupportPage';
 import ReclaimePage from './pages/caregiver/ReclaimePage';
 import GroceryShoppingListPage from './pages/caregiver/features/GroceryShoppingListPage';
 import CaregiverHerediblesPage from './pages/caregiver/CaregiverHerediblesPage';
+import RecipeDetailPage from './pages/caregiver/RecipeDetailPage';
 import PharmacyPage from './pages/caregiver/features/PharmacyPage';
 import CaregivingTipsPage from './pages/caregiver/features/CaregivingTipsPage';
 import ChampionCornerPage from './pages/caregiver/features/ChampionCornerPage';
@@ -78,6 +79,7 @@ function App() {
               <Route path="/dashboard/caregiver" element={<CaregiverDashboard />} />
               <Route path="/patient-monitor" element={<PatientMonitorPage />} />
               <Route path="/caregiver/heredibles" element={<CaregiverHerediblesPage />} />
+              <Route path="/caregiver/recipe/:recipeId" element={<RecipeDetailPage />} />
               <Route path="/care-planning" element={<CarePlanningPage />} />
               <Route path="/caregiver-support" element={<CaregiverSupportPage />} />
               <Route path="/reclaime" element={<ReclaimePage />} />

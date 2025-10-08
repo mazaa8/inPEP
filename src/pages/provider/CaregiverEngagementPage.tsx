@@ -129,7 +129,7 @@ const CaregiverEngagementPage = () => {
     const fetchCaregiverEngagement = async () => {
       try {
         setLoading(true);
-        const response = await fetch('http://localhost:3001/api/caregiver-engagement', {
+        const response = await fetch('http://localhost:3000/api/caregiver-engagement', {
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`,
           },
@@ -359,6 +359,19 @@ const CaregiverEngagementPage = () => {
                       ) : (
                         <TrendingDownIcon sx={{ fontSize: 16, color: '#f44336' }} />
                       )}
+                      {caregiver.flagged && (
+                        <Chip 
+                          icon={<WarningIcon />}
+                          label="Priority" 
+                          size="small"
+                          sx={{ 
+                            bgcolor: 'rgba(255, 152, 0, 0.2)',
+                            color: '#FFA726',
+                            fontWeight: 600,
+                            ml: 1,
+                          }}
+                        />
+                      )}
                     </Box>
                   </TableCell>
                   <TableCell sx={{ color: 'rgba(255,255,255,0.8)' }}>
@@ -423,6 +436,27 @@ const CaregiverEngagementPage = () => {
           open={detailModalOpen}
           onClose={() => setDetailModalOpen(false)}
           caregiver={selectedCaregiver}
+          onUpdate={() => {
+            // Refresh caregiver list when flag status changes
+            const fetchCaregiverEngagement = async () => {
+              try {
+                const response = await fetch('http://localhost:3000/api/caregiver-engagement', {
+                  headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`,
+                  },
+                });
+                
+                if (!response.ok) throw new Error('Failed to fetch');
+                
+                const data = await response.json();
+                setCaregivers(data.caregivers);
+                setSummary(data.summary);
+              } catch (error) {
+                console.error('Error refreshing caregiver engagement:', error);
+              }
+            };
+            fetchCaregiverEngagement();
+          }}
         />
       </Layout>
     </Box>

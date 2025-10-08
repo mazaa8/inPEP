@@ -1,4 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useVideoCall } from '../../context/VideoCallContext';
 import {
   Dialog,
   DialogTitle,
@@ -21,7 +23,7 @@ import {
   Message as MessageIcon,
   Phone as PhoneIcon,
   Flag as FlagIcon,
-  VolunteerActivism as CareIcon,
+  VolunteerActivism,
   Medication as MedicationIcon,
   Restaurant as RestaurantIcon,
   MonitorHeart as VitalsIcon,
@@ -34,10 +36,18 @@ interface CaregiverDetailModalProps {
   open: boolean;
   onClose: () => void;
   caregiver: any;
+  onUpdate?: () => void;
 }
 
-const CaregiverDetailModal = ({ open, onClose, caregiver }: CaregiverDetailModalProps) => {
-  const [flagged, setFlagged] = useState(false);
+const CaregiverDetailModal = ({ open, onClose, caregiver, onUpdate }: CaregiverDetailModalProps) => {
+  const navigate = useNavigate();
+  const { initiateCall } = useVideoCall();
+  const [flagged, setFlagged] = useState(caregiver?.flagged || false);
+
+  // Update flagged state when caregiver changes
+  useEffect(() => {
+    setFlagged(caregiver?.flagged || false);
+  }, [caregiver]);
 
   if (!caregiver) return null;
 
@@ -74,19 +84,54 @@ const CaregiverDetailModal = ({ open, onClose, caregiver }: CaregiverDetailModal
   };
 
   const handleMessage = () => {
-    // TODO: Integrate with messaging system
-    console.log('Opening message to:', caregiver.caregiverName);
+    // Navigate to messages page with caregiver pre-selected
+    // Use caregiverId (actual user ID) not engagement record ID
+    const caregiverUserId = caregiver.caregiverId || caregiver.id;
+    
+    navigate('/provider/messages', { 
+      state: { 
+        recipientId: caregiverUserId,
+        recipientName: caregiver.caregiverName,
+        recipientType: 'caregiver'
+      } 
+    });
+    onClose();
   };
 
   const handleCall = () => {
-    // TODO: Integrate with video call system
-    console.log('Initiating call to:', caregiver.caregiverName);
+    // Initiate video call using existing WebRTC system
+    // Use caregiverId from the caregiver object (this is their user ID)
+    const caregiverUserId = caregiver.caregiverId || caregiver.id;
+    initiateCall(caregiverUserId, caregiver.caregiverName);
+    onClose();
   };
 
-  const handleFlag = () => {
-    setFlagged(!flagged);
-    // TODO: Add to priority list
-    console.log('Flagged for follow-up:', caregiver.caregiverName);
+  const handleFlag = async () => {
+    const newFlaggedState = !flagged;
+    setFlagged(newFlaggedState);
+    
+    // Save flag to backend
+    try {
+      const response = await fetch(`http://localhost:3000/api/caregiver-engagement/${caregiver.id}/flag`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+        },
+        body: JSON.stringify({ flagged: newFlaggedState }),
+      });
+      
+      if (!response.ok) throw new Error('Failed to flag caregiver');
+      
+      console.log(`${newFlaggedState ? 'Flagged' : 'Unflagged'} for follow-up:`, caregiver.caregiverName);
+      
+      // Trigger parent refresh
+      if (onUpdate) onUpdate();
+    } catch (error) {
+      console.error('Error flagging caregiver:', error);
+      // Revert on error
+      setFlagged(!newFlaggedState);
+    }
   };
 
   return (
@@ -375,6 +420,110 @@ const CaregiverDetailModal = ({ open, onClose, caregiver }: CaregiverDetailModal
               </CardContent>
             </Card>
           </Grid>
+
+          {/* ReclaiMe Recommendations */}
+          {caregiver.burnoutRisk >= 40 && (
+            <Grid item xs={12}>
+              <Card sx={{ 
+                background: 'linear-gradient(135deg, rgba(156, 39, 176, 0.1) 0%, rgba(103, 58, 183, 0.1) 100%)',
+                backdropFilter: 'blur(10px)',
+                border: '1px solid rgba(156, 39, 176, 0.3)',
+              }}>
+                <CardContent>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
+                    <VolunteerActivism sx={{ fontSize: 32, color: '#9c27b0' }} />
+                    <Typography variant="h6" sx={{ color: '#9c27b0', fontWeight: 700 }}>
+                      ReclaiMe Recommendations
+                    </Typography>
+                  </Box>
+                  <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.8)', mb: 2 }}>
+                    Based on {caregiver.caregiverName}'s burnout risk of {caregiver.burnoutRisk}%, we recommend:
+                  </Typography>
+                  <Grid container spacing={2}>
+                    {caregiver.burnoutRisk >= 60 && (
+                      <>
+                        <Grid item xs={12} sm={6}>
+                          <Box sx={{ 
+                            p: 2, 
+                            borderRadius: 2, 
+                            bgcolor: 'rgba(156, 39, 176, 0.1)',
+                            border: '1px solid rgba(156, 39, 176, 0.2)',
+                          }}>
+                            <Typography variant="subtitle2" sx={{ color: '#ce93d8', fontWeight: 600, mb: 1 }}>
+                              🧘 Immediate Self-Care
+                            </Typography>
+                            <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.7)' }}>
+                              Guided meditation sessions and breathing exercises to reduce stress
+                            </Typography>
+                          </Box>
+                        </Grid>
+                        <Grid item xs={12} sm={6}>
+                          <Box sx={{ 
+                            p: 2, 
+                            borderRadius: 2, 
+                            bgcolor: 'rgba(156, 39, 176, 0.1)',
+                            border: '1px solid rgba(156, 39, 176, 0.2)',
+                          }}>
+                            <Typography variant="subtitle2" sx={{ color: '#ce93d8', fontWeight: 600, mb: 1 }}>
+                              🤝 Respite Care Options
+                            </Typography>
+                            <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.7)' }}>
+                              Connect with local respite care services for temporary relief
+                            </Typography>
+                          </Box>
+                        </Grid>
+                      </>
+                    )}
+                    <Grid item xs={12} sm={6}>
+                      <Box sx={{ 
+                        p: 2, 
+                        borderRadius: 2, 
+                        bgcolor: 'rgba(156, 39, 176, 0.1)',
+                        border: '1px solid rgba(156, 39, 176, 0.2)',
+                      }}>
+                        <Typography variant="subtitle2" sx={{ color: '#ce93d8', fontWeight: 600, mb: 1 }}>
+                          💬 Support Groups
+                        </Typography>
+                        <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.7)' }}>
+                          Join Champion Corner to connect with other caregivers
+                        </Typography>
+                      </Box>
+                    </Grid>
+                    <Grid item xs={12} sm={6}>
+                      <Box sx={{ 
+                        p: 2, 
+                        borderRadius: 2, 
+                        bgcolor: 'rgba(156, 39, 176, 0.1)',
+                        border: '1px solid rgba(156, 39, 176, 0.2)',
+                      }}>
+                        <Typography variant="subtitle2" sx={{ color: '#ce93d8', fontWeight: 600, mb: 1 }}>
+                          📚 Educational Resources
+                        </Typography>
+                        <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.7)' }}>
+                          Access caregiving tips and stress management strategies
+                        </Typography>
+                      </Box>
+                    </Grid>
+                  </Grid>
+                  <Button
+                    variant="contained"
+                    fullWidth
+                    onClick={() => {
+                      navigate('/reclaime');
+                      onClose();
+                    }}
+                    sx={{
+                      mt: 2,
+                      background: 'linear-gradient(135deg, #9c27b0 0%, #673ab7 100%)',
+                      '&:hover': { background: 'linear-gradient(135deg, #7b1fa2 0%, #512da8 100%)' },
+                    }}
+                  >
+                    View Full ReclaiMe Resources
+                  </Button>
+                </CardContent>
+              </Card>
+            </Grid>
+          )}
 
           {/* Activity Stats */}
           <Grid item xs={12}>

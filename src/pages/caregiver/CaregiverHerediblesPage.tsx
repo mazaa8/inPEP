@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   Box,
   Typography,
@@ -60,6 +61,7 @@ function TabPanel(props: TabPanelProps) {
 }
 
 const CaregiverHerediblesPage = () => {
+  const navigate = useNavigate();
   const [tabValue, setTabValue] = useState(0);
   const [mealPlan, setMealPlan] = useState<MealPlan | null>(null);
   const [recipes, setRecipes] = useState<Recipe[]>([]);
@@ -88,11 +90,14 @@ const CaregiverHerediblesPage = () => {
         medicationService.getPatientPrescriptions(patientId, 'active'),
       ]);
       setMealPlan(mealPlanData);
-      setRecipes(recipesData);
+      setRecipes(recipesData || []);
       setNutritionSummary(nutritionData);
-      setPrescriptions(prescriptionsData);
+      setPrescriptions(prescriptionsData || []);
     } catch (err) {
       console.error('Failed to load Heredibles data:', err);
+      // Set empty arrays to prevent crashes
+      setRecipes([]);
+      setPrescriptions([]);
     } finally {
       setLoading(false);
     }
@@ -133,8 +138,8 @@ const CaregiverHerediblesPage = () => {
   };
 
   const handleViewRecipe = (recipe: Recipe) => {
-    setSelectedRecipe(recipe);
-    setRecipeDialogOpen(true);
+    // Navigate to dedicated recipe page
+    navigate(`/caregiver/recipe/${recipe.id}`);
   };
 
   const getTodaysMeals = () => {
@@ -830,18 +835,54 @@ const CaregiverHerediblesPage = () => {
           onClose={() => setRecipeDialogOpen(false)}
           maxWidth="md"
           fullWidth
+          PaperProps={{
+            sx: {
+              borderRadius: '20px',
+              maxHeight: '90vh',
+            }
+          }}
         >
           {selectedRecipe && (
             <>
-              <DialogTitle>
+              <DialogTitle sx={{ 
+                background: roleColors.CAREGIVER.gradient,
+                color: 'white',
+                pb: 2,
+              }}>
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <Typography variant="h5">{selectedRecipe.name}</Typography>
-                  <IconButton onClick={() => setRecipeDialogOpen(false)}>
+                  <Box>
+                    <Typography variant="h5" sx={{ fontWeight: 700, mb: 1 }}>
+                      {selectedRecipe.name}
+                    </Typography>
+                    <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+                      <Chip 
+                        label={selectedRecipe.category} 
+                        size="small" 
+                        sx={{ bgcolor: 'rgba(255,255,255,0.2)', color: 'white' }}
+                      />
+                      {selectedRecipe.cuisine && (
+                        <Chip 
+                          label={`🌍 ${selectedRecipe.cuisine}`} 
+                          size="small" 
+                          sx={{ bgcolor: 'rgba(255,255,255,0.2)', color: 'white' }}
+                        />
+                      )}
+                      <Chip 
+                        label={selectedRecipe.difficulty} 
+                        size="small" 
+                        sx={{ bgcolor: 'rgba(255,255,255,0.2)', color: 'white' }}
+                      />
+                    </Box>
+                  </Box>
+                  <IconButton 
+                    onClick={() => setRecipeDialogOpen(false)}
+                    sx={{ color: 'white' }}
+                  >
                     <CloseIcon />
                   </IconButton>
                 </Box>
               </DialogTitle>
-              <DialogContent dividers>
+              <DialogContent dividers sx={{ p: 3 }}>
                 {/* Food-Drug Interaction Warning */}
                 {prescriptions.length > 0 && (() => {
                   const ingredients = selectedRecipe.ingredients ? JSON.parse(selectedRecipe.ingredients) : [];
@@ -896,66 +937,205 @@ const CaregiverHerediblesPage = () => {
 
                 <Divider sx={{ my: 2 }} />
 
-                <Typography variant="h6" gutterBottom>
-                  Nutrition Facts (per serving)
+                <Typography variant="h6" gutterBottom sx={{ color: roleColors.CAREGIVER.primary, fontWeight: 700 }}>
+                  📊 Nutrition Facts (per serving)
                 </Typography>
                 <Grid container spacing={2} sx={{ mb: 3 }}>
-                  <Grid item xs={4}>
-                    <Box sx={{ p: 2, textAlign: 'center', bgcolor: '#f5f5f5' }}>
-                      <Typography variant="h6">{selectedRecipe.calories}</Typography>
-                      <Typography variant="caption">Calories</Typography>
+                  <Grid item xs={3}>
+                    <Box sx={{ 
+                      p: 2, 
+                      textAlign: 'center', 
+                      bgcolor: '#e8f5e9',
+                      borderRadius: '12px',
+                      border: '2px solid #c8e6c9',
+                    }}>
+                      <Typography variant="h5" sx={{ fontWeight: 700, color: roleColors.CAREGIVER.primary }}>
+                        {selectedRecipe.calories}
+                      </Typography>
+                      <Typography variant="caption" sx={{ fontWeight: 600 }}>Calories</Typography>
                     </Box>
                   </Grid>
-                  <Grid item xs={4}>
-                    <Box sx={{ p: 2, textAlign: 'center', bgcolor: '#f5f5f5' }}>
-                      <Typography variant="h6">{selectedRecipe.protein.toFixed(0)}g</Typography>
-                      <Typography variant="caption">Protein</Typography>
+                  <Grid item xs={3}>
+                    <Box sx={{ 
+                      p: 2, 
+                      textAlign: 'center', 
+                      bgcolor: '#e8f5e9',
+                      borderRadius: '12px',
+                      border: '2px solid #c8e6c9',
+                    }}>
+                      <Typography variant="h5" sx={{ fontWeight: 700, color: roleColors.CAREGIVER.primary }}>
+                        {selectedRecipe.protein.toFixed(0)}g
+                      </Typography>
+                      <Typography variant="caption" sx={{ fontWeight: 600 }}>Protein</Typography>
                     </Box>
                   </Grid>
-                  <Grid item xs={4}>
-                    <Box sx={{ p: 2, textAlign: 'center', bgcolor: '#f5f5f5' }}>
-                      <Typography variant="h6">{selectedRecipe.fiber.toFixed(0)}g</Typography>
-                      <Typography variant="caption">Fiber</Typography>
+                  <Grid item xs={3}>
+                    <Box sx={{ 
+                      p: 2, 
+                      textAlign: 'center', 
+                      bgcolor: '#e8f5e9',
+                      borderRadius: '12px',
+                      border: '2px solid #c8e6c9',
+                    }}>
+                      <Typography variant="h5" sx={{ fontWeight: 700, color: roleColors.CAREGIVER.primary }}>
+                        {selectedRecipe.carbs.toFixed(0)}g
+                      </Typography>
+                      <Typography variant="caption" sx={{ fontWeight: 600 }}>Carbs</Typography>
+                    </Box>
+                  </Grid>
+                  <Grid item xs={3}>
+                    <Box sx={{ 
+                      p: 2, 
+                      textAlign: 'center', 
+                      bgcolor: '#e8f5e9',
+                      borderRadius: '12px',
+                      border: '2px solid #c8e6c9',
+                    }}>
+                      <Typography variant="h5" sx={{ fontWeight: 700, color: roleColors.CAREGIVER.primary }}>
+                        {selectedRecipe.fiber.toFixed(0)}g
+                      </Typography>
+                      <Typography variant="caption" sx={{ fontWeight: 600 }}>Fiber</Typography>
                     </Box>
                   </Grid>
                 </Grid>
 
-                <Typography variant="h6" gutterBottom>
-                  Ingredients
+                <Typography variant="h6" gutterBottom sx={{ color: roleColors.CAREGIVER.primary, fontWeight: 700 }}>
+                  🥗 Ingredients
                 </Typography>
-                <List dense>
-                  {JSON.parse(selectedRecipe.ingredients).map((ing: any, idx: number) => (
-                    <ListItem key={idx}>
-                      <ListItemText primary={`${ing.amount} ${ing.unit} ${ing.name}`} />
-                    </ListItem>
-                  ))}
-                </List>
+                <Box sx={{ 
+                  bgcolor: '#f1f8f4', 
+                  borderRadius: '12px', 
+                  p: 2,
+                  border: '1px solid #c8e6c9',
+                  mb: 3,
+                }}>
+                  <List dense>
+                    {JSON.parse(selectedRecipe.ingredients).map((ing: any, idx: number) => (
+                      <ListItem key={idx}>
+                        <ListItemIcon>
+                          <Checkbox edge="start" />
+                        </ListItemIcon>
+                        <ListItemText 
+                          primary={`${ing.amount} ${ing.unit} ${ing.name}`}
+                          sx={{ '& .MuiListItemText-primary': { fontWeight: 500 } }}
+                        />
+                      </ListItem>
+                    ))}
+                  </List>
+                </Box>
 
-                <Typography variant="h6" gutterBottom sx={{ mt: 3 }}>
-                  Instructions
+                <Typography variant="h6" gutterBottom sx={{ mt: 3, color: roleColors.CAREGIVER.primary, fontWeight: 700 }}>
+                  👨‍🍳 Instructions
                 </Typography>
-                <List>
+                <List sx={{ 
+                  bgcolor: '#f1f8f4', 
+                  borderRadius: '12px', 
+                  p: 2,
+                  border: '1px solid #c8e6c9',
+                }}>
                   {JSON.parse(selectedRecipe.instructions).map((step: string, idx: number) => (
-                    <ListItem key={idx}>
+                    <ListItem key={idx} sx={{ alignItems: 'flex-start', mb: 1 }}>
+                      <Box
+                        sx={{
+                          minWidth: 32,
+                          height: 32,
+                          borderRadius: '50%',
+                          bgcolor: roleColors.CAREGIVER.primary,
+                          color: 'white',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          fontWeight: 700,
+                          mr: 2,
+                          mt: 0.5,
+                        }}
+                      >
+                        {idx + 1}
+                      </Box>
                       <ListItemText
-                        primary={`${idx + 1}. ${step}`}
-                        sx={{ '& .MuiListItemText-primary': { mb: 1 } }}
+                        primary={step}
+                        sx={{ 
+                          '& .MuiListItemText-primary': { 
+                            mb: 1,
+                            fontSize: '0.95rem',
+                            lineHeight: 1.6,
+                          } 
+                        }}
                       />
                     </ListItem>
                   ))}
                 </List>
 
                 {selectedRecipe.tips && (
-                  <Box sx={{ p: 2, bgcolor: '#e3f2fd', mt: 3 }}>
-                    <Typography variant="subtitle2" color="primary" gutterBottom>
+                  <Box sx={{ 
+                    p: 3, 
+                    bgcolor: '#fff3e0', 
+                    borderRadius: '12px',
+                    border: '2px solid #ffe0b2',
+                    mt: 3,
+                  }}>
+                    <Typography variant="h6" sx={{ color: '#f57c00', fontWeight: 700, mb: 1 }}>
                       💡 Chef's Tip
                     </Typography>
-                    <Typography variant="body2">{selectedRecipe.tips}</Typography>
+                    <Typography variant="body2" sx={{ lineHeight: 1.6 }}>
+                      {selectedRecipe.tips}
+                    </Typography>
                   </Box>
                 )}
+
+                {/* Dietary Tags */}
+                <Box sx={{ mt: 3 }}>
+                  <Typography variant="subtitle2" gutterBottom sx={{ fontWeight: 600 }}>
+                    Dietary Information
+                  </Typography>
+                  <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+                    {JSON.parse(selectedRecipe.dietaryTags).map((tag: string) => (
+                      <Chip 
+                        key={tag} 
+                        label={tag} 
+                        size="small" 
+                        sx={{ 
+                          bgcolor: '#e8f5e9',
+                          color: roleColors.CAREGIVER.primary,
+                          fontWeight: 600,
+                        }}
+                      />
+                    ))}
+                  </Box>
+                </Box>
               </DialogContent>
-              <DialogActions>
-                <Button onClick={() => setRecipeDialogOpen(false)}>Close</Button>
+              <DialogActions sx={{ p: 3, gap: 1 }}>
+                <Button 
+                  onClick={() => setRecipeDialogOpen(false)}
+                  variant="outlined"
+                  sx={{ 
+                    borderColor: roleColors.CAREGIVER.primary,
+                    color: roleColors.CAREGIVER.primary,
+                    '&:hover': {
+                      borderColor: roleColors.CAREGIVER.primary,
+                      bgcolor: 'rgba(76, 175, 80, 0.1)',
+                    }
+                  }}
+                >
+                  Close
+                </Button>
+                <Button 
+                  variant="contained"
+                  sx={{ 
+                    background: roleColors.CAREGIVER.gradient,
+                    color: 'white',
+                    fontWeight: 600,
+                    '&:hover': {
+                      background: roleColors.CAREGIVER.gradient,
+                      opacity: 0.9,
+                    }
+                  }}
+                  onClick={() => {
+                    window.print();
+                  }}
+                >
+                  🖨️ Print Recipe
+                </Button>
               </DialogActions>
             </>
           )}
