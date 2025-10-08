@@ -4,11 +4,13 @@ import DashboardCard from './DashboardCard';
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend } from 'recharts';
 import { providerService, type PatientOverviewMetrics } from '../../../services/providerService';
 import { useAuth } from '../../../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28'];
 
 const PatientOverview = () => {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [metrics, setMetrics] = useState<PatientOverviewMetrics | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -76,26 +78,31 @@ const PatientOverview = () => {
 
       {/* Caregiver Engagement Widget */}
       <Grid item xs={12} sm={6}>
-        <DashboardCard title="Caregiver Engagement">
-          <ResponsiveContainer width="100%" height={200}>
-            <PieChart>
-              <Pie
-                data={caregiverEngagementData}
-                cx="50%"
-                cy="50%"
-                labelLine={false}
-                outerRadius={80}
-                fill="#8884d8"
-                dataKey="value"
-              >
-                {caregiverEngagementData.map((_entry, index) => (
-                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                ))}
-              </Pie>
-              <Legend />
-            </PieChart>
-          </ResponsiveContainer>
-        </DashboardCard>
+        <Box 
+          onClick={() => navigate('/provider/caregiver-engagement')}
+          sx={{ cursor: 'pointer', '&:hover': { transform: 'scale(1.02)', transition: 'transform 0.2s' } }}
+        >
+          <DashboardCard title="Caregiver Engagement">
+            <ResponsiveContainer width="100%" height={200}>
+              <PieChart>
+                <Pie
+                  data={caregiverEngagementData}
+                  cx="50%"
+                  cy="50%"
+                  labelLine={false}
+                  outerRadius={80}
+                  fill="#8884d8"
+                  dataKey="value"
+                >
+                  {caregiverEngagementData.map((_entry, index) => (
+                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                  ))}
+                </Pie>
+                <Legend />
+              </PieChart>
+            </ResponsiveContainer>
+          </DashboardCard>
+        </Box>
       </Grid>
     </Grid>
   );
