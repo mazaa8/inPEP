@@ -17,7 +17,9 @@
     "seed:heredibles": "tsx src/scripts/seedHeredibles.ts",
     "seed:cultural": "tsx src/scripts/seedCulturalRecipes.ts",
     "reset:heredibles": "tsx src/scripts/resetHeredibles.ts",
-    "update:characters": "tsx src/scripts/updateMainCharacters.ts"
+    "update:characters": "tsx src/scripts/updateMainCharacters.ts",
+    "seed": "tsx prisma/seed.ts",
+    "seed:caregiver-engagement": "tsx prisma/seeds/caregiverEngagement.ts"
   },
   "keywords": [
     "healthcare",

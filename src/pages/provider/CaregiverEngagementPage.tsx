@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Box,
   Typography,
@@ -113,7 +113,42 @@ const generateMockCaregivers = () => {
 
 const CaregiverEngagementPage = () => {
   const [searchQuery, setSearchQuery] = useState('');
-  const caregivers = generateMockCaregivers();
+  const [caregivers, setCaregivers] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [summary, setSummary] = useState({
+    totalCaregivers: 0,
+    avgEngagement: 0,
+    atRiskCount: 0,
+    activeThisWeek: 0,
+  });
+
+  useEffect(() => {
+    const fetchCaregiverEngagement = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch('http://localhost:3001/api/caregiver-engagement', {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`,
+          },
+        });
+        
+        if (!response.ok) throw new Error('Failed to fetch');
+        
+        const data = await response.json();
+        setCaregivers(data.caregivers);
+        setSummary(data.summary);
+      } catch (error) {
+        console.error('Error fetching caregiver engagement:', error);
+        // Fallback to mock data
+        const mockCaregivers = generateMockCaregivers();
+        setCaregivers(mockCaregivers);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCaregiverEngagement();
+  }, []);
 
   // Filter caregivers based on search
   const filteredCaregivers = caregivers.filter(
@@ -122,13 +157,13 @@ const CaregiverEngagementPage = () => {
       c.patientName.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  // Calculate overview metrics
-  const totalCaregivers = caregivers.length;
-  const avgEngagement = Math.round(
-    caregivers.reduce((sum, c) => sum + c.engagementScore, 0) / totalCaregivers
-  );
-  const atRiskCount = caregivers.filter((c) => c.burnoutRisk >= 60).length;
-  const activeThisWeek = caregivers.filter((c) => c.lastActivity.includes('hours') || c.lastActivity.includes('1 days')).length;
+  // Use summary from API or calculate from caregivers
+  const totalCaregivers = summary.totalCaregivers || caregivers.length;
+  const avgEngagement = summary.avgEngagement || (caregivers.length > 0 
+    ? Math.round(caregivers.reduce((sum, c) => sum + c.engagementScore, 0) / caregivers.length)
+    : 0);
+  const atRiskCount = summary.atRiskCount || caregivers.filter((c) => c.burnoutRisk >= 60).length;
+  const activeThisWeek = summary.activeThisWeek || caregivers.filter((c) => c.lastActivity?.includes('hours') || c.lastActivity?.includes('1 day')).length;
 
   const getEngagementColor = (level: string) => {
     switch (level) {
