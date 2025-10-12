@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Typography, Box, Grid, Button, Avatar, Card, CardContent, IconButton, Chip, Dialog, DialogTitle, DialogContent, DialogActions, TextField } from '@mui/material';
-import { CreditCard as CardIcon, Add as AddIcon, Delete as DeleteIcon, Star as StarIcon, AccountBalance as BankIcon, AccountBalanceWallet as WalletIcon, HealthAndSafety as InsuranceIcon } from '@mui/icons-material';
+import { CreditCard as CardIcon, Add as AddIcon, Delete as DeleteIcon, Star as StarIcon, AccountBalance as BankIcon, AccountBalanceWallet as WalletIcon, HealthAndSafety as InsuranceIcon, Payment as PaymentIcon } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import Layout from '../../../components/layout/Layout';
 import { roleColors } from '../../../styles/glassmorphism';
@@ -236,25 +236,46 @@ const PaymentMethodsPage = () => {
                   <Typography variant="body2" sx={{ color: 'rgba(27, 94, 32, 0.7)', mb: 2 }}>
                     {method.holderName}
                   </Typography>
-                  {!method.isDefault && (
+                  
+                  <Box sx={{ display: 'flex', gap: 1 }}>
                     <Button
-                      variant="outlined"
+                      variant="contained"
                       size="small"
                       fullWidth
-                      onClick={() => handleSetDefault(method.id)}
+                      startIcon={<PaymentIcon />}
+                      onClick={() => navigate('/caregiver/make-payment')}
                       sx={{
-                        borderColor: roleColors.CAREGIVER.primary,
-                        color: roleColors.CAREGIVER.primary,
+                        background: roleColors.CAREGIVER.gradient,
+                        color: 'white',
                         fontWeight: 600,
                         '&:hover': {
-                          borderColor: roleColors.CAREGIVER.primary,
-                          bgcolor: 'rgba(76, 175, 80, 0.05)',
+                          transform: 'scale(1.02)',
                         },
                       }}
                     >
-                      Set as Default
+                      Make Payment
                     </Button>
-                  )}
+                    {!method.isDefault && (
+                      <Button
+                        variant="outlined"
+                        size="small"
+                        onClick={() => handleSetDefault(method.id)}
+                        sx={{
+                          borderColor: roleColors.CAREGIVER.primary,
+                          color: roleColors.CAREGIVER.primary,
+                          fontWeight: 600,
+                          minWidth: 'auto',
+                          px: 2,
+                          '&:hover': {
+                            borderColor: roleColors.CAREGIVER.primary,
+                            bgcolor: 'rgba(76, 175, 80, 0.05)',
+                          },
+                        }}
+                      >
+                        <StarIcon sx={{ fontSize: 18 }} />
+                      </Button>
+                    )}
+                  </Box>
                 </CardContent>
               </Card>
             </Grid>
