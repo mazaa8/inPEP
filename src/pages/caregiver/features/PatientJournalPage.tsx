@@ -1,13 +1,15 @@
 import { useState, useEffect, useMemo } from 'react';
-import { Box, Typography, Grid, TextField, Chip, Fab, CircularProgress, Divider, Button, Tabs, Tab, Avatar } from '@mui/material';
+import { Box, Typography, Grid, TextField, Chip, Fab, CircularProgress, Divider, Button, Tabs, Tab, Avatar, Snackbar, Alert } from '@mui/material';
 import { Add as AddIcon, Search as SearchIcon, PictureAsPdf as PdfIcon, Share as ShareIcon, LocalHospital, PersonOff, Psychology, Healing, StickyNote2, TrendingUp, TrendingDown } from '@mui/icons-material';
 import { Book as BookIcon, SentimentVerySatisfied, SentimentNeutral, SentimentDissatisfied, Warning } from '@mui/icons-material';
 import Layout from '../../../components/layout/Layout';
 import JournalEntryDialog from '../../../components/caregiver/JournalEntryDialog';
 import MoodAnalytics from '../../../components/caregiver/MoodAnalytics';
+import StructuredDetailsView from '../../../components/caregiver/StructuredDetailsView';
 import { journalService, type JournalEntry } from '../../../services/journalService';
 import { generateJournalPDF } from '../../../utils/pdfGenerator';
 import { roleColors } from '../../../styles/glassmorphism';
+import { useAuth } from '../../../context/AuthContext';
 
 const MOOD_COLORS: Record<string, string> = {
   happy: '#4caf50',
@@ -42,6 +44,7 @@ const EVENT_ICONS: Record<string, React.ReactNode> = {
 };
 
 const PatientJournalPage = () => {
+  const { user } = useAuth();
   const [entries, setEntries] = useState<JournalEntry[]>([]);
   const [selectedEntry, setSelectedEntry] = useState<JournalEntry | null>(null);
   const [loading, setLoading] = useState(true);
@@ -50,6 +53,8 @@ const PatientJournalPage = () => {
   const [eventTypeFilter, setEventTypeFilter] = useState<string[]>([]);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [activeTab, setActiveTab] = useState(0);
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState('');
 
   const patientId = 'b805ec90-e553-4de7-9de0-45f2eb73d1ba'; // Abdeen White
 
@@ -102,15 +107,36 @@ const PatientJournalPage = () => {
 
   const handleCreateEntry = async (entryData: Partial<JournalEntry>) => {
     try {
+      if (!user?.id) {
+        console.error('User not authenticated');
+        return;
+      }
+
       const newEntry = await journalService.createJournalEntry({
         ...entryData,
         patientId,
-        caregiverId: 'authUserId', // Replace with actual authenticated user ID
+        caregiverId: user.id,
+        isVisibleToPatient: true,
       });
+      
+      // Add the new entry to the top of the list
       setEntries(prev => [newEntry, ...prev]);
+      
+      // Automatically select and display the new entry
       setSelectedEntry(newEntry);
+      
+      // Switch to Journal Entries tab if on Mood Analytics
+      setActiveTab(0);
+      
+      // Show success message
+      setSnackbarMessage('✅ Journal entry saved successfully!');
+      setSnackbarOpen(true);
+      
+      console.log('✅ Journal entry created successfully:', newEntry);
     } catch (err) {
-      console.error('Failed to create journal entry:', err);
+      console.error('❌ Failed to create journal entry:', err);
+      setSnackbarMessage('❌ Failed to save journal entry. Please try again.');
+      setSnackbarOpen(true);
     }
   };
 
@@ -576,9 +602,25 @@ const PatientJournalPage = () => {
                     )}
                   </Box>
                   <Divider sx={{ mb: 2 }} />
-                  <Typography variant="body1" sx={{ whiteSpace: 'pre-wrap' }}>
-                    {selectedEntry.content}
-                  </Typography>
+                  
+                  {/* Structured Details */}
+                  <StructuredDetailsView 
+                    eventType={selectedEntry.eventType}
+                    structuredDetails={selectedEntry.structuredDetails}
+                  />
+                  
+                  {/* Additional Notes */}
+                  {selectedEntry.content && (
+                    <Box sx={{ mt: 3 }}>
+                      <Typography variant="h6" sx={{ fontWeight: 600, mb: 1, color: '#1b5e20' }}>
+                        Additional Notes
+                      </Typography>
+                      <Typography variant="body1" sx={{ whiteSpace: 'pre-wrap', p: 2, bgcolor: 'rgba(76, 175, 80, 0.05)', borderRadius: '8px' }}>
+                        {selectedEntry.content}
+                      </Typography>
+                    </Box>
+                  )}
+                  
                   <Box sx={{ mt: 3, display: 'flex', gap: 2 }}>
                     <Button 
                       variant="outlined" 
@@ -630,6 +672,22 @@ const PatientJournalPage = () => {
           />
         </Box>
       </Layout>
+
+      {/* Success/Error Notification */}
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={4000}
+        onClose={() => setSnackbarOpen(false)}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      >
+        <Alert 
+          onClose={() => setSnackbarOpen(false)} 
+          severity={snackbarMessage.includes('❌') ? 'error' : 'success'}
+          sx={{ width: '100%' }}
+        >
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
     </Box>
   );
 };
