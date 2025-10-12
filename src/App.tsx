@@ -12,6 +12,7 @@ import PatientSupportPage from './pages/patient/PatientSupportPage';
 import PatientAppointmentsPage from './pages/patient/PatientAppointmentsPage';
 import MealPlanPage from './pages/patient/MealPlanPage';
 import PatientHerediblesPage from './pages/patient/HerediblesPage';
+import PatientJournalViewPage from './pages/patient/PatientJournalPage';
 import CaregiverDashboard from './pages/dashboards/CaregiverDashboard';
 import ProviderDashboard from './pages/dashboards/ProviderDashboard';
 import ProviderMessagesPage from './pages/provider/ProviderMessagesPage';
@@ -73,15 +74,15 @@ function App() {
               <Route path="/welcome-home/patient" element={<WelcomeHomePatient />} />
               <Route path="/dashboard/patient" element={<PatientDashboard />} />
               <Route path="/patient/appointments" element={<PatientAppointmentsPage />} />
+              <Route path="/patient/support" element={<PatientSupportPage />} />
               <Route path="/patient/meal-plan" element={<MealPlanPage />} />
               <Route path="/patient/heredibles" element={<PatientHerediblesPage />} />
-              <Route path="/messages" element={<MessagesPage />} />
+              <Route path="/patient/journal" element={<PatientJournalViewPage />} />
             </Route>
             <Route element={<ProtectedRoute allowedRoles={['CAREGIVER']} />}>
               <Route path="/patient-support" element={<PatientSupportPage />} />
               <Route path="/dashboard/caregiver" element={<CaregiverDashboard />} />
               <Route path="/patient-monitor" element={<PatientMonitorPage />} />
-              <Route path="/caregiver/heredibles" element={<CaregiverHerediblesPage />} />
               <Route path="/caregiver/recipe/:recipeId" element={<RecipeDetailPage />} />
               <Route path="/care-planning" element={<CarePlanningPage />} />
               <Route path="/caregiver/patient-journal" element={<PatientJournalPage />} />

@@ -632,6 +632,12 @@ const Layout = ({ children, title, darkMode = false, themeColor }: LayoutProps) 
                           </ListItemIcon>
                           <ListItemText primary="Heredibles™" />
                         </ListItemButton>
+                        <ListItemButton sx={{ pl: 4, ...(darkMode && { color: 'white', '&:hover': { bgcolor: 'rgba(33, 150, 243, 0.1)' } }) }} onClick={() => navigate('/patient/journal')}>
+                          <ListItemIcon sx={{ color: darkMode ? currentTheme.secondary : 'primary.main' }}>
+                            <BookIcon />
+                          </ListItemIcon>
+                          <ListItemText primary="My Health Journal" />
+                        </ListItemButton>
                       </>
                     )}
                     {user?.role === 'CAREGIVER' && (
