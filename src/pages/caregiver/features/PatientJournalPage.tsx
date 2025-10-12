@@ -10,7 +10,7 @@ import ShareJournalDialog from '../../../components/caregiver/ShareJournalDialog
 import MediaGallery from '../../../components/caregiver/MediaGallery';
 import AIInsightsPanel from '../../../components/caregiver/AIInsightsPanel';
 import { journalService, type JournalEntry, type MediaAttachment } from '../../../services/journalService';
-import { generateJournalPDF } from '../../../utils/pdfGenerator';
+import { generateDetailedEntryPDF, exportToCSV, exportToJSON, printJournalEntry, generateMonthlySummaryPDF } from '../../../utils/exportService';
 import { roleColors } from '../../../styles/glassmorphism';
 import { useAuth } from '../../../context/AuthContext';
 
@@ -258,26 +258,89 @@ const PatientJournalPage = () => {
           mb: 4,
           boxShadow: '0 8px 32px 0 rgba(76, 175, 80, 0.15)',
         }}>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-            <Box sx={{
-              width: 64,
-              height: 64,
-              borderRadius: '16px',
-              background: roleColors.CAREGIVER.gradient,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              boxShadow: `0 8px 24px ${roleColors.CAREGIVER.primary}40`,
-            }}>
-              <BookIcon sx={{ fontSize: 36, color: 'white' }} />
+          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 2 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+              <Box sx={{
+                width: 64,
+                height: 64,
+                borderRadius: '16px',
+                background: roleColors.CAREGIVER.gradient,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                boxShadow: `0 8px 24px ${roleColors.CAREGIVER.primary}40`,
+              }}>
+                <BookIcon sx={{ fontSize: 36, color: 'white' }} />
+              </Box>
+              <Box>
+                <Typography variant="h3" sx={{ fontWeight: 700, color: '#1b5e20', mb: 0.5 }}>
+                  Patient Journal
+                </Typography>
+                <Typography variant="body1" sx={{ color: 'rgba(27, 94, 32, 0.7)' }}>
+                  View and manage the patient's journal entries.
+                </Typography>
+              </Box>
             </Box>
-            <Box>
-              <Typography variant="h3" sx={{ fontWeight: 700, color: '#1b5e20', mb: 0.5 }}>
-                Patient Journal
-              </Typography>
-              <Typography variant="body1" sx={{ color: 'rgba(27, 94, 32, 0.7)' }}>
-                View and manage the patient's journal entries.
-              </Typography>
+            
+            {/* Export Buttons */}
+            <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+              <Button
+                variant="outlined"
+                size="small"
+                startIcon={<PdfIcon />}
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  alert('Button clicked! Entries: ' + entries.length);
+                  try {
+                    console.log('Generating monthly report...');
+                    console.log('Entries count:', entries.length);
+                    if (entries.length === 0) {
+                      alert('No entries to export. Please create some journal entries first.');
+                      return;
+                    }
+                    const currentMonth = new Date().toLocaleString('default', { month: 'long' });
+                    const currentYear = new Date().getFullYear().toString();
+                    console.log('Month:', currentMonth, 'Year:', currentYear);
+                    generateMonthlySummaryPDF(entries, currentMonth, currentYear, user?.name);
+                    console.log('Monthly report generated successfully!');
+                  } catch (error) {
+                    console.error('Error generating monthly report:', error);
+                    alert('Error generating report: ' + (error as Error).message);
+                  }
+                }}
+                sx={{
+                  borderColor: '#4caf50',
+                  color: '#4caf50',
+                  '&:hover': { borderColor: '#388e3c', bgcolor: 'rgba(76, 175, 80, 0.1)' },
+                }}
+              >
+                Monthly Report
+              </Button>
+              <Button
+                variant="outlined"
+                size="small"
+                onClick={() => exportToCSV(entries)}
+                sx={{
+                  borderColor: '#2196f3',
+                  color: '#2196f3',
+                  '&:hover': { borderColor: '#1976d2', bgcolor: 'rgba(33, 150, 243, 0.1)' },
+                }}
+              >
+                Export CSV
+              </Button>
+              <Button
+                variant="outlined"
+                size="small"
+                onClick={() => exportToJSON(entries)}
+                sx={{
+                  borderColor: '#ff9800',
+                  color: '#ff9800',
+                  '&:hover': { borderColor: '#f57c00', bgcolor: 'rgba(255, 152, 0, 0.1)' },
+                }}
+              >
+                Export JSON
+              </Button>
             </Box>
           </Box>
         </Box>
@@ -748,13 +811,22 @@ const PatientJournalPage = () => {
                     />
                   )}
                   
-                  <Box sx={{ mt: 3, display: 'flex', gap: 2 }}>
+                  <Box sx={{ mt: 3, display: 'flex', gap: 2, flexWrap: 'wrap' }}>
                     <Button 
                       variant="outlined" 
                       startIcon={<PdfIcon />} 
-                      onClick={() => generateJournalPDF(selectedEntry)}
+                      onClick={() => generateDetailedEntryPDF(selectedEntry, user?.name)}
+                      sx={{ borderColor: '#4caf50', color: '#4caf50' }}
                     >
-                      Download as PDF
+                      Export PDF
+                    </Button>
+                    <Button 
+                      variant="outlined" 
+                      startIcon={<PdfIcon />} 
+                      onClick={() => printJournalEntry(selectedEntry)}
+                      sx={{ borderColor: '#2196f3', color: '#2196f3' }}
+                    >
+                      Print
                     </Button>
                     <Button 
                       variant="contained" 
