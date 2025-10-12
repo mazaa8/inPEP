@@ -78,6 +78,7 @@ function App() {
               <Route path="/patient/meal-plan" element={<MealPlanPage />} />
               <Route path="/patient/heredibles" element={<PatientHerediblesPage />} />
               <Route path="/patient/journal" element={<PatientJournalViewPage />} />
+              <Route path="/patient/messages" element={<MessagesPage />} />
             </Route>
             <Route element={<ProtectedRoute allowedRoles={['CAREGIVER']} />}>
               <Route path="/patient-support" element={<PatientSupportPage />} />
