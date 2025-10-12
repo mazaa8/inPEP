@@ -44,6 +44,7 @@ import CaregiverMessagesPage from './pages/caregiver/MessagesPage';
 import CaregiverWelcomeLand from './pages/dashboard/CaregiverWelcomeLand';
 import AppointmentsBillingPage from './pages/caregiver/features/AppointmentsBillingPage';
 import PaymentMethodsPage from './pages/caregiver/features/PaymentMethodsPage';
+import MakePaymentPage from './pages/caregiver/features/MakePaymentPage';
 import ProtectedRoute from './routes/ProtectedRoute';
 import HelpCenter from './pages/support/HelpCenter';
 import TermsOfService from './pages/support/TermsOfService';
@@ -91,6 +92,7 @@ function App() {
               <Route path="/caregiver/care-tips" element={<CaregivingTipsPage />} />
               <Route path="/caregiver/appointments-billing" element={<AppointmentsBillingPage />} />
               <Route path="/caregiver/payment-methods" element={<PaymentMethodsPage />} />
+              <Route path="/caregiver/make-payment" element={<MakePaymentPage />} />
               <Route path="/champion-corner" element={<ChampionCornerPage />} />
               <Route path="/share-your-story" element={<StorySubmissionPage />} />
               <Route path="/caregiver/messages" element={<CaregiverMessagesPage />} />
