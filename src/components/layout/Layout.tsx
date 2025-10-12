@@ -1,4 +1,5 @@
 import { Box, AppBar, Toolbar, Typography, Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Button, Collapse, IconButton, InputBase, Badge, Menu, MenuItem } from '@mui/material';
+import NotificationBell from '../notifications/NotificationBell';
 import { styled, alpha } from '@mui/material/styles';
 import {
   DashboardOutlined as Dashboard,
@@ -228,23 +229,28 @@ const Layout = ({ children, title, darkMode = false, themeColor }: LayoutProps) 
           <Box sx={{ flexGrow: 1 }} />
           {user && (
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-              <IconButton 
-                size="large" 
-                aria-label="show 17 new notifications" 
-                onClick={handleNotificationClick}
-                sx={{ 
-                  color: 'white',
-                  '&:hover': { 
-                    background: 'rgba(255, 255, 255, 0.1)',
-                    transform: 'scale(1.05)',
-                  },
-                  transition: 'all 0.2s ease',
-                }}
-              >
-                <Badge badgeContent={17} color="error">
-                  <NotificationsIcon sx={{ color: 'white' }} />
-                </Badge>
-              </IconButton>
+              {/* Notification Bell - Functional for Provider, placeholder for others */}
+              {user.role === 'PROVIDER' ? (
+                <NotificationBell />
+              ) : (
+                <IconButton 
+                  size="large" 
+                  aria-label="show 17 new notifications" 
+                  onClick={handleNotificationClick}
+                  sx={{ 
+                    color: 'white',
+                    '&:hover': { 
+                      background: 'rgba(255, 255, 255, 0.1)',
+                      transform: 'scale(1.05)',
+                    },
+                    transition: 'all 0.2s ease',
+                  }}
+                >
+                  <Badge badgeContent={17} color="error">
+                    <NotificationsIcon sx={{ color: 'white' }} />
+                  </Badge>
+                </IconButton>
+              )}
               
               <Box sx={{ 
                 display: 'flex', 
