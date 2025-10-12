@@ -21,8 +21,11 @@ import {
   IconButton,
   Tooltip,
   Alert,
+  Switch,
+  FormControlLabel,
+  Paper,
 } from '@mui/material';
-import { Mic, MicOff, Stop, PhotoCamera, Videocam, Delete, CloudUpload } from '@mui/icons-material';
+import { Mic, MicOff, Stop, PhotoCamera, Videocam, Delete, CloudUpload, Visibility, VisibilityOff, Lock, LockOpen } from '@mui/icons-material';
 import type { JournalEntry, MediaAttachment } from '../../services/journalService';
 
 interface JournalEntryDialogProps {
@@ -75,6 +78,9 @@ const JournalEntryDialog = ({ open, onClose, onSubmit }: JournalEntryDialogProps
   const [mood, setMood] = useState<string | null>(null);
   const [tags, setTags] = useState<string[]>([]);
   const [currentTag, setCurrentTag] = useState('');
+  
+  // Privacy controls
+  const [isVisibleToPatient, setIsVisibleToPatient] = useState(true);
 
   // Structured details for each event type
   const [seizureDetails, setSeizureDetails] = useState<SeizureDetails>({
@@ -285,6 +291,7 @@ const JournalEntryDialog = ({ open, onClose, onSubmit }: JournalEntryDialogProps
       tags: tags.join(', '),
       structuredDetails: structuredDetails ? JSON.stringify(structuredDetails) : undefined,
       attachments: attachments.length > 0 ? JSON.stringify(attachments) : undefined,
+      isVisibleToPatient,
       entryDate: new Date().toISOString(),
     };
     onSubmit(entryData);
@@ -297,6 +304,7 @@ const JournalEntryDialog = ({ open, onClose, onSubmit }: JournalEntryDialogProps
     setMood(null);
     setTags([]);
     setAttachments([]);
+    setIsVisibleToPatient(true);
   };
 
   const handleArrayToggle = (array: string[], value: string, setter: (arr: string[]) => void) => {
@@ -844,6 +852,59 @@ const JournalEntryDialog = ({ open, onClose, onSubmit }: JournalEntryDialogProps
             Maximum 5MB per file. Supported: JPG, PNG, GIF, MP4, MOV
           </Typography>
         </Box>
+
+        {/* Privacy Controls */}
+        <Paper 
+          elevation={0}
+          sx={{ 
+            mt: 3, 
+            p: 2, 
+            bgcolor: 'rgba(76, 175, 80, 0.05)', 
+            border: '1px solid rgba(76, 175, 80, 0.2)',
+            borderRadius: '12px',
+          }}
+        >
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
+            {isVisibleToPatient ? <Visibility sx={{ color: '#4caf50' }} /> : <VisibilityOff sx={{ color: '#999' }} />}
+            <Typography variant="subtitle2" sx={{ fontWeight: 600, color: '#1b5e20' }}>
+              Privacy Settings
+            </Typography>
+          </Box>
+
+          <FormControlLabel
+            control={
+              <Switch
+                checked={isVisibleToPatient}
+                onChange={(e) => setIsVisibleToPatient(e.target.checked)}
+                color="success"
+              />
+            }
+            label={
+              <Box>
+                <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                  Visible to Patient
+                </Typography>
+                <Typography variant="caption" color="text.secondary">
+                  {isVisibleToPatient 
+                    ? 'Patient can view this entry in their journal'
+                    : 'This entry is private - only caregivers and providers can see it'}
+                </Typography>
+              </Box>
+            }
+          />
+
+          <Alert 
+            severity={isVisibleToPatient ? 'info' : 'warning'} 
+            icon={isVisibleToPatient ? <LockOpen /> : <Lock />}
+            sx={{ mt: 2 }}
+          >
+            <Typography variant="caption">
+              {isVisibleToPatient 
+                ? 'This entry will be visible to the patient. Avoid sensitive caregiver notes.'
+                : 'Private entries are useful for sensitive observations, caregiver concerns, or clinical notes not appropriate for patient viewing.'}
+            </Typography>
+          </Alert>
+        </Paper>
       </DialogContent>
       <DialogActions sx={{ p: 2 }}>
         <Button onClick={onClose}>Cancel</Button>

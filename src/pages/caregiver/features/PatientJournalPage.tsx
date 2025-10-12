@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { Box, Typography, Grid, TextField, Chip, Fab, CircularProgress, Divider, Button, Tabs, Tab, Avatar, Snackbar, Alert } from '@mui/material';
-import { Add as AddIcon, Search as SearchIcon, PictureAsPdf as PdfIcon, Share as ShareIcon, LocalHospital, PersonOff, Psychology, Healing, StickyNote2, TrendingUp, TrendingDown, CheckBox, CheckBoxOutlineBlank } from '@mui/icons-material';
+import { Add as AddIcon, Search as SearchIcon, PictureAsPdf as PdfIcon, Share as ShareIcon, LocalHospital, PersonOff, Psychology, Healing, StickyNote2, TrendingUp, TrendingDown, CheckBox, CheckBoxOutlineBlank, Visibility, VisibilityOff } from '@mui/icons-material';
 import { Book as BookIcon, SentimentVerySatisfied, SentimentNeutral, SentimentDissatisfied, Warning } from '@mui/icons-material';
 import Layout from '../../../components/layout/Layout';
 import JournalEntryDialog from '../../../components/caregiver/JournalEntryDialog';
@@ -688,6 +688,19 @@ const PatientJournalPage = () => {
                       <Typography variant="subtitle2" color="text.secondary">
                         {new Date(selectedEntry.entryDate).toLocaleString()}
                       </Typography>
+                      {/* Privacy Indicator */}
+                      <Chip
+                        icon={selectedEntry.isVisibleToPatient ? <Visibility /> : <VisibilityOff />}
+                        label={selectedEntry.isVisibleToPatient ? 'Visible to Patient' : 'Private Entry'}
+                        size="small"
+                        sx={{
+                          mt: 1,
+                          bgcolor: selectedEntry.isVisibleToPatient ? 'rgba(76, 175, 80, 0.1)' : 'rgba(255, 152, 0, 0.1)',
+                          color: selectedEntry.isVisibleToPatient ? '#4caf50' : '#ff9800',
+                          border: `1px solid ${selectedEntry.isVisibleToPatient ? '#4caf50' : '#ff9800'}`,
+                          fontWeight: 600,
+                        }}
+                      />
                     </Box>
                     {selectedEntry.mood && (
                       <Box sx={{ textAlign: 'center' }}>
