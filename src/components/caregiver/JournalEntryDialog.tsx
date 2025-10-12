@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import {
   Dialog,
   DialogTitle,
@@ -18,7 +18,11 @@ import {
   Slider,
   Grid,
   Divider,
+  IconButton,
+  Tooltip,
+  Alert,
 } from '@mui/material';
+import { Mic, MicOff, Stop } from '@mui/icons-material';
 import type { JournalEntry } from '../../services/journalService';
 
 interface JournalEntryDialogProps {
@@ -105,6 +109,77 @@ const JournalEntryDialog = ({ open, onClose, onSubmit }: JournalEntryDialogProps
     interventions: [],
     effectiveness: 5,
   });
+
+  // Voice recognition state
+  const [isListening, setIsListening] = useState(false);
+  const [voiceSupported, setVoiceSupported] = useState(true);
+  const [voiceError, setVoiceError] = useState('');
+  const recognitionRef = useRef<any>(null);
+
+  // Check for voice recognition support
+  useEffect(() => {
+    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+      setVoiceSupported(false);
+      return;
+    }
+
+    const recognition = new SpeechRecognition();
+    recognition.continuous = true;
+    recognition.interimResults = true;
+    recognition.lang = 'en-US';
+
+    recognition.onresult = (event: any) => {
+      let interimTranscript = '';
+      let finalTranscript = '';
+
+      for (let i = event.resultIndex; i < event.results.length; i++) {
+        const transcript = event.results[i][0].transcript;
+        if (event.results[i].isFinal) {
+          finalTranscript += transcript + ' ';
+        } else {
+          interimTranscript += transcript;
+        }
+      }
+
+      if (finalTranscript) {
+        setContent(prev => prev + finalTranscript);
+      }
+    };
+
+    recognition.onerror = (event: any) => {
+      console.error('Speech recognition error:', event.error);
+      setVoiceError(`Voice recognition error: ${event.error}`);
+      setIsListening(false);
+    };
+
+    recognition.onend = () => {
+      setIsListening(false);
+    };
+
+    recognitionRef.current = recognition;
+
+    return () => {
+      if (recognitionRef.current) {
+        recognitionRef.current.stop();
+      }
+    };
+  }, []);
+
+  const startListening = () => {
+    if (recognitionRef.current && !isListening) {
+      setVoiceError('');
+      recognitionRef.current.start();
+      setIsListening(true);
+    }
+  };
+
+  const stopListening = () => {
+    if (recognitionRef.current && isListening) {
+      recognitionRef.current.stop();
+      setIsListening(false);
+    }
+  };
 
   // Reset structured details when event type changes
   useEffect(() => {
@@ -490,19 +565,79 @@ const JournalEntryDialog = ({ open, onClose, onSubmit }: JournalEntryDialogProps
 
         <Divider sx={{ my: 3 }} />
 
-        <TextField
-          margin="dense"
-          label="Additional Notes"
-          type="text"
-          fullWidth
-          multiline
-          rows={4}
-          variant="outlined"
-          value={content}
-          onChange={(e) => setContent(e.target.value)}
-          placeholder="Add any additional observations or context..."
-          sx={{ mb: 2 }}
-        />
+        {/* Voice Error Alert */}
+        {voiceError && (
+          <Alert severity="warning" sx={{ mb: 2 }} onClose={() => setVoiceError('')}>
+            {voiceError}
+          </Alert>
+        )}
+
+        {/* Additional Notes with Voice Input */}
+        <Box sx={{ position: 'relative', mb: 2 }}>
+          <TextField
+            margin="dense"
+            label="Additional Notes"
+            type="text"
+            fullWidth
+            multiline
+            rows={4}
+            variant="outlined"
+            value={content}
+            onChange={(e) => setContent(e.target.value)}
+            placeholder="Add any additional observations or context... (or click the microphone to speak)"
+            sx={{ 
+              '& .MuiOutlinedInput-root': {
+                paddingRight: '60px', // Make room for mic button
+              }
+            }}
+          />
+          
+          {/* Voice Input Button */}
+          {voiceSupported && (
+            <Tooltip title={isListening ? "Stop recording" : "Start voice input"}>
+              <IconButton
+                onClick={isListening ? stopListening : startListening}
+                sx={{
+                  position: 'absolute',
+                  right: 8,
+                  top: 16,
+                  color: isListening ? '#f44336' : '#4caf50',
+                  animation: isListening ? 'pulse 1.5s ease-in-out infinite' : 'none',
+                  '@keyframes pulse': {
+                    '0%': { transform: 'scale(1)', opacity: 1 },
+                    '50%': { transform: 'scale(1.1)', opacity: 0.8 },
+                    '100%': { transform: 'scale(1)', opacity: 1 },
+                  },
+                }}
+              >
+                {isListening ? <Stop /> : <Mic />}
+              </IconButton>
+            </Tooltip>
+          )}
+
+          {!voiceSupported && (
+            <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 0.5 }}>
+              Voice input not supported in this browser. Try Chrome, Edge, or Safari.
+            </Typography>
+          )}
+
+          {isListening && (
+            <Box sx={{ 
+              display: 'flex', 
+              alignItems: 'center', 
+              gap: 1, 
+              mt: 1,
+              p: 1,
+              bgcolor: 'rgba(244, 67, 54, 0.1)',
+              borderRadius: '8px',
+            }}>
+              <MicOff sx={{ color: '#f44336', fontSize: 20 }} />
+              <Typography variant="caption" sx={{ color: '#f44336', fontWeight: 600 }}>
+                Listening... Speak now
+              </Typography>
+            </Box>
+          )}
+        </Box>
         <Box sx={{ mb: 2 }}>
           <Typography variant="subtitle2" color="text.secondary" gutterBottom>Patient's Mood</Typography>
           <ToggleButtonGroup
