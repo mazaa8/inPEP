@@ -4,7 +4,8 @@ import {
   getJournalEntries, 
   shareJournalEntries,
   getSharedJournalEntries,
-  markEntryAsReviewed 
+  markEntryAsReviewed,
+  getJournalInsights
 } from '../controllers/journalController.js';
 import { authenticate } from '../middleware/auth.js';
 
@@ -15,5 +16,6 @@ router.post('/', authenticate, createJournalEntry);
 router.post('/share', authenticate, shareJournalEntries);
 router.get('/shared/:providerId', authenticate, getSharedJournalEntries);
 router.post('/review/:entryId', authenticate, markEntryAsReviewed);
+router.get('/insights/:patientId', authenticate, getJournalInsights);
 
 export default router;

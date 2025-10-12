@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import * as journalService from '../services/journalService.js';
+import * as journalInsightsService from '../services/journalInsightsService.js';
 
 export const getJournalEntries = async (req: Request, res: Response) => {
   try {
@@ -48,5 +49,15 @@ export const markEntryAsReviewed = async (req: Request, res: Response) => {
     res.status(200).json(entry);
   } catch (error) {
     res.status(500).json({ error: 'Failed to mark entry as reviewed' });
+  }
+};
+
+export const getJournalInsights = async (req: Request, res: Response) => {
+  try {
+    const { patientId } = req.params;
+    const insights = await journalInsightsService.analyzeJournalEntries(patientId);
+    res.status(200).json(insights);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to generate insights' });
   }
 };

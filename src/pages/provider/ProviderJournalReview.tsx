@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
 import { Box, Typography, Grid, Card, CardContent, Chip, Button, TextField, Dialog, DialogTitle, DialogContent, DialogActions, CircularProgress, Divider } from '@mui/material';
-import { CheckCircle, LocalHospital, PersonOff, Psychology, Healing, StickyNote2, Person, CalendarToday, AccessTime } from '@mui/icons-material';
+import { CheckCircle, LocalHospital, PersonOff, Psychology, Healing, StickyNote2, Person, CalendarToday, AccessTime, TrendingUp } from '@mui/icons-material';
 import ProviderPageWrapper from '../../components/layout/ProviderPageWrapper';
 import StructuredDetailsView from '../../components/caregiver/StructuredDetailsView';
+import AIInsightsPanel from '../../components/caregiver/AIInsightsPanel';
 import { journalService, type JournalEntry } from '../../services/journalService';
 import { useAuth } from '../../context/AuthContext';
 
@@ -30,6 +31,8 @@ const ProviderJournalReview = () => {
   const [reviewDialogOpen, setReviewDialogOpen] = useState(false);
   const [providerNotes, setProviderNotes] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  const [showInsights, setShowInsights] = useState(false);
+  const [insightsPatientId, setInsightsPatientId] = useState<string | null>(null);
 
   useEffect(() => {
     if (user?.id) {
@@ -42,10 +45,13 @@ const ProviderJournalReview = () => {
       setLoading(true);
       // For demo, using a test provider ID - replace with actual provider profile ID
       const providerId = '550e8400-e29b-41d4-a716-446655440000';
+      console.log('🔍 Fetching shared entries for provider:', providerId);
       const data = await journalService.getSharedJournalEntries(providerId);
+      console.log('✅ Received shared entries:', data.length, 'entries');
+      console.log('📋 Entries:', data);
       setEntries(data);
     } catch (err) {
-      console.error('Failed to load shared journal entries:', err);
+      console.error('❌ Failed to load shared journal entries:', err);
     } finally {
       setLoading(false);
     }
@@ -93,6 +99,39 @@ const ProviderJournalReview = () => {
 
   return (
     <ProviderPageWrapper title="Patient Journal Review" icon={<StickyNote2 />}>
+      {/* AI Insights Toggle - Prominent Position */}
+      {entries.length > 0 && (
+        <Box sx={{ mb: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <Typography variant="h5" sx={{ color: '#FFA726', fontWeight: 600 }}>
+            Shared Journal Entries
+          </Typography>
+          <Button
+            variant={showInsights ? 'contained' : 'outlined'}
+            startIcon={<Psychology />}
+            size="large"
+            onClick={() => {
+              setShowInsights(!showInsights);
+              if (!showInsights && entries.length > 0) {
+                setInsightsPatientId(entries[0].patientId);
+              }
+            }}
+            sx={{
+              borderColor: 'rgba(255, 152, 0, 0.5)',
+              color: showInsights ? 'white' : '#FFA726',
+              background: showInsights ? 'linear-gradient(135deg, #FFA726 0%, #FFB74D 100%)' : 'transparent',
+              fontWeight: 600,
+              px: 3,
+              '&:hover': {
+                borderColor: '#FFA726',
+                background: showInsights ? 'linear-gradient(135deg, #FF9800 0%, #FFA726 100%)' : 'rgba(255, 152, 0, 0.1)',
+              },
+            }}
+          >
+            {showInsights ? 'Hide' : 'Show'} AI Insights
+          </Button>
+        </Box>
+      )}
+
       {/* Summary Cards */}
       <Grid container spacing={3} sx={{ mb: 4 }}>
         <Grid item xs={12} md={4}>
@@ -147,6 +186,13 @@ const ProviderJournalReview = () => {
           </Card>
         </Grid>
       </Grid>
+
+      {/* AI Insights Panel */}
+      {showInsights && insightsPatientId && (
+        <Box sx={{ mb: 4 }}>
+          <AIInsightsPanel patientId={insightsPatientId} />
+        </Box>
+      )}
 
       {/* Entries List */}
       {entries.length === 0 ? (

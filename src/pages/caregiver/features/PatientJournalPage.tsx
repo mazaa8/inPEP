@@ -8,6 +8,7 @@ import MoodAnalytics from '../../../components/caregiver/MoodAnalytics';
 import StructuredDetailsView from '../../../components/caregiver/StructuredDetailsView';
 import ShareJournalDialog from '../../../components/caregiver/ShareJournalDialog';
 import MediaGallery from '../../../components/caregiver/MediaGallery';
+import AIInsightsPanel from '../../../components/caregiver/AIInsightsPanel';
 import { journalService, type JournalEntry, type MediaAttachment } from '../../../services/journalService';
 import { generateJournalPDF } from '../../../utils/pdfGenerator';
 import { roleColors } from '../../../styles/glassmorphism';
@@ -468,6 +469,7 @@ const PatientJournalPage = () => {
           >
             <Tab label="Journal Entries" />
             <Tab label="Mood Analytics" />
+            <Tab label="AI Insights" icon={<Psychology />} iconPosition="start" />
           </Tabs>
         </Box>
 
@@ -759,8 +761,10 @@ const PatientJournalPage = () => {
               )}
             </Grid>
           </Grid>
-          ) : (
+          ) : activeTab === 1 ? (
             <MoodAnalytics entries={entries} />
+          ) : (
+            <AIInsightsPanel patientId={patientId} />
           )}
 
           <Fab 

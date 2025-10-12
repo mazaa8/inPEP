@@ -33,11 +33,14 @@ export const getSharedJournalEntries = async (providerId: string) => {
 
   const patientIds = patients.map(p => p.userId);
 
+  // If provider has assigned patients, show only their entries
+  // Otherwise, show all shared entries (for demo/testing)
+  const whereClause = patientIds.length > 0 
+    ? { patientId: { in: patientIds }, sharedWithProvider: true }
+    : { sharedWithProvider: true };
+
   return prisma.patientJournalEntry.findMany({
-    where: {
-      patientId: { in: patientIds },
-      sharedWithProvider: true,
-    },
+    where: whereClause,
     include: {
       patient: { select: { name: true, email: true } },
       caregiver: { select: { name: true } },
