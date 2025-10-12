@@ -1,12 +1,29 @@
 import { useState, useEffect, useMemo } from 'react';
-import { Box, Typography, Grid, TextField, Chip, Fab, CircularProgress, Divider, Button } from '@mui/material';
+import { Box, Typography, Grid, TextField, Chip, Fab, CircularProgress, Divider, Button, Tabs, Tab, Avatar } from '@mui/material';
 import { Add as AddIcon, Search as SearchIcon, PictureAsPdf as PdfIcon, Share as ShareIcon } from '@mui/icons-material';
-import { Book as BookIcon } from '@mui/icons-material';
+import { Book as BookIcon, SentimentVerySatisfied, SentimentNeutral, SentimentDissatisfied, Warning } from '@mui/icons-material';
 import Layout from '../../../components/layout/Layout';
 import JournalEntryDialog from '../../../components/caregiver/JournalEntryDialog';
+import MoodAnalytics from '../../../components/caregiver/MoodAnalytics';
 import { journalService, type JournalEntry } from '../../../services/journalService';
 import { generateJournalPDF } from '../../../utils/pdfGenerator';
 import { roleColors } from '../../../styles/glassmorphism';
+
+const MOOD_COLORS: Record<string, string> = {
+  happy: '#4caf50',
+  neutral: '#2196f3',
+  sad: '#ff9800',
+  angry: '#f44336',
+  anxious: '#9c27b0',
+};
+
+const MOOD_ICONS: Record<string, React.ReactNode> = {
+  happy: <SentimentVerySatisfied />,
+  neutral: <SentimentNeutral />,
+  sad: <SentimentDissatisfied />,
+  angry: <Warning />,
+  anxious: <Warning />,
+};
 
 const PatientJournalPage = () => {
   const [entries, setEntries] = useState<JournalEntry[]>([]);
@@ -15,6 +32,7 @@ const PatientJournalPage = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [tagFilter, setTagFilter] = useState<string[]>([]);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState(0);
 
   const patientId = 'b805ec90-e553-4de7-9de0-45f2eb73d1ba'; // Abdeen White
 
@@ -76,6 +94,18 @@ const PatientJournalPage = () => {
       console.error('Failed to create journal entry:', err);
     }
   };
+
+  const getMoodIcon = (mood?: string) => {
+    if (!mood) return null;
+    const moodLower = mood.toLowerCase();
+    return MOOD_ICONS[moodLower] || null;
+  };
+
+  const getMoodColor = (mood?: string) => {
+    if (!mood) return 'transparent';
+    const moodLower = mood.toLowerCase();
+    return MOOD_COLORS[moodLower] || '#999';
+  };
   return (
     <Box sx={{ 
       minHeight: '100vh', 
@@ -118,6 +148,35 @@ const PatientJournalPage = () => {
           </Box>
         </Box>
 
+        {/* Tabs */}
+        <Box sx={{ 
+          mb: 3,
+          background: 'rgba(255, 255, 255, 0.7)',
+          backdropFilter: 'blur(20px)',
+          WebkitBackdropFilter: 'blur(20px)',
+          border: '1px solid rgba(255, 255, 255, 0.8)',
+          borderRadius: '16px',
+          boxShadow: '0 4px 20px rgba(76, 175, 80, 0.1)',
+        }}>
+          <Tabs 
+            value={activeTab} 
+            onChange={(_, newValue) => setActiveTab(newValue)}
+            sx={{
+              '& .MuiTab-root': {
+                fontWeight: 600,
+                fontSize: '1rem',
+                textTransform: 'none',
+              },
+              '& .Mui-selected': {
+                color: roleColors.CAREGIVER.primary,
+              },
+            }}
+          >
+            <Tab label="Journal Entries" />
+            <Tab label="Mood Analytics" />
+          </Tabs>
+        </Box>
+
         {/* Content Area */}
         <Box sx={{ 
           p: 4, 
@@ -128,6 +187,7 @@ const PatientJournalPage = () => {
           borderRadius: '20px',
           boxShadow: '0 4px 20px rgba(76, 175, 80, 0.1)',
         }}>
+          {activeTab === 0 ? (
           <Grid container spacing={4}>
             {/* Left Column: Timeline & Filters */}
             <Grid item xs={12} md={4}>
@@ -184,12 +244,42 @@ const PatientJournalPage = () => {
                         bgcolor: selectedEntry?.id === entry.id ? '#e8f5e9' : 'transparent',
                         cursor: 'pointer',
                         '&:hover': { bgcolor: '#f1f8f4' },
+                        position: 'relative',
                       }}
                     >
-                      <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>{entry.title}</Typography>
+                      {/* Mood Indicator */}
+                      {entry.mood && (
+                        <Avatar
+                          sx={{
+                            position: 'absolute',
+                            top: 8,
+                            right: 8,
+                            width: 32,
+                            height: 32,
+                            bgcolor: getMoodColor(entry.mood),
+                            fontSize: '1.2rem',
+                          }}
+                        >
+                          {getMoodIcon(entry.mood)}
+                        </Avatar>
+                      )}
+                      <Typography variant="subtitle1" sx={{ fontWeight: 600, pr: entry.mood ? 5 : 0 }}>{entry.title}</Typography>
                       <Typography variant="caption" color="text.secondary">
                         {new Date(entry.entryDate).toLocaleString()}
                       </Typography>
+                      {entry.mood && (
+                        <Chip 
+                          label={entry.mood.charAt(0).toUpperCase() + entry.mood.slice(1)}
+                          size="small"
+                          sx={{ 
+                            mt: 0.5,
+                            bgcolor: getMoodColor(entry.mood) + '20',
+                            color: getMoodColor(entry.mood),
+                            fontWeight: 600,
+                            fontSize: '0.7rem',
+                          }}
+                        />
+                      )}
                       <Typography variant="body2" sx={{ mt: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                         {entry.content}
                       </Typography>
@@ -203,10 +293,32 @@ const PatientJournalPage = () => {
             <Grid item xs={12} md={8}>
               {selectedEntry ? (
                 <Box>
-                  <Typography variant="h4" sx={{ fontWeight: 700, color: '#1b5e20' }}>{selectedEntry.title}</Typography>
-                  <Typography variant="subtitle2" color="text.secondary" sx={{ mb: 2 }}>
-                    {new Date(selectedEntry.entryDate).toLocaleString()}
-                  </Typography>
+                  <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
+                    <Box>
+                      <Typography variant="h4" sx={{ fontWeight: 700, color: '#1b5e20' }}>{selectedEntry.title}</Typography>
+                      <Typography variant="subtitle2" color="text.secondary">
+                        {new Date(selectedEntry.entryDate).toLocaleString()}
+                      </Typography>
+                    </Box>
+                    {selectedEntry.mood && (
+                      <Box sx={{ textAlign: 'center' }}>
+                        <Avatar
+                          sx={{
+                            width: 56,
+                            height: 56,
+                            bgcolor: getMoodColor(selectedEntry.mood),
+                            fontSize: '2rem',
+                            mb: 1,
+                          }}
+                        >
+                          {getMoodIcon(selectedEntry.mood)}
+                        </Avatar>
+                        <Typography variant="caption" sx={{ fontWeight: 600, color: getMoodColor(selectedEntry.mood) }}>
+                          {selectedEntry.mood.charAt(0).toUpperCase() + selectedEntry.mood.slice(1)}
+                        </Typography>
+                      </Box>
+                    )}
+                  </Box>
                   <Divider sx={{ mb: 2 }} />
                   <Typography variant="body1" sx={{ whiteSpace: 'pre-wrap' }}>
                     {selectedEntry.content}
@@ -237,6 +349,9 @@ const PatientJournalPage = () => {
               )}
             </Grid>
           </Grid>
+          ) : (
+            <MoodAnalytics entries={entries} />
+          )}
 
           <Fab 
             color="primary" 
