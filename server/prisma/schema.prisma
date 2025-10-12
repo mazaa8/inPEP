@@ -60,6 +60,9 @@ model PatientJournalEntry {
   providerReviewedAt   DateTime?
   providerNotes        String?   // Provider's response/notes
   
+  // Media attachments (stored as JSON array of base64 encoded files)
+  attachments          String?   // JSON: [{type: 'image/jpeg', data: 'base64...', name: 'photo.jpg'}]
+  
   createdAt            DateTime  @default(now())
   updatedAt            DateTime  @updatedAt
 

@@ -22,8 +22,8 @@ import {
   Tooltip,
   Alert,
 } from '@mui/material';
-import { Mic, MicOff, Stop } from '@mui/icons-material';
-import type { JournalEntry } from '../../services/journalService';
+import { Mic, MicOff, Stop, PhotoCamera, Videocam, Delete, CloudUpload } from '@mui/icons-material';
+import type { JournalEntry, MediaAttachment } from '../../services/journalService';
 
 interface JournalEntryDialogProps {
   open: boolean;
@@ -116,6 +116,11 @@ const JournalEntryDialog = ({ open, onClose, onSubmit }: JournalEntryDialogProps
   const [voiceError, setVoiceError] = useState('');
   const recognitionRef = useRef<any>(null);
 
+  // Media attachments state
+  const [attachments, setAttachments] = useState<MediaAttachment[]>([]);
+  const [uploadError, setUploadError] = useState('');
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
   // Check for voice recognition support
   useEffect(() => {
     const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
@@ -207,6 +212,57 @@ const JournalEntryDialog = ({ open, onClose, onSubmit }: JournalEntryDialogProps
     setTags(tags.filter(tag => tag !== tagToDelete));
   };
 
+  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files;
+    if (!files || files.length === 0) return;
+
+    setUploadError('');
+    const maxSize = 5 * 1024 * 1024; // 5MB limit per file
+
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+
+      // Check file size
+      if (file.size > maxSize) {
+        setUploadError(`File "${file.name}" is too large. Maximum size is 5MB.`);
+        continue;
+      }
+
+      // Check file type
+      if (!file.type.startsWith('image/') && !file.type.startsWith('video/')) {
+        setUploadError(`File "${file.name}" is not a valid image or video.`);
+        continue;
+      }
+
+      // Convert to base64
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const base64Data = e.target?.result as string;
+        const newAttachment: MediaAttachment = {
+          type: file.type,
+          data: base64Data,
+          name: file.name,
+          size: file.size,
+          uploadedAt: new Date().toISOString(),
+        };
+        setAttachments(prev => [...prev, newAttachment]);
+      };
+      reader.onerror = () => {
+        setUploadError(`Failed to read file "${file.name}".`);
+      };
+      reader.readAsDataURL(file);
+    }
+
+    // Reset file input
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
+  const handleRemoveAttachment = (index: number) => {
+    setAttachments(prev => prev.filter((_, i) => i !== index));
+  };
+
   const handleSubmit = () => {
     let structuredDetails: any = null;
 
@@ -228,6 +284,7 @@ const JournalEntryDialog = ({ open, onClose, onSubmit }: JournalEntryDialogProps
       mood: mood?.split(' ')[1].toLowerCase() || undefined,
       tags: tags.join(', '),
       structuredDetails: structuredDetails ? JSON.stringify(structuredDetails) : undefined,
+      attachments: attachments.length > 0 ? JSON.stringify(attachments) : undefined,
       entryDate: new Date().toISOString(),
     };
     onSubmit(entryData);
@@ -239,6 +296,7 @@ const JournalEntryDialog = ({ open, onClose, onSubmit }: JournalEntryDialogProps
     setContent('');
     setMood(null);
     setTags([]);
+    setAttachments([]);
   };
 
   const handleArrayToggle = (array: string[], value: string, setter: (arr: string[]) => void) => {
@@ -669,6 +727,122 @@ const JournalEntryDialog = ({ open, onClose, onSubmit }: JournalEntryDialogProps
               <Chip key={tag} label={tag} onDelete={() => handleDeleteTag(tag)} />
             ))}
           </Box>
+        </Box>
+
+        {/* Photo/Video Upload Section */}
+        <Box sx={{ mt: 3 }}>
+          <Typography variant="subtitle2" color="text.secondary" gutterBottom>
+            Photos & Videos
+          </Typography>
+          
+          {uploadError && (
+            <Alert severity="error" sx={{ mb: 2 }} onClose={() => setUploadError('')}>
+              {uploadError}
+            </Alert>
+          )}
+
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*,video/*"
+            multiple
+            style={{ display: 'none' }}
+            onChange={handleFileUpload}
+          />
+
+          <Box sx={{ display: 'flex', gap: 1, mb: 2 }}>
+            <Button
+              variant="outlined"
+              startIcon={<PhotoCamera />}
+              onClick={() => fileInputRef.current?.click()}
+              size="small"
+            >
+              Add Photos
+            </Button>
+            <Button
+              variant="outlined"
+              startIcon={<Videocam />}
+              onClick={() => fileInputRef.current?.click()}
+              size="small"
+            >
+              Add Videos
+            </Button>
+          </Box>
+
+          {attachments.length > 0 && (
+            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2 }}>
+              {attachments.map((attachment, index) => (
+                <Box
+                  key={index}
+                  sx={{
+                    position: 'relative',
+                    width: 120,
+                    height: 120,
+                    borderRadius: '8px',
+                    overflow: 'hidden',
+                    border: '2px solid #e0e0e0',
+                  }}
+                >
+                  {attachment.type.startsWith('image/') ? (
+                    <img
+                      src={attachment.data}
+                      alt={attachment.name}
+                      style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                    />
+                  ) : (
+                    <Box
+                      sx={{
+                        width: '100%',
+                        height: '100%',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        bgcolor: '#f5f5f5',
+                      }}
+                    >
+                      <Videocam sx={{ fontSize: 48, color: '#999' }} />
+                    </Box>
+                  )}
+                  <IconButton
+                    size="small"
+                    onClick={() => handleRemoveAttachment(index)}
+                    sx={{
+                      position: 'absolute',
+                      top: 4,
+                      right: 4,
+                      bgcolor: 'rgba(0, 0, 0, 0.6)',
+                      color: 'white',
+                      '&:hover': { bgcolor: 'rgba(0, 0, 0, 0.8)' },
+                    }}
+                  >
+                    <Delete fontSize="small" />
+                  </IconButton>
+                  <Typography
+                    variant="caption"
+                    sx={{
+                      position: 'absolute',
+                      bottom: 0,
+                      left: 0,
+                      right: 0,
+                      bgcolor: 'rgba(0, 0, 0, 0.6)',
+                      color: 'white',
+                      p: 0.5,
+                      fontSize: '0.65rem',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      whiteSpace: 'nowrap',
+                    }}
+                  >
+                    {attachment.name}
+                  </Typography>
+                </Box>
+              ))}
+            </Box>
+          )}
+
+          <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 1 }}>
+            Maximum 5MB per file. Supported: JPG, PNG, GIF, MP4, MOV
+          </Typography>
         </Box>
       </DialogContent>
       <DialogActions sx={{ p: 2 }}>

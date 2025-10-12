@@ -7,7 +7,8 @@ import JournalEntryDialog from '../../../components/caregiver/JournalEntryDialog
 import MoodAnalytics from '../../../components/caregiver/MoodAnalytics';
 import StructuredDetailsView from '../../../components/caregiver/StructuredDetailsView';
 import ShareJournalDialog from '../../../components/caregiver/ShareJournalDialog';
-import { journalService, type JournalEntry } from '../../../services/journalService';
+import MediaGallery from '../../../components/caregiver/MediaGallery';
+import { journalService, type JournalEntry, type MediaAttachment } from '../../../services/journalService';
 import { generateJournalPDF } from '../../../utils/pdfGenerator';
 import { roleColors } from '../../../styles/glassmorphism';
 import { useAuth } from '../../../context/AuthContext';
@@ -723,6 +724,13 @@ const PatientJournalPage = () => {
                         {selectedEntry.content}
                       </Typography>
                     </Box>
+                  )}
+
+                  {/* Media Gallery */}
+                  {selectedEntry.attachments && (
+                    <MediaGallery 
+                      attachments={JSON.parse(selectedEntry.attachments) as MediaAttachment[]}
+                    />
                   )}
                   
                   <Box sx={{ mt: 3, display: 'flex', gap: 2 }}>
