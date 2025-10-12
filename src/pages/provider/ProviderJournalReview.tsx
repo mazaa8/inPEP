@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Box, Typography, Grid, Card, CardContent, Chip, Button, TextField, Dialog, DialogTitle, DialogContent, DialogActions, CircularProgress, Divider } from '@mui/material';
-import { CheckCircle, LocalHospital, PersonOff, Psychology, Healing, StickyNote2, Person, CalendarToday, AccessTime, TrendingUp } from '@mui/icons-material';
+import { CheckCircle, LocalHospital, PersonOff, Psychology, Healing, StickyNote2, Person, CalendarToday, AccessTime, TrendingUp, Assignment, Medication, NoteAdd } from '@mui/icons-material';
 import ProviderPageWrapper from '../../components/layout/ProviderPageWrapper';
 import StructuredDetailsView from '../../components/caregiver/StructuredDetailsView';
 import AIInsightsPanel from '../../components/caregiver/AIInsightsPanel';
@@ -33,6 +33,14 @@ const ProviderJournalReview = () => {
   const [submitting, setSubmitting] = useState(false);
   const [showInsights, setShowInsights] = useState(false);
   const [insightsPatientId, setInsightsPatientId] = useState<string | null>(null);
+  
+  // New dialog states
+  const [treatmentPlanDialogOpen, setTreatmentPlanDialogOpen] = useState(false);
+  const [prescribeDialogOpen, setPrescribeDialogOpen] = useState(false);
+  const [emrDialogOpen, setEmrDialogOpen] = useState(false);
+  const [treatmentPlanText, setTreatmentPlanText] = useState('');
+  const [prescriptionText, setPrescriptionText] = useState('');
+  const [emrNotes, setEmrNotes] = useState('');
 
   useEffect(() => {
     if (user?.id) {
@@ -276,23 +284,90 @@ const ProviderJournalReview = () => {
                         </Box>
                       </Box>
                     </Box>
-                    <Button
-                      variant={entry.providerReviewedAt ? 'outlined' : 'contained'}
-                      size="small"
-                      onClick={() => {
-                        setSelectedEntry(entry);
-                        setProviderNotes(entry.providerNotes || '');
-                        setReviewDialogOpen(true);
-                      }}
-                      sx={entry.providerReviewedAt ? {
-                        borderColor: 'rgba(255, 152, 0, 0.5)',
-                        color: '#FFA726',
-                      } : {
-                        background: 'linear-gradient(135deg, #FFA726 0%, #FFB74D 100%)',
-                      }}
-                    >
-                      {entry.providerReviewedAt ? 'View Review' : 'Review'}
-                    </Button>
+                    <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+                      <Button
+                        variant={entry.providerReviewedAt ? 'outlined' : 'contained'}
+                        size="small"
+                        startIcon={<CheckCircle />}
+                        onClick={() => {
+                          setSelectedEntry(entry);
+                          setProviderNotes(entry.providerNotes || '');
+                          setReviewDialogOpen(true);
+                        }}
+                        sx={entry.providerReviewedAt ? {
+                          borderColor: 'rgba(255, 152, 0, 0.5)',
+                          color: '#FFA726',
+                        } : {
+                          background: 'linear-gradient(135deg, #FFA726 0%, #FFB74D 100%)',
+                        }}
+                      >
+                        {entry.providerReviewedAt ? 'View Review' : 'Review'}
+                      </Button>
+                      
+                      {/* Clinical Action Buttons */}
+                      <Button
+                        variant="outlined"
+                        size="small"
+                        startIcon={<Assignment />}
+                        onClick={() => {
+                          setSelectedEntry(entry);
+                          setTreatmentPlanText('');
+                          setTreatmentPlanDialogOpen(true);
+                        }}
+                        sx={{
+                          borderColor: 'rgba(76, 175, 80, 0.5)',
+                          color: '#4caf50',
+                          '&:hover': {
+                            borderColor: '#4caf50',
+                            bgcolor: 'rgba(76, 175, 80, 0.1)',
+                          },
+                        }}
+                      >
+                        Treatment Plan
+                      </Button>
+                      
+                      <Button
+                        variant="outlined"
+                        size="small"
+                        startIcon={<Medication />}
+                        onClick={() => {
+                          setSelectedEntry(entry);
+                          setPrescriptionText('');
+                          setPrescribeDialogOpen(true);
+                        }}
+                        sx={{
+                          borderColor: 'rgba(33, 150, 243, 0.5)',
+                          color: '#2196f3',
+                          '&:hover': {
+                            borderColor: '#2196f3',
+                            bgcolor: 'rgba(33, 150, 243, 0.1)',
+                          },
+                        }}
+                      >
+                        Prescribe
+                      </Button>
+                      
+                      <Button
+                        variant="outlined"
+                        size="small"
+                        startIcon={<NoteAdd />}
+                        onClick={() => {
+                          setSelectedEntry(entry);
+                          setEmrNotes('');
+                          setEmrDialogOpen(true);
+                        }}
+                        sx={{
+                          borderColor: 'rgba(156, 39, 176, 0.5)',
+                          color: '#9c27b0',
+                          '&:hover': {
+                            borderColor: '#9c27b0',
+                            bgcolor: 'rgba(156, 39, 176, 0.1)',
+                          },
+                        }}
+                      >
+                        Add to EMR
+                      </Button>
+                    </Box>
                   </Box>
 
                   {entry.sharedNote && (
@@ -409,6 +484,188 @@ const ProviderJournalReview = () => {
               {submitting ? 'Saving...' : 'Mark as Reviewed'}
             </Button>
           )}
+        </DialogActions>
+      </Dialog>
+
+      {/* Treatment Plan Dialog */}
+      <Dialog 
+        open={treatmentPlanDialogOpen} 
+        onClose={() => setTreatmentPlanDialogOpen(false)}
+        maxWidth="md"
+        fullWidth
+        PaperProps={{
+          sx: {
+            background: 'rgba(0, 0, 0, 0.9)',
+            backdropFilter: 'blur(20px)',
+            border: '1px solid rgba(76, 175, 80, 0.3)',
+          }
+        }}
+      >
+        <DialogTitle sx={{ color: '#4caf50', display: 'flex', alignItems: 'center', gap: 1 }}>
+          <Assignment /> Create Treatment Plan
+        </DialogTitle>
+        <DialogContent>
+          <Divider sx={{ mb: 2, borderColor: 'rgba(76, 175, 80, 0.2)' }} />
+          <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.7)', mb: 2 }}>
+            Based on: <strong>{selectedEntry?.title}</strong>
+          </Typography>
+          <TextField
+            fullWidth
+            multiline
+            rows={8}
+            label="Treatment Plan"
+            placeholder="Describe the treatment plan, interventions, goals, and follow-up actions...\n\nExample:\n- Adjust medication dosage\n- Schedule follow-up in 2 weeks\n- Implement fall prevention measures\n- Refer to specialist"
+            value={treatmentPlanText}
+            onChange={(e) => setTreatmentPlanText(e.target.value)}
+            sx={{
+              '& .MuiOutlinedInput-root': {
+                color: 'rgba(255, 255, 255, 0.9)',
+                '& fieldset': { borderColor: 'rgba(76, 175, 80, 0.3)' },
+              },
+              '& .MuiInputLabel-root': { color: 'rgba(255, 255, 255, 0.5)' },
+            }}
+          />
+        </DialogContent>
+        <DialogActions sx={{ p: 2 }}>
+          <Button onClick={() => setTreatmentPlanDialogOpen(false)} sx={{ color: 'rgba(255, 255, 255, 0.7)' }}>
+            Cancel
+          </Button>
+          <Button
+            onClick={() => {
+              console.log('Treatment Plan Created:', treatmentPlanText);
+              alert('Treatment plan saved! (This would integrate with your treatment planning system)');
+              setTreatmentPlanDialogOpen(false);
+            }}
+            variant="contained"
+            disabled={!treatmentPlanText.trim()}
+            sx={{
+              background: 'linear-gradient(135deg, #4caf50 0%, #66bb6a 100%)',
+            }}
+          >
+            Save Treatment Plan
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Prescribe Dialog */}
+      <Dialog 
+        open={prescribeDialogOpen} 
+        onClose={() => setPrescribeDialogOpen(false)}
+        maxWidth="md"
+        fullWidth
+        PaperProps={{
+          sx: {
+            background: 'rgba(0, 0, 0, 0.9)',
+            backdropFilter: 'blur(20px)',
+            border: '1px solid rgba(33, 150, 243, 0.3)',
+          }
+        }}
+      >
+        <DialogTitle sx={{ color: '#2196f3', display: 'flex', alignItems: 'center', gap: 1 }}>
+          <Medication /> Write Prescription
+        </DialogTitle>
+        <DialogContent>
+          <Divider sx={{ mb: 2, borderColor: 'rgba(33, 150, 243, 0.2)' }} />
+          <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.7)', mb: 2 }}>
+            Based on: <strong>{selectedEntry?.title}</strong>
+          </Typography>
+          <TextField
+            fullWidth
+            multiline
+            rows={8}
+            label="Prescription Details"
+            placeholder="Enter prescription details...\n\nExample:\n- Medication: Keppra (Levetiracetam)\n- Dosage: 500mg\n- Frequency: Twice daily\n- Duration: 30 days\n- Refills: 2\n- Special Instructions: Take with food"
+            value={prescriptionText}
+            onChange={(e) => setPrescriptionText(e.target.value)}
+            sx={{
+              '& .MuiOutlinedInput-root': {
+                color: 'rgba(255, 255, 255, 0.9)',
+                '& fieldset': { borderColor: 'rgba(33, 150, 243, 0.3)' },
+              },
+              '& .MuiInputLabel-root': { color: 'rgba(255, 255, 255, 0.5)' },
+            }}
+          />
+        </DialogContent>
+        <DialogActions sx={{ p: 2 }}>
+          <Button onClick={() => setPrescribeDialogOpen(false)} sx={{ color: 'rgba(255, 255, 255, 0.7)' }}>
+            Cancel
+          </Button>
+          <Button
+            onClick={() => {
+              console.log('Prescription Created:', prescriptionText);
+              alert('Prescription saved! (This would integrate with your pharmacy/prescription system)');
+              setPrescribeDialogOpen(false);
+            }}
+            variant="contained"
+            disabled={!prescriptionText.trim()}
+            sx={{
+              background: 'linear-gradient(135deg, #2196f3 0%, #42a5f5 100%)',
+            }}
+          >
+            Send Prescription
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* EMR Export Dialog */}
+      <Dialog 
+        open={emrDialogOpen} 
+        onClose={() => setEmrDialogOpen(false)}
+        maxWidth="md"
+        fullWidth
+        PaperProps={{
+          sx: {
+            background: 'rgba(0, 0, 0, 0.9)',
+            backdropFilter: 'blur(20px)',
+            border: '1px solid rgba(156, 39, 176, 0.3)',
+          }
+        }}
+      >
+        <DialogTitle sx={{ color: '#9c27b0', display: 'flex', alignItems: 'center', gap: 1 }}>
+          <NoteAdd /> Add to EMR
+        </DialogTitle>
+        <DialogContent>
+          <Divider sx={{ mb: 2, borderColor: 'rgba(156, 39, 176, 0.2)' }} />
+          <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.7)', mb: 2 }}>
+            Export to Electronic Medical Record: <strong>{selectedEntry?.title}</strong>
+          </Typography>
+          <Typography variant="caption" sx={{ color: 'rgba(255, 255, 255, 0.5)', display: 'block', mb: 2 }}>
+            This entry will be added to the patient's official medical record.
+          </Typography>
+          <TextField
+            fullWidth
+            multiline
+            rows={6}
+            label="Additional Clinical Notes (Optional)"
+            placeholder="Add any additional clinical context or notes for the EMR...\n\nExample:\n- Clinical significance\n- Differential diagnosis\n- Follow-up required\n- Patient education provided"
+            value={emrNotes}
+            onChange={(e) => setEmrNotes(e.target.value)}
+            sx={{
+              '& .MuiOutlinedInput-root': {
+                color: 'rgba(255, 255, 255, 0.9)',
+                '& fieldset': { borderColor: 'rgba(156, 39, 176, 0.3)' },
+              },
+              '& .MuiInputLabel-root': { color: 'rgba(255, 255, 255, 0.5)' },
+            }}
+          />
+        </DialogContent>
+        <DialogActions sx={{ p: 2 }}>
+          <Button onClick={() => setEmrDialogOpen(false)} sx={{ color: 'rgba(255, 255, 255, 0.7)' }}>
+            Cancel
+          </Button>
+          <Button
+            onClick={() => {
+              console.log('EMR Export:', { entry: selectedEntry, notes: emrNotes });
+              alert('Entry exported to EMR! (This would integrate with your EMR system like Epic, Cerner, etc.)');
+              setEmrDialogOpen(false);
+            }}
+            variant="contained"
+            sx={{
+              background: 'linear-gradient(135deg, #9c27b0 0%, #ba68c8 100%)',
+            }}
+          >
+            Export to EMR
+          </Button>
         </DialogActions>
       </Dialog>
     </ProviderPageWrapper>
