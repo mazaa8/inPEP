@@ -15,6 +15,7 @@ import emrRoutes from './emrRoutes.js';
 import admissionRoutes from './admissionRoutes.js';
 import caregiverEngagementRoutes from './caregiverEngagementRoutes.js';
 import journalRoutes from './journalRoutes.js';
+import healthTimelineRoutes from './healthTimelineRoutes.js';
 
 const router = Router();
 
@@ -44,5 +45,6 @@ router.use('/emr', emrRoutes);
 router.use('/admissions', admissionRoutes);
 router.use('/caregiver-engagement', caregiverEngagementRoutes);
 router.use('/journal', journalRoutes);
+router.use('/health-timeline', healthTimelineRoutes);
 
 export default router;

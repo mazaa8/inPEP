@@ -65,23 +65,45 @@ async function calculateVitalsScore(patientId: string, startDate: Date, endDate:
   return score;
 }
 
-// Calculate mood tracking score (from patient mood board)
+// Calculate mood tracking score (from patient journal)
 async function calculateMoodScore(patientId: string, startDate: Date, endDate: Date): Promise<number> {
-  // This would pull from patient daily summary/mood board
-  // For now, using health insights as proxy
-  const insights = await prisma.healthInsight.findMany({
+  // Pull mood data from Patient Journal entries
+  const journalEntries = await prisma.patientJournalEntry.findMany({
     where: {
       patientId,
-      category: 'GENERAL',
-      generatedAt: { gte: startDate, lte: endDate },
+      entryDate: { gte: startDate, lte: endDate },
+      mood: { not: null },
     },
   });
   
-  // If patient is logging mood regularly, they get points
-  const daysInPeriod = Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
-  const score = Math.min((insights.length / daysInPeriod) * 100, 100);
+  if (journalEntries.length === 0) return 0;
   
-  return score;
+  // Calculate mood quality score
+  const moodScores: Record<string, number> = {
+    happy: 100,
+    neutral: 75,
+    anxious: 50,
+    sad: 40,
+    angry: 30,
+  };
+  
+  let totalMoodScore = 0;
+  journalEntries.forEach(entry => {
+    if (entry.mood) {
+      totalMoodScore += moodScores[entry.mood] || 50;
+    }
+  });
+  
+  const averageMoodScore = totalMoodScore / journalEntries.length;
+  
+  // Also factor in tracking frequency (bonus for regular logging)
+  const daysInPeriod = Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
+  const trackingFrequency = Math.min((journalEntries.length / daysInPeriod) * 100, 100);
+  
+  // Weighted: 70% mood quality, 30% tracking frequency
+  const finalScore = (averageMoodScore * 0.7) + (trackingFrequency * 0.3);
+  
+  return Math.round(finalScore);
 }
 
 // Calculate exercise score
