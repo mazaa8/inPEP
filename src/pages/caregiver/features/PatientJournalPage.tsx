@@ -1,11 +1,12 @@
 import { useState, useEffect, useMemo } from 'react';
 import { Box, Typography, Grid, TextField, Chip, Fab, CircularProgress, Divider, Button, Tabs, Tab, Avatar, Snackbar, Alert } from '@mui/material';
-import { Add as AddIcon, Search as SearchIcon, PictureAsPdf as PdfIcon, Share as ShareIcon, LocalHospital, PersonOff, Psychology, Healing, StickyNote2, TrendingUp, TrendingDown } from '@mui/icons-material';
+import { Add as AddIcon, Search as SearchIcon, PictureAsPdf as PdfIcon, Share as ShareIcon, LocalHospital, PersonOff, Psychology, Healing, StickyNote2, TrendingUp, TrendingDown, CheckBox, CheckBoxOutlineBlank } from '@mui/icons-material';
 import { Book as BookIcon, SentimentVerySatisfied, SentimentNeutral, SentimentDissatisfied, Warning } from '@mui/icons-material';
 import Layout from '../../../components/layout/Layout';
 import JournalEntryDialog from '../../../components/caregiver/JournalEntryDialog';
 import MoodAnalytics from '../../../components/caregiver/MoodAnalytics';
 import StructuredDetailsView from '../../../components/caregiver/StructuredDetailsView';
+import ShareJournalDialog from '../../../components/caregiver/ShareJournalDialog';
 import { journalService, type JournalEntry } from '../../../services/journalService';
 import { generateJournalPDF } from '../../../utils/pdfGenerator';
 import { roleColors } from '../../../styles/glassmorphism';
@@ -55,6 +56,8 @@ const PatientJournalPage = () => {
   const [activeTab, setActiveTab] = useState(0);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
+  const [selectedForSharing, setSelectedForSharing] = useState<string[]>([]);
+  const [shareDialogOpen, setShareDialogOpen] = useState(false);
 
   const patientId = 'b805ec90-e553-4de7-9de0-45f2eb73d1ba'; // Abdeen White
 
@@ -199,6 +202,41 @@ const PatientJournalPage = () => {
     setEventTypeFilter(prev => 
       prev.includes(eventType) ? prev.filter(t => t !== eventType) : [...prev, eventType]
     );
+  };
+
+  const handleToggleSelection = (entryId: string) => {
+    setSelectedForSharing(prev =>
+      prev.includes(entryId) ? prev.filter(id => id !== entryId) : [...prev, entryId]
+    );
+  };
+
+  const handleSelectAll = () => {
+    if (selectedForSharing.length === filteredEntries.length) {
+      setSelectedForSharing([]);
+    } else {
+      setSelectedForSharing(filteredEntries.map(e => e.id));
+    }
+  };
+
+  const handleShareEntries = async (sharedNote: string) => {
+    try {
+      const result = await journalService.shareJournalEntries(selectedForSharing, sharedNote);
+      
+      // Update the entries to reflect shared status
+      setEntries(prev => prev.map(entry =>
+        selectedForSharing.includes(entry.id)
+          ? { ...entry, sharedWithProvider: true, sharedAt: new Date().toISOString(), sharedNote }
+          : entry
+      ));
+      
+      setSelectedForSharing([]);
+      setSnackbarMessage(`✅ Successfully shared ${result.count} ${result.count === 1 ? 'entry' : 'entries'} with provider!`);
+      setSnackbarOpen(true);
+    } catch (error) {
+      console.error('Failed to share entries:', error);
+      setSnackbarMessage('❌ Failed to share entries. Please try again.');
+      setSnackbarOpen(true);
+    }
   };
   return (
     <Box sx={{ 
@@ -481,6 +519,44 @@ const PatientJournalPage = () => {
                 </Box>
               </Box>
 
+              {/* Selection Toolbar */}
+              {selectedForSharing.length > 0 && (
+                <Box sx={{ 
+                  mb: 2, 
+                  p: 2, 
+                  bgcolor: 'rgba(76, 175, 80, 0.1)', 
+                  borderRadius: '12px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                }}>
+                  <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                    {selectedForSharing.length} {selectedForSharing.length === 1 ? 'entry' : 'entries'} selected
+                  </Typography>
+                  <Box sx={{ display: 'flex', gap: 1 }}>
+                    <Button
+                      size="small"
+                      onClick={handleSelectAll}
+                      sx={{ textTransform: 'none' }}
+                    >
+                      {selectedForSharing.length === filteredEntries.length ? 'Deselect All' : 'Select All'}
+                    </Button>
+                    <Button
+                      variant="contained"
+                      size="small"
+                      startIcon={<ShareIcon />}
+                      onClick={() => setShareDialogOpen(true)}
+                      sx={{
+                        background: roleColors.CAREGIVER.gradient,
+                        textTransform: 'none',
+                      }}
+                    >
+                      Share with Provider
+                    </Button>
+                  </Box>
+                </Box>
+              )}
+
               {/* Entries List */}
               {loading ? (
                 <CircularProgress />
@@ -488,8 +564,7 @@ const PatientJournalPage = () => {
                 <Box sx={{ maxHeight: '60vh', overflowY: 'auto' }}>
                   {filteredEntries.map(entry => (
                     <Box 
-                      key={entry.id} 
-                      onClick={() => setSelectedEntry(entry)}
+                      key={entry.id}
                       sx={{
                         p: 2,
                         mb: 2,
@@ -500,8 +575,28 @@ const PatientJournalPage = () => {
                         cursor: 'pointer',
                         '&:hover': { bgcolor: '#f1f8f4' },
                         position: 'relative',
+                        display: 'flex',
+                        alignItems: 'flex-start',
+                        gap: 1,
                       }}
                     >
+                      {/* Checkbox for selection */}
+                      <Box
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleToggleSelection(entry.id);
+                        }}
+                        sx={{
+                          mt: 0.5,
+                          cursor: 'pointer',
+                          color: selectedForSharing.includes(entry.id) ? roleColors.CAREGIVER.primary : 'text.secondary',
+                        }}
+                      >
+                        {selectedForSharing.includes(entry.id) ? <CheckBox /> : <CheckBoxOutlineBlank />}
+                      </Box>
+
+                      {/* Entry content */}
+                      <Box sx={{ flex: 1 }} onClick={() => setSelectedEntry(entry)}>
                       {/* Mood Indicator */}
                       {entry.mood && (
                         <Avatar
@@ -554,6 +649,15 @@ const PatientJournalPage = () => {
                       <Typography variant="body2" sx={{ mt: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                         {entry.content}
                       </Typography>
+                      {entry.sharedWithProvider && (
+                        <Chip
+                          label="Shared with Provider"
+                          size="small"
+                          color="success"
+                          sx={{ mt: 1 }}
+                        />
+                      )}
+                      </Box>
                     </Box>
                   ))}
                 </Box>
@@ -669,6 +773,13 @@ const PatientJournalPage = () => {
             open={dialogOpen}
             onClose={() => setDialogOpen(false)}
             onSubmit={handleCreateEntry}
+          />
+
+          <ShareJournalDialog
+            open={shareDialogOpen}
+            onClose={() => setShareDialogOpen(false)}
+            selectedEntries={entries.filter(e => selectedForSharing.includes(e.id))}
+            onShare={handleShareEntries}
           />
         </Box>
       </Layout>

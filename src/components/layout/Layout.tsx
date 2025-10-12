@@ -27,6 +27,7 @@ import {
   PsychologyOutlined as Psychology,
   LocalHospitalOutlined as LocalHospital,
   VolunteerActivismOutlined as CaregiverIcon,
+  StickyNote2Outlined as JournalIcon,
 } from '@mui/icons-material';
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -371,6 +372,32 @@ const Layout = ({ children, title, darkMode = false, themeColor }: LayoutProps) 
                       <Psychology />
                     </ListItemIcon>
                     <ListItemText primary="AI Adherence Tracking" />
+                  </ListItemButton>
+                </ListItem>
+                <ListItem disablePadding>
+                  <ListItemButton 
+                    onClick={() => navigate('/provider/journal-review')}
+                    selected={currentPath === '/provider/journal-review'}
+                    sx={{
+                      color: 'white',
+                      '&:hover': {
+                        bgcolor: 'rgba(255, 152, 0, 0.1)',
+                        borderLeft: '4px solid rgba(255, 152, 0, 0.5)',
+                      },
+                      '&.Mui-selected': {
+                        bgcolor: 'rgba(255, 152, 0, 0.2)',
+                        borderLeft: '4px solid #FFA726',
+                        '&:hover': {
+                          bgcolor: 'rgba(255, 152, 0, 0.25)',
+                        },
+                      },
+                      transition: 'all 0.2s ease',
+                    }}
+                  >
+                    <ListItemIcon sx={{ color: '#FFA726' }}>
+                      <JournalIcon />
+                    </ListItemIcon>
+                    <ListItemText primary="Journal Review" />
                   </ListItemButton>
                 </ListItem>
                 <ListItem disablePadding>

@@ -17,6 +17,7 @@ import ProviderDashboard from './pages/dashboards/ProviderDashboard';
 import ProviderMessagesPage from './pages/provider/ProviderMessagesPage';
 import ProviderAppointmentsPage from './pages/provider/ProviderAppointmentsPage';
 import ProviderDirectoryPage from './pages/provider/ProviderDirectoryPage';
+import ProviderJournalReview from './pages/provider/ProviderJournalReview';
 import AIAdherenceTracking from './pages/provider/AIAdherenceTracking';
 import EMRIntegrationPage from './pages/provider/EMRIntegrationPage';
 import CaregiverEngagementPage from './pages/provider/CaregiverEngagementPage';
@@ -99,6 +100,7 @@ function App() {
               <Route path="/welcome-home/provider" element={<WelcomeHomeProvider />} />
               <Route path="/dashboard/provider" element={<ProviderDashboard />} />
               <Route path="/provider/ai-adherence" element={<AIAdherenceTracking />} />
+              <Route path="/provider/journal-review" element={<ProviderJournalReview />} />
               <Route path="/provider/caregiver-engagement" element={<CaregiverEngagementPage />} />
               <Route path="/provider/emr-integration" element={<EMRIntegrationPage />} />
               <Route path="/dashboard/analytics" element={<AnalyticsPage />} />
