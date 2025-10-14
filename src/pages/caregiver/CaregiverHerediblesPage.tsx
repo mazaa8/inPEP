@@ -36,6 +36,7 @@ import {
   CameraAlt as CameraIcon,
   Star as StarIcon,
   StarBorder as StarBorderIcon,
+  Visibility as VisibilityIcon,
 } from '@mui/icons-material';
 import Layout from '../../components/layout/Layout';
 import MealPhotoCapture from '../../components/heredibles/MealPhotoCapture';
@@ -680,8 +681,25 @@ const CaregiverHerediblesPage = () => {
                     </Box>
                   </CardContent>
                   <CardActions>
-                    <Button size="small" fullWidth onClick={() => handleViewRecipe(recipe)}>
-                      View Recipe
+                    <Button 
+                      size="small" 
+                      fullWidth 
+                      variant="contained"
+                      onClick={() => handleViewRecipe(recipe)}
+                      startIcon={<VisibilityIcon />}
+                      sx={{
+                        background: roleColors.CAREGIVER.gradient,
+                        color: 'white',
+                        fontWeight: 600,
+                        '&:hover': {
+                          background: roleColors.CAREGIVER.gradient,
+                          transform: 'translateY(-2px)',
+                          boxShadow: `0 8px 16px ${roleColors.CAREGIVER.primary}40`,
+                        },
+                        transition: 'all 0.3s ease',
+                      }}
+                    >
+                      View Full Recipe
                     </Button>
                   </CardActions>
                 </Card>

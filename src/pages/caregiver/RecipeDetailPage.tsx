@@ -35,18 +35,23 @@ const RecipeDetailPage = () => {
   }, [recipeId]);
 
   const fetchRecipeData = async () => {
+    if (!recipeId) {
+      setLoading(false);
+      return;
+    }
+
     try {
       setLoading(true);
-      const [recipesData, prescriptionsData] = await Promise.all([
-        herediblesService.getRecipes(),
+      const [recipeData, prescriptionsData] = await Promise.all([
+        herediblesService.getRecipe(recipeId),
         medicationService.getPatientPrescriptions(patientId, 'active'),
       ]);
       
-      const foundRecipe = recipesData.find((r: Recipe) => r.id === recipeId);
-      setRecipe(foundRecipe || null);
+      setRecipe(recipeData);
       setPrescriptions(prescriptionsData || []);
     } catch (err) {
       console.error('Failed to load recipe:', err);
+      setRecipe(null);
     } finally {
       setLoading(false);
     }
@@ -151,12 +156,13 @@ const RecipeDetailPage = () => {
 
           {/* Food-Drug Interaction Warning */}
           {prescriptions.length > 0 && (() => {
-            const ingredients = recipe.ingredients ? JSON.parse(recipe.ingredients) : [];
+            const ingredientObjects = recipe.ingredients ? JSON.parse(recipe.ingredients) : [];
+            const ingredientNames = ingredientObjects.map((ing: any) => ing.name);
             const medications = prescriptions.map(p => ({
               name: p.medication.name,
               category: p.medication.category,
             }));
-            const interactions = FoodDrugInteractionChecker.checkRecipeInteractions(ingredients, medications);
+            const interactions = FoodDrugInteractionChecker.checkRecipeInteractions(ingredientNames, medications);
             return <FoodDrugInteractionWarning interactions={interactions} />;
           })()}
 
