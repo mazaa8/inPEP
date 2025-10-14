@@ -87,6 +87,7 @@ function App() {
               <Route path="/caregiver/recipe/:recipeId" element={<RecipeDetailPage />} />
               <Route path="/care-planning" element={<CarePlanningPage />} />
               <Route path="/caregiver/patient-journal" element={<PatientJournalPage />} />
+              <Route path="/caregiver/heredibles" element={<CaregiverHerediblesPage />} />
               <Route path="/caregiver-support" element={<CaregiverSupportPage />} />
               <Route path="/reclaime" element={<ReclaimePage />} />
               <Route path="/caregiver/grocery-list" element={<GroceryShoppingListPage />} />
